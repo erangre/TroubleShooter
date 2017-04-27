@@ -28,6 +28,46 @@ class TroubleCategoryTest(QtTest):
         next_ind = self.model.subcategory_counter("main")
         self.assertEqual(next_ind, 1)
 
+    def test_add_subcategory_to_category(self):
+        main_category_id = "main"
+        main_category = self.model.get_category_by_id(main_category_id)
+
+        new_sub_a_id = "subcategory_a"
+        new_sub_a_caption = "The first category of problems"
+        new_sub_a_image = os.path.join(data_path, "images/beam_status.png")
+
+        new_sub_a = self.model.add_subcategory(main_category_id, new_sub_a_id, new_sub_a_caption, new_sub_a_image)
+        self.assertEqual(new_sub_a['id'], new_sub_a_id)
+        self.assertEqual(new_sub_a['parent_id'], main_category_id)
+        self.assertEqual(new_sub_a['level'], main_category['level'] + 1)
+
+        new_sub_b_id = "subcategory_b"
+        new_sub_b_caption = "The first subcategory of problems"
+        new_sub_b_image = os.path.join(data_path, "images/beam_status.png")
+
+        new_sub_b = self.model.add_subcategory(new_sub_a_id, new_sub_b_id, new_sub_b_caption, new_sub_b_image)
+        self.assertEqual(new_sub_b['id'], new_sub_b_id)
+        self.assertEqual(new_sub_b['parent_id'], new_sub_a_id)
+        self.assertEqual(new_sub_b['level'], new_sub_a['level'] + 1)
+
+    def test_add_existing_category_id_results_in_None(self):
+        main_category_id = "main"
+        main_category = self.model.get_category_by_id(main_category_id)
+
+        new_sub_a_id = "subcategory_a"
+        new_sub_a_caption = "The first category of problems"
+        new_sub_a_image = os.path.join(data_path, "images/beam_status.png")
+
+        new_sub_a = self.model.add_subcategory(main_category_id, new_sub_a_id, new_sub_a_caption, new_sub_a_image)
+
+        new_sub_b_id = "subcategory_a"
+        new_sub_b_caption = "The first subcategory of problems"
+        new_sub_b_image = os.path.join(data_path, "images/beam_status.png")
+
+        new_sub_b = self.model.add_subcategory(new_sub_a_id, new_sub_b_id, new_sub_b_caption, new_sub_b_image)
+
+        self.assertIsNone(new_sub_b)
+
     def test_section_counter(self):
         new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
         self.model.add_subcategory("main", "subcategory_a", "first category", new_subcategory_image)
@@ -54,7 +94,7 @@ class TroubleCategoryTest(QtTest):
         self.assertEqual(new_section['parent_id'], new_subcategory_id)
         self.assertEqual(new_section['level'], new_subcategory['level'] + 1)
 
-    def test_add_subcategory_to_category(self):
+    def test_add_existing_section_id_results_in_None(self):
         main_category_id = "main"
         main_category = self.model.get_category_by_id(main_category_id)
 
@@ -63,18 +103,23 @@ class TroubleCategoryTest(QtTest):
         new_sub_a_image = os.path.join(data_path, "images/beam_status.png")
 
         new_sub_a = self.model.add_subcategory(main_category_id, new_sub_a_id, new_sub_a_caption, new_sub_a_image)
-        self.assertEqual(new_sub_a['id'], new_sub_a_id)
-        self.assertEqual(new_sub_a['parent_id'], main_category_id)
-        self.assertEqual(new_sub_a['level'], main_category['level'] + 1)
 
         new_sub_b_id = "subcategory_b"
         new_sub_b_caption = "The first subcategory of problems"
         new_sub_b_image = os.path.join(data_path, "images/beam_status.png")
 
-        new_sub_b = self.model.add_subcategory(new_sub_a_id, new_sub_b_id, new_sub_b_caption, new_sub_b_image)
-        self.assertEqual(new_sub_b['id'], new_sub_b_id)
-        self.assertEqual(new_sub_b['parent_id'], new_sub_a_id)
-        self.assertEqual(new_sub_b['level'], new_sub_a['level'] + 1)
+        new_sub_b = self.model.add_subcategory(main_category_id, new_sub_b_id, new_sub_b_caption, new_sub_b_image)
+
+        new_section_a_id = "section_a"
+        new_section_a_caption = "First problem to check"
+        new_section_a = self.model.add_section(new_sub_a_id, new_section_a_id, new_section_a_caption)
+        self.assertIsNotNone(new_section_a)
+
+        new_section_b_id = "section_a"
+        new_section_b_caption = "Second problem to check"
+        new_section_b = self.model.add_section(new_sub_b_id, new_section_b_id, new_section_b_caption)
+
+        self.assertIsNone(new_section_b)
 
 
 class MainCategoryTest(QtTest):
