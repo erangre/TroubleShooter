@@ -28,57 +28,53 @@ class TroubleCategoryTest(QtTest):
         next_ind = self.model.subcategory_counter("main")
         self.assertEqual(next_ind, 1)
 
+    def test_section_counter(self):
+        new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
+        self.model.add_subcategory("main", "subcategory_a", "first category", new_subcategory_image)
+        next_ind = self.model.section_counter("subcategory_a")
+        self.assertEqual(next_ind, 0)
+        self.model.add_section("subcategory_a", "section_a", "first section")
+        next_ind = self.model.section_counter("subcategory_a")
+        self.assertEqual(next_ind, 1)
 
-    # def test_section_counter(self):
-    #     next_ind = self.model.section_counter
-    #     self.assertEqual(next_ind, 0)
-    #     self.model.add_section("section_a", "first section")
-    #     next_ind = self.model.section_counter
-    #     self.assertEqual(next_ind, 1)
-    #
-    # def test_subcategory_counter(self):
-    #     new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
-    #     next_ind = self.model.subcategory_counter
-    #     self.assertEqual(next_ind, 0)
-    #     self.model.add_subcategory("subcategory_a", "first category", new_subcategory_image)
-    #     next_ind = self.model.subcategory_counter
-    #     self.assertEqual(next_ind, 1)
-    #
-    # def test_add_section_to_category(self):
-    #     new_section_name = "section_a"
-    #     new_section_caption = "First problem to check"
-    #     # next_ind = self.model.section_counter
-    #     new_section = self.model.add_section(new_section_name, new_section_caption)  # type: TroubleSection
-    #     self.assertEqual(new_section['obj'].id, new_section_name)
-    #     self.assertEqual(new_section['obj'].parent_id, self.model.id)
-    #     self.assertEqual(new_section['obj'].level, self.model.level + 1)
-    #
-    # def test_add_subcategory_to_category(self):
-    #     new_subcategory_name = "subcategory_a"
-    #     new_subcategory_caption = "The first category of problems"
-    #     new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
-    #     # next_ind = self.model.subcategory_counter
-    #     new_subcategory = self.model.add_subcategory(new_subcategory_name, new_subcategory_caption,
-    #                                                  new_subcategory_image)  # type: TroubleCategory
-    #     self.assertEqual(new_subcategory['obj'].id, new_subcategory_name)
-    #     self.assertEqual(new_subcategory['obj'].parent_id, self.model.id)
-    #     self.assertEqual(new_subcategory['obj'].level, self.model.level + 1)
-    #
-    # def test_add_section_to_subcategory(self):
-    #     new_subcategory_name = "subcategory_a"
-    #     new_subcategory_caption = "The first category of problems"
-    #     new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
-    #     # next_ind = self.model.subcategory_counter
-    #     new_subcategory = self.model.add_subcategory(new_subcategory_name, new_subcategory_caption,
-    #                                                  new_subcategory_image)  # type: TroubleCategory
-    #
-    #     new_section_name = "section_a"
-    #     new_section_caption = "First problem to check"
-    #     next_ind = new_subcategory['obj'].section_counter
-    #     new_section = new_subcategory['obj'].add_section(new_section_name, new_section_caption)  # type: TroubleSection
-    #     self.assertEqual(new_section['obj'].id, new_section_name)
-    #     self.assertEqual(new_section['obj'].parent_id, new_subcategory['obj'].id)
-    #     self.assertEqual(new_section['obj'].level, new_subcategory['obj'].level + 1)
+    def test_add_section_to_category(self):
+        main_category_id = "main"
+        new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
+        new_subcategory_id = "subcategory_a"
+        new_subcategory_caption = "first category"
+        new_subcategory = self.model.add_subcategory(main_category_id, new_subcategory_id, new_subcategory_caption,
+                                                     new_subcategory_image)
+
+        new_section_id = "section_a"
+        new_section_caption = "First problem to check"
+
+        new_section = self.model.add_section(new_subcategory_id, new_section_id, new_section_caption)
+
+        self.assertEqual(new_section['id'], new_section_id)
+        self.assertEqual(new_section['parent_id'], new_subcategory_id)
+        self.assertEqual(new_section['level'], new_subcategory['level'] + 1)
+
+    def test_add_subcategory_to_category(self):
+        main_category_id = "main"
+        main_category = self.model.get_category_by_id(main_category_id)
+
+        new_sub_a_id = "subcategory_a"
+        new_sub_a_caption = "The first category of problems"
+        new_sub_a_image = os.path.join(data_path, "images/beam_status.png")
+
+        new_sub_a = self.model.add_subcategory(main_category_id, new_sub_a_id, new_sub_a_caption, new_sub_a_image)
+        self.assertEqual(new_sub_a['id'], new_sub_a_id)
+        self.assertEqual(new_sub_a['parent_id'], main_category_id)
+        self.assertEqual(new_sub_a['level'], main_category['level'] + 1)
+
+        new_sub_b_id = "subcategory_b"
+        new_sub_b_caption = "The first subcategory of problems"
+        new_sub_b_image = os.path.join(data_path, "images/beam_status.png")
+
+        new_sub_b = self.model.add_subcategory(new_sub_a_id, new_sub_b_id, new_sub_b_caption, new_sub_b_image)
+        self.assertEqual(new_sub_b['id'], new_sub_b_id)
+        self.assertEqual(new_sub_b['parent_id'], new_sub_a_id)
+        self.assertEqual(new_sub_b['level'], new_sub_a['level'] + 1)
 
 
 class MainCategoryTest(QtTest):
