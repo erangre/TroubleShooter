@@ -215,44 +215,68 @@ class TroubleSectionTest(QtTest):
         self.test_add_choice_with_section_as_solution()
         self.test_add_choice_with_message_as_solution()
         self.test_add_choice_with_section_as_solution()
-        next_ind = self.model.choice_counter
+        next_ind = self.model.choice_counter(self.new_section_id)
         self.assertEqual(next_ind, 4)
 
 
-# class MainCategoryTest(QtTest):
-#     def setUp(self):
-#         self.cat_model = TroubleCategory(category_id="main", level=0)
-#
-#     def tearDown(self):
-#         del self.cat_model
-#
-#     def test_export_category_to_yaml(self):
-#         new_subcategory_name = "subcategory_a"
-#         new_subcategory_caption = "The first category of problems"
-#         new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
-#         # self.cat_model.add_subcategory(new_subcategory_name, new_subcategory_caption, new_subcategory_image)
-#
-#         output_file = os.path.join(data_path, 'output1.yml')
-#         self.cat_model.export_category_to_yaml(output_file)
-#         self.assertTrue(os.path.isfile(output_file))
-#
-#         # outfile = open(output_file, 'r')
-#         # output_contents = outfile.readlines()
-#         # self.assertTrue(new_subcategory_name in '-'.join(output_contents))
-#
-#     def test_import_category_from_yaml(self):
-#         new_subcategory_name = "subcategory_a"
-#         new_subcategory_caption = "The first category of problems"
-#         new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
-#         self.cat_model.add_subcategory(new_subcategory_name, new_subcategory_caption, new_subcategory_image)
-#
-#         output_file = os.path.join(data_path, 'output1.yml')
-#         self.cat_model.export_category_to_yaml(output_file)
-#         self.assertTrue(os.path.isfile(output_file))
-#
-#         self.tearDown()
-#         self.setUp()
-#
-#         self.cat_model.import_category_from_yaml(output_file)
-#
-#         # os.remove(output_file)
+class YAMLExportImportTest(QtTest):
+    def setUp(self):
+        self.model = TroubleShooter(category_id="main", level=0)
+        self.main_category_id = "main"
+        new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
+        self.new_subcategory_id = "subcategory_a"
+        new_subcategory_caption = "first category"
+        self.new_subcategory = self.model.add_subcategory(self.main_category_id, self.new_subcategory_id,
+                                                          new_subcategory_caption, new_subcategory_image)
+
+        self.new_section_id = "section_a"
+        new_section_caption = "First problem to check"
+        self.new_section = self.model.add_section_to_category(self.new_subcategory_id, self.new_section_id,
+                                                              new_section_caption)
+
+        self.new_section_b_id = "section_b"
+        new_section_b_caption = "2nd problem to check"
+        self.new_section_b = self.model.add_section_to_category(self.new_subcategory_id, self.new_section_b_id,
+                                                                new_section_b_caption)
+
+        choice1 = "yes"
+        solution1_type = "message"
+        solution1 = "fix problem a"
+
+        choice2 = "nope"
+        solution2_type = "section"
+        solution2 = self.new_section_b_id
+
+        self.model.add_choice_to_section(self.new_section_id, choice1, solution_type=solution1_type, solution=solution1)
+        self.model.add_choice_to_section(self.new_section_id, choice2, solution_type=solution2_type, solution=solution2)
+
+    def tearDown(self):
+        del self.model
+
+    def test_export_category_to_yaml(self):
+
+        output_file = os.path.join(data_path, 'output1.yml')
+        self.model.export_category_to_yaml(output_file)
+        self.assertTrue(os.path.isfile(output_file))
+
+        outfile = open(output_file, 'r')
+        output_contents = outfile.readlines()
+        print(output_contents)
+        self.assertTrue(self.new_subcategory in '-'.join(output_contents))
+
+    # def test_import_category_from_yaml(self):
+    #     new_subcategory_name = "subcategory_a"
+    #     new_subcategory_caption = "The first category of problems"
+    #     new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
+    #     self.cat_model.add_subcategory(new_subcategory_name, new_subcategory_caption, new_subcategory_image)
+    #
+    #     output_file = os.path.join(data_path, 'output1.yml')
+    #     self.cat_model.export_category_to_yaml(output_file)
+    #     self.assertTrue(os.path.isfile(output_file))
+    #
+    #     self.tearDown()
+    #     self.setUp()
+    #
+    #     self.cat_model.import_category_from_yaml(output_file)
+    #
+    #     # os.remove(output_file)

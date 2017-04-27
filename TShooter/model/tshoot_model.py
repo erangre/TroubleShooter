@@ -98,3 +98,16 @@ class TroubleShooter(QtCore.QObject):
             return True
         else:
             return False
+
+    def export_category_to_yaml(self, output_file):
+        stream = open(output_file, "w")
+        all_data = {'all_categories': self._all_categories,
+                    'all_sections': self._all_sections
+        }
+
+        yaml.dump(all_data, stream)
+        stream.close()
+
+    # def import_category_from_yaml(self, input_file):
+        # yaml.add_constructor(u'!python/object:TShooter.model.cat_model.TroubleCategory', self.category_constructor)
+        # print(yaml.load(stream, Loader=yaml.Loader))
