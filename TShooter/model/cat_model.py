@@ -14,7 +14,7 @@ class TroubleCategory(QtCore.QObject):
         self._subcategories = OrderedDict()
         self._sections = OrderedDict()
 
-    def add_section(self, section_name, section_caption):
+    def add_section_to_category(self, section_name, section_caption):
         self._sections[section_name] = {}
         self._sections[section_name]['obj'] = TroubleSection(section_id=section_name, level=self._level+1,
                                                              parent=self._id)

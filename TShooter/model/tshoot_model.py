@@ -29,14 +29,14 @@ class TroubleShooter(QtCore.QObject):
         if subcategory_id in self._all_categories:
             return None
         self._all_categories[category_id]['subcategories'][subcategory_id] = {}
-        self._all_categories[category_id]['subcategories'][subcategory_id]['id'] = subcategory_id  # redundant?
-        self._all_categories[category_id]['subcategories'][subcategory_id]['caption'] = subcategory_caption
-        self._all_categories[category_id]['subcategories'][subcategory_id]['image'] = subcategory_image
-        self._all_categories[category_id]['subcategories'][subcategory_id]['parent_id'] = category_id
-        self._all_categories[category_id]['subcategories'][subcategory_id]['level'] = \
-            self._all_categories[category_id]['level'] + 1
-        self._all_categories[category_id]['subcategories'][subcategory_id]['subcategories'] = OrderedDict()
-        self._all_categories[subcategory_id] = self._all_categories[category_id]['subcategories'][subcategory_id]
+        new_category = self._all_categories[category_id]['subcategories'][subcategory_id]
+        new_category['id'] = subcategory_id  # redundant?
+        new_category['caption'] = subcategory_caption
+        new_category['image'] = subcategory_image
+        new_category['parent_id'] = category_id
+        new_category['level'] = self._all_categories[category_id]['level'] + 1
+        new_category['subcategories'] = OrderedDict()
+        self._all_categories[subcategory_id] = new_category
 
         self._all_categories[subcategory_id]['sections'] = OrderedDict()
 
@@ -45,16 +45,23 @@ class TroubleShooter(QtCore.QObject):
     def section_counter(self, category_id):
         return len(self._all_categories[category_id]['sections'])
 
-    def add_section(self, category_id, section_id, section_caption):
+    def add_section_to_category(self, category_id, section_id, section_caption):
         if section_id in self._all_sections:
             return None
         self._all_categories[category_id]['sections'][section_id] = {}
-        self._all_categories[category_id]['sections'][section_id]['id'] = section_id  # redundant?
-        self._all_categories[category_id]['sections'][section_id]['caption'] = section_caption
-        self._all_categories[category_id]['sections'][section_id]['parent_id'] = category_id
-        self._all_categories[category_id]['sections'][section_id]['level'] = \
-            self._all_categories[category_id]['level'] + 1
+        new_section = self._all_categories[category_id]['sections'][section_id]
+        new_section['id'] = section_id  # redundant?
+        new_section['caption'] = section_caption
+        new_section['parent_id'] = category_id
+        new_section['level'] = self._all_categories[category_id]['level'] + 1
+        new_section['messages'] = []
 
-        self._all_sections[section_id] = self._all_categories[category_id]['sections'][section_id]
+        self._all_sections[section_id] = new_section
 
         return self._all_sections[section_id]
+
+    def message_counter(self, section_id):
+        return len(self._all_sections[section_id]['messages'])
+
+    def add_message_to_section(self, section_id, message):
+        self._all_sections[section_id]['messages'].append(message)

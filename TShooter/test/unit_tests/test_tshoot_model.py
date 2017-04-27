@@ -73,7 +73,7 @@ class TroubleCategoryTest(QtTest):
         self.model.add_subcategory("main", "subcategory_a", "first category", new_subcategory_image)
         next_ind = self.model.section_counter("subcategory_a")
         self.assertEqual(next_ind, 0)
-        self.model.add_section("subcategory_a", "section_a", "first section")
+        self.model.add_section_to_category("subcategory_a", "section_a", "first section")
         next_ind = self.model.section_counter("subcategory_a")
         self.assertEqual(next_ind, 1)
 
@@ -88,7 +88,7 @@ class TroubleCategoryTest(QtTest):
         new_section_id = "section_a"
         new_section_caption = "First problem to check"
 
-        new_section = self.model.add_section(new_subcategory_id, new_section_id, new_section_caption)
+        new_section = self.model.add_section_to_category(new_subcategory_id, new_section_id, new_section_caption)
 
         self.assertEqual(new_section['id'], new_section_id)
         self.assertEqual(new_section['parent_id'], new_subcategory_id)
@@ -112,14 +112,31 @@ class TroubleCategoryTest(QtTest):
 
         new_section_a_id = "section_a"
         new_section_a_caption = "First problem to check"
-        new_section_a = self.model.add_section(new_sub_a_id, new_section_a_id, new_section_a_caption)
+        new_section_a = self.model.add_section_to_category(new_sub_a_id, new_section_a_id, new_section_a_caption)
         self.assertIsNotNone(new_section_a)
 
         new_section_b_id = "section_a"
         new_section_b_caption = "Second problem to check"
-        new_section_b = self.model.add_section(new_sub_b_id, new_section_b_id, new_section_b_caption)
+        new_section_b = self.model.add_section_to_category(new_sub_b_id, new_section_b_id, new_section_b_caption)
 
         self.assertIsNone(new_section_b)
+
+    def test_message_counter(self):
+        main_category_id = "main"
+        new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
+        new_subcategory_id = "subcategory_a"
+        new_subcategory_caption = "first category"
+        new_subcategory = self.model.add_subcategory(main_category_id, new_subcategory_id, new_subcategory_caption,
+                                                     new_subcategory_image)
+        new_section_id = "section_a"
+        new_section_caption = "First problem to check"
+        new_section = self.model.add_section_to_category(new_subcategory_id, new_section_id, new_section_caption)
+
+        next_ind = self.model.message_counter(new_section_id)
+        self.assertEqual(next_ind, 0)
+        self.model.add_message_to_section(new_section_id, "test message")
+        next_ind = self.model.message_counter(new_section_id)
+        self.assertEqual(next_ind, 1)
 
 
 class MainCategoryTest(QtTest):
@@ -157,6 +174,5 @@ class MainCategoryTest(QtTest):
         self.setUp()
 
         self.cat_model.import_category_from_yaml(output_file)
-
 
         # os.remove(output_file)

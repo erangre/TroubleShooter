@@ -22,7 +22,7 @@ class TroubleCategoryTest(QtTest):
     def test_section_counter(self):
         next_ind = self.model.section_counter
         self.assertEqual(next_ind, 0)
-        self.model.add_section("section_a", "first section")
+        self.model.add_section_to_category("section_a", "first section")
         next_ind = self.model.section_counter
         self.assertEqual(next_ind, 1)
 
@@ -38,7 +38,7 @@ class TroubleCategoryTest(QtTest):
         new_section_name = "section_a"
         new_section_caption = "First problem to check"
         # next_ind = self.model.section_counter
-        new_section = self.model.add_section(new_section_name, new_section_caption)  # type: TroubleSection
+        new_section = self.model.add_section_to_category(new_section_name, new_section_caption)  # type: TroubleSection
         self.assertEqual(new_section['obj'].id, new_section_name)
         self.assertEqual(new_section['obj'].parent_id, self.model.id)
         self.assertEqual(new_section['obj'].level, self.model.level + 1)
@@ -65,7 +65,7 @@ class TroubleCategoryTest(QtTest):
         new_section_name = "section_a"
         new_section_caption = "First problem to check"
         next_ind = new_subcategory['obj'].section_counter
-        new_section = new_subcategory['obj'].add_section(new_section_name, new_section_caption)  # type: TroubleSection
+        new_section = new_subcategory['obj'].add_section_to_category(new_section_name, new_section_caption)  # type: TroubleSection
         self.assertEqual(new_section['obj'].id, new_section_name)
         self.assertEqual(new_section['obj'].parent_id, new_subcategory['obj'].id)
         self.assertEqual(new_section['obj'].level, new_subcategory['obj'].level + 1)
