@@ -7,7 +7,7 @@ import yaml
 from ..utility import QtTest
 # from ...model.cat_model import TroubleCategory
 # from ...model.ts_model import TroubleSection
-from ...model.tshoot_model import TroubleShooter
+from ...model.tshoot_model import TroubleShooter, IMAGE, TEXT, SECTION_SOLUTION
 
 unittest_path = os.path.dirname(__file__)
 data_path = os.path.join(unittest_path, '../data')
@@ -120,8 +120,6 @@ class TroubleSectionCreationTest(QtTest):
         self.assertIsNone(new_section_b)
 
 
-
-
 class TroubleSectionTest(QtTest):
     def setUp(self):
         self.model = TroubleShooter(category_id="main", level=0)
@@ -140,12 +138,85 @@ class TroubleSectionTest(QtTest):
     def tearDown(self):
         del self.model
 
+    def test_get_section_by_id(self):
+        current_section = self.model.get_section_by_id(self.new_section_id)
+        self.assertEqual(current_section, self.new_section)
+
     def test_message_counter(self):
         next_ind = self.model.message_counter(self.new_section_id)
         self.assertEqual(next_ind, 0)
         self.model.add_message_to_section(self.new_section_id, "test message")
         next_ind = self.model.message_counter(self.new_section_id)
         self.assertEqual(next_ind, 1)
+
+    def test_add_text_message(self):
+        msg1 = "test message"
+        next_ind = self.model.message_counter(self.new_section_id)
+        self.model.add_message_to_section(self.new_section_id, msg1)
+        self.assertEqual(self.new_section['messages'][next_ind], msg1)
+        self.assertEqual(self.new_section['message_type'][next_ind], TEXT)
+
+    def test_add_image_as_message(self):
+        img1 = os.path.join(data_path, "images/beam_status.png")
+        next_ind = self.model.message_counter(self.new_section_id)
+        self.model.add_message_to_section(self.new_section_id, img1)
+        self.assertEqual(self.new_section['messages'][next_ind], img1)
+        self.assertEqual(self.new_section['message_type'][next_ind], IMAGE)
+
+    def test_add_multiple_messages(self):
+        self.test_add_text_message()
+        self.test_add_image_as_message()
+        self.test_add_image_as_message()
+        self.test_add_text_message()
+        next_ind = self.model.message_counter(self.new_section_id)
+        self.assertEqual(next_ind, 4)
+
+    def test_choice_counter(self):
+        next_ind = self.model.choice_counter(self.new_section_id)
+        self.assertEqual(next_ind, 0)
+        self.model.add_choice_to_section(self.new_section_id, "test", solution_type="message", solution="no problem")
+        next_ind = self.model.choice_counter(self.new_section_id)
+        self.assertEqual(next_ind, 1)
+
+    def test_add_choice_with_message_as_solution(self):
+        choice1 = "yes"
+        solution1_type = "message"
+        solution1 = "fix problem a"
+
+        next_ind = self.model.choice_counter(self.new_section_id)
+        self.model.add_choice_to_section(self.new_section_id, choice1, solution_type=solution1_type, solution=solution1)
+
+        self.assertEqual(self.new_section['choices'][next_ind], choice1)
+        self.assertEqual(self.new_section['solution_type'][next_ind], solution1_type)
+        self.assertEqual(self.new_section['solution_message'][next_ind], solution1)
+        self.assertEqual(self.new_section['solution_section_id'][next_ind], None)
+
+    def test_add_choice_with_section_as_solution(self):
+        next_section_id = "section_b"
+        next_section_caption = "Check this next"
+        next_section = self.model.add_section_to_category(self.new_subcategory_id, next_section_id,
+                                                          next_section_caption)
+
+        choice1 = "nope"
+        solution1_type = "section"
+
+        next_ind = self.model.choice_counter(self.new_section_id)
+
+        self.model.add_choice_to_section(self.new_section_id, choice1, solution_type=solution1_type,
+                                         solution=next_section_id)
+
+        self.assertEqual(self.new_section['choices'][next_ind], choice1)
+        self.assertEqual(self.new_section['solution_type'][next_ind], solution1_type)
+        self.assertEqual(self.new_section['solution_message'][next_ind], SECTION_SOLUTION)
+        self.assertEqual(self.new_section['solution_section_id'][next_ind], next_section_id)
+
+    def test_add_multiple_choices(self):
+        self.test_add_choice_with_message_as_solution()
+        self.test_add_choice_with_section_as_solution()
+        self.test_add_choice_with_message_as_solution()
+        self.test_add_choice_with_section_as_solution()
+        next_ind = self.model.choice_counter
+        self.assertEqual(next_ind, 4)
 
 
 # class MainCategoryTest(QtTest):

@@ -3,6 +3,9 @@ from collections import OrderedDict
 from .ts_model import TroubleSection
 import os
 import yaml
+TEXT = 0
+IMAGE = 1
+SECTION_SOLUTION = "Next"
 
 
 class TroubleShooter(QtCore.QObject):
@@ -55,9 +58,17 @@ class TroubleShooter(QtCore.QObject):
         new_section['parent_id'] = category_id
         new_section['level'] = self._all_categories[category_id]['level'] + 1
         new_section['messages'] = []
+        new_section['message_type'] = []
+        new_section['choices'] = []
+        new_section['solution_type'] = []
+        new_section['solution_message'] = []
+        new_section['solution_section_id'] = []
 
         self._all_sections[section_id] = new_section
 
+        return self._all_sections[section_id]
+
+    def get_section_by_id(self, section_id):
         return self._all_sections[section_id]
 
     def message_counter(self, section_id):
@@ -65,3 +76,25 @@ class TroubleShooter(QtCore.QObject):
 
     def add_message_to_section(self, section_id, message):
         self._all_sections[section_id]['messages'].append(message)
+        if os.path.isfile(message):
+            self._all_sections[section_id]['message_type'].append(IMAGE)
+        else:
+            self._all_sections[section_id]['message_type'].append(TEXT)
+
+    def choice_counter(self, section_id):
+        return len(self._all_sections[section_id]['choices'])
+
+    def add_choice_to_section(self, section_id, choice_caption, **kwargs):
+        self._all_sections[section_id]['choices'].append(choice_caption)
+        solution_type = kwargs['solution_type']
+        self._all_sections[section_id]['solution_type'].append(solution_type)
+        if solution_type == 'message':
+            self._all_sections[section_id]['solution_message'].append(kwargs['solution'])
+            self._all_sections[section_id]['solution_section_id'].append(None)
+            return True
+        elif solution_type == 'section':
+            self._all_sections[section_id]['solution_message'].append(SECTION_SOLUTION)
+            self._all_sections[section_id]['solution_section_id'].append(kwargs['solution'])
+            return True
+        else:
+            return False
