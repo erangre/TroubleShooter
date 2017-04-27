@@ -1,5 +1,6 @@
 from qtpy import QtCore
 import os
+import yaml
 IMAGE = 1
 TEXT = 0
 

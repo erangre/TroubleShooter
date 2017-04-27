@@ -2,6 +2,7 @@ import unittest
 import os
 import numpy as np
 from mock import MagicMock
+import yaml
 
 from ..utility import QtTest
 from ...model.cat_model import TroubleCategory
@@ -68,3 +69,43 @@ class TroubleCategoryTest(QtTest):
         self.assertEqual(new_section['obj'].id, new_section_name)
         self.assertEqual(new_section['obj'].parent_id, new_subcategory['obj'].id)
         self.assertEqual(new_section['obj'].level, new_subcategory['obj'].level + 1)
+
+
+class MainCategoryTest(QtTest):
+    def setUp(self):
+        self.cat_model = TroubleCategory(category_id="main", level=0)
+
+    def tearDown(self):
+        del self.cat_model
+
+    def test_export_category_to_yaml(self):
+        new_subcategory_name = "subcategory_a"
+        new_subcategory_caption = "The first category of problems"
+        new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
+        # self.cat_model.add_subcategory(new_subcategory_name, new_subcategory_caption, new_subcategory_image)
+
+        output_file = os.path.join(data_path, 'output1.yml')
+        self.cat_model.export_category_to_yaml(output_file)
+        self.assertTrue(os.path.isfile(output_file))
+
+        # outfile = open(output_file, 'r')
+        # output_contents = outfile.readlines()
+        # self.assertTrue(new_subcategory_name in '-'.join(output_contents))
+
+    def test_import_category_from_yaml(self):
+        new_subcategory_name = "subcategory_a"
+        new_subcategory_caption = "The first category of problems"
+        new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
+        self.cat_model.add_subcategory(new_subcategory_name, new_subcategory_caption, new_subcategory_image)
+
+        output_file = os.path.join(data_path, 'output1.yml')
+        self.cat_model.export_category_to_yaml(output_file)
+        self.assertTrue(os.path.isfile(output_file))
+
+        self.tearDown()
+        self.setUp()
+
+        self.cat_model.import_category_from_yaml(output_file)
+
+
+        # os.remove(output_file)

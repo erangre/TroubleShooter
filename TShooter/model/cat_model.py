@@ -2,6 +2,7 @@ from qtpy import QtCore
 from collections import OrderedDict
 from .ts_model import TroubleSection
 import os
+import yaml
 
 
 class TroubleCategory(QtCore.QObject):
@@ -27,6 +28,24 @@ class TroubleCategory(QtCore.QObject):
         self._subcategories[subcategory_name]['subcategory_caption'] = subcategory_caption
         self._subcategories[subcategory_name]['subcategory_image'] = subcategory_image
         return self._subcategories[subcategory_name]
+
+    # def export_category_to_yaml(self, output_file):
+    #     stream = open(output_file, "w")
+    #     yaml.dump(self, stream)
+    #     stream.close()
+
+    # def import_category_from_yaml(self, input_file):
+        # yaml.add_constructor(u'!python/object:TShooter.model.cat_model.TroubleCategory', self.category_constructor)
+        # print(yaml.load(stream, Loader=yaml.Loader))
+
+    # def category_constructor(self, loader, node):
+    #     values = loader.construct_mapping(node, deep=True)
+    #     _id = values["_id"]
+    #     _level = values["_level"]
+    #     _parent_id = values["_parent_id"]
+    #     _subcategories = values["_subcategories"]
+    #     _sections = values["_sections"]
+    #     return TroubleCategory(_id, _level, _parent_id)
 
     @property
     def section_counter(self):
