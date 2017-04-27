@@ -3,6 +3,7 @@ import os
 import numpy as np
 from mock import MagicMock
 import yaml
+import copy
 
 from ..utility import QtTest
 # from ...model.cat_model import TroubleCategory
@@ -254,29 +255,27 @@ class YAMLExportImportTest(QtTest):
         del self.model
 
     def test_export_category_to_yaml(self):
-
         output_file = os.path.join(data_path, 'output1.yml')
         self.model.export_category_to_yaml(output_file)
         self.assertTrue(os.path.isfile(output_file))
 
         outfile = open(output_file, 'r')
         output_contents = outfile.readlines()
-        print(output_contents)
-        self.assertTrue(self.new_subcategory in '-'.join(output_contents))
+        self.assertTrue(self.new_subcategory_id in '-'.join(output_contents))
 
-    # def test_import_category_from_yaml(self):
-    #     new_subcategory_name = "subcategory_a"
-    #     new_subcategory_caption = "The first category of problems"
-    #     new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
-    #     self.cat_model.add_subcategory(new_subcategory_name, new_subcategory_caption, new_subcategory_image)
-    #
-    #     output_file = os.path.join(data_path, 'output1.yml')
-    #     self.cat_model.export_category_to_yaml(output_file)
-    #     self.assertTrue(os.path.isfile(output_file))
-    #
-    #     self.tearDown()
-    #     self.setUp()
-    #
-    #     self.cat_model.import_category_from_yaml(output_file)
-    #
-    #     # os.remove(output_file)
+    def test_import_category_from_yaml(self):
+        output_file = os.path.join(data_path, 'output1.yml')
+        self.model.export_category_to_yaml(output_file)
+        self.assertTrue(os.path.isfile(output_file))
+        all_data = copy.deepcopy(self.model.get_all_data())
+
+        self.tearDown()
+        self.model = TroubleShooter(category_id="main", level=0)
+        self.new_subcategory_id = "subcategory_a"
+
+        self.assertIsNone(self.model.get_category_by_id(self.new_subcategory_id))
+        self.model.import_category_from_yaml(output_file)
+        self.assertEqual(self.new_subcategory_id, self.model.get_category_by_id(self.new_subcategory_id)['id'])
+        self.assertDictEqual(self.model.get_all_data(), all_data)
+
+        # os.remove(output_file)

@@ -3,6 +3,7 @@ from collections import OrderedDict
 from .ts_model import TroubleSection
 import os
 import yaml
+import copy
 TEXT = 0
 IMAGE = 1
 SECTION_SOLUTION = "Next"
@@ -26,7 +27,7 @@ class TroubleShooter(QtCore.QObject):
         return len(self._all_categories[category_id]['subcategories'])
 
     def get_category_by_id(self, category_id):
-        return self._all_categories[category_id]
+        return self._all_categories.get(category_id, None)
 
     def add_subcategory(self, category_id, subcategory_id, subcategory_caption, subcategory_image):
         if subcategory_id in self._all_categories:
@@ -69,7 +70,7 @@ class TroubleShooter(QtCore.QObject):
         return self._all_sections[section_id]
 
     def get_section_by_id(self, section_id):
-        return self._all_sections[section_id]
+        return self._all_sections.get(section_id, None)
 
     def message_counter(self, section_id):
         return len(self._all_sections[section_id]['messages'])
@@ -99,15 +100,18 @@ class TroubleShooter(QtCore.QObject):
         else:
             return False
 
+    def get_all_data(self):
+        all_data = {'all_categories': self._all_categories,
+                    'all_sections': self._all_sections}
+        return all_data
+
     def export_category_to_yaml(self, output_file):
         stream = open(output_file, "w")
-        all_data = {'all_categories': self._all_categories,
-                    'all_sections': self._all_sections
-        }
-
-        yaml.dump(all_data, stream)
+        yaml.dump(self.get_all_data(), stream)
         stream.close()
 
-    # def import_category_from_yaml(self, input_file):
-        # yaml.add_constructor(u'!python/object:TShooter.model.cat_model.TroubleCategory', self.category_constructor)
-        # print(yaml.load(stream, Loader=yaml.Loader))
+    def import_category_from_yaml(self, input_file):
+        stream = open(input_file, 'r')
+        all_data = yaml.load(stream)
+        self._all_categories = copy.deepcopy(all_data['all_categories'])
+        self._all_sections = copy.deepcopy(all_data['all_sections'])
