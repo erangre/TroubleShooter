@@ -11,8 +11,8 @@ class TroubleCategory(QtCore.QObject):
         self._id = category_id
         self._level = level
         self._parent_id = parent
-        self._subcategories = OrderedDict()
-        self._sections = OrderedDict()
+        self._subcategories = {}
+        self._sections = {}
 
     def add_section_to_category(self, section_name, section_caption):
         self._sections[section_name] = {}

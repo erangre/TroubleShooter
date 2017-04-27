@@ -11,15 +11,15 @@ SECTION_SOLUTION = "Next"
 class TroubleShooter(QtCore.QObject):
     def __init__(self, category_id="name", level=0, parent=None):
         super(TroubleShooter, self).__init__()
-        self._all_categories = OrderedDict()
-        self._all_sections = OrderedDict()
+        self._all_categories = {}
+        self._all_sections = {}
         self._main_category = {'id': category_id,  # perhaps id is redundant
                                'level': level,
                                'parent': parent,
                                'caption': 'main',
                                'image': None,
                                'sections': None,
-                               'subcategories': OrderedDict()}
+                               'subcategories': {}}
         self._all_categories[category_id] = self._main_category
 
     def subcategory_counter(self, category_id):
@@ -38,10 +38,10 @@ class TroubleShooter(QtCore.QObject):
         new_category['image'] = subcategory_image
         new_category['parent_id'] = category_id
         new_category['level'] = self._all_categories[category_id]['level'] + 1
-        new_category['subcategories'] = OrderedDict()
+        new_category['subcategories'] = {}
         self._all_categories[subcategory_id] = new_category
 
-        self._all_categories[subcategory_id]['sections'] = OrderedDict()
+        self._all_categories[subcategory_id]['sections'] = {}
 
         return self._all_categories[subcategory_id]
 
