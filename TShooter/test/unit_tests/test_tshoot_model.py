@@ -119,22 +119,7 @@ class TroubleSectionCreationTest(QtTest):
 
         self.assertIsNone(new_section_b)
 
-    def test_message_counter(self):
-        main_category_id = "main"
-        new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
-        new_subcategory_id = "subcategory_a"
-        new_subcategory_caption = "first category"
-        new_subcategory = self.model.add_subcategory(main_category_id, new_subcategory_id, new_subcategory_caption,
-                                                     new_subcategory_image)
-        new_section_id = "section_a"
-        new_section_caption = "First problem to check"
-        new_section = self.model.add_section_to_category(new_subcategory_id, new_section_id, new_section_caption)
 
-        next_ind = self.model.message_counter(new_section_id)
-        self.assertEqual(next_ind, 0)
-        self.model.add_message_to_section(new_section_id, "test message")
-        next_ind = self.model.message_counter(new_section_id)
-        self.assertEqual(next_ind, 1)
 
 
 class TroubleSectionTest(QtTest):
@@ -147,8 +132,21 @@ class TroubleSectionTest(QtTest):
         self.new_subcategory = self.model.add_subcategory(self.main_category_id, self.new_subcategory_id,
                                                           new_subcategory_caption, new_subcategory_image)
 
+        self.new_section_id = "section_a"
+        new_section_caption = "First problem to check"
+        self.new_section = self.model.add_section_to_category(self.new_subcategory_id, self.new_section_id,
+                                                              new_section_caption)
+
     def tearDown(self):
         del self.model
+
+    def test_message_counter(self):
+        next_ind = self.model.message_counter(self.new_section_id)
+        self.assertEqual(next_ind, 0)
+        self.model.add_message_to_section(self.new_section_id, "test message")
+        next_ind = self.model.message_counter(self.new_section_id)
+        self.assertEqual(next_ind, 1)
+
 
 # class MainCategoryTest(QtTest):
 #     def setUp(self):
