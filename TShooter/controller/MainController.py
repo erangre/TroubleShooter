@@ -108,7 +108,10 @@ class MainController(object):
     def tree_item_selection_changed(self):
         if self.widget.get_selected_categories()[0] in self.widget.sections.values():
             self.widget._hlayout.addWidget(self.widget.section_edit_pane)
+            self.widget.section_edit_pane.setVisible(True)
+
             print("added to layout")
         else:
             self.widget._hlayout.removeWidget(self.widget.section_edit_pane)
+            self.widget.section_edit_pane.setVisible(False)
             print("rem from layout")
