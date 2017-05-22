@@ -16,7 +16,7 @@ class TroubleShooter(QtCore.QObject):
         self._all_sections = OrderedDict()
         self._main_category = {'id': category_id,  # perhaps id is redundant
                                'level': level,
-                               'parent': parent,
+                               'parent_id': parent,
                                'caption': 'main',
                                'image': None,
                                'sections': None,
