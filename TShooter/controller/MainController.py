@@ -102,16 +102,21 @@ class MainController(object):
             section_id, ok = QtWidgets.QInputDialog.getText(self.widget, 'Create a new section', 'Section ID')
             if not ok:
                 return
-        self.widget.add_section(parent_id, section_id)
         self.model.add_section_to_category(parent_id, section_id, section_id)
+        self.widget.add_section(parent_id, section_id)
 
     def tree_item_selection_changed(self):
-        if self.widget.get_selected_categories()[0] in self.widget.sections.values():
+        self.selected_item = self.widget.get_selected_categories()[0]
+        if self.selected_item in self.widget.sections.values():
             self.widget._hlayout.addWidget(self.widget.section_edit_pane)
             self.widget.section_edit_pane.setVisible(True)
-
-            print("added to layout")
+            self.update_section_edit_pane()
         else:
             self.widget._hlayout.removeWidget(self.widget.section_edit_pane)
             self.widget.section_edit_pane.setVisible(False)
-            print("rem from layout")
+
+    def update_section_edit_pane(self):
+        selected_section = self.model.get_section_by_id(self.selected_item.text(0))
+        self.widget.section_edit_pane.section_caption_le.setText(selected_section['caption'])
+        self.widget.section_edit_pane.section_parent_id_le.setText(selected_section['parent_id'])
+        self.widget.section_edit_pane.section_level_le.setText(str(selected_section['level']))

@@ -147,23 +147,25 @@ class SectionTests(QtTest):
 
     def test_add_two_sections_to_one_category(self):
         # add first section
-        section_id = 'section_a'
-        self.controller.section_id = section_id
+        section_id_a = 'section_a'
+        self.controller.section_id = section_id_a
         self.controller.widget.add_section_btn.click()
+        self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.sections[section_id_a])
 
         # simulate the user choosing the category again
         self.controller.widget.set_selected_category(self.cat_id)
 
         # add 2nd section
-        section_id = 'section_b'
+        section_id_b = 'section_b'
         parent_id = self.cat_id
         level = 2
-        self.controller.section_id = section_id
+        self.controller.section_id = section_id_b
         self.controller.widget.add_section_btn.click()
 
-        self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.sections[section_id])
-        self.assertEqual(self.controller.model.get_section_by_id(section_id)['parent_id'], parent_id)
-        self.assertEqual(self.controller.model.get_section_by_id(section_id)['level'], level)
+        self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.sections[section_id_b])
+        self.assertEqual(self.controller.model.get_section_by_id(section_id_a)['parent_id'], parent_id)
+        self.assertEqual(self.controller.model.get_section_by_id(section_id_b)['parent_id'], parent_id)
+        self.assertEqual(self.controller.model.get_section_by_id(section_id_a)['level'], level)
 
     def test_cannot_add_section_to_main_category(self):
         sections_widget = self.controller.widget.sections
@@ -234,6 +236,9 @@ class EditSectionTests(QtTest):
 
     def setUp(self):
         self.controller = MainController()
+        self.model = self.controller.model
+        self.widget = self.controller.widget
+
         self.cat_id = 'first_category'
         caption = 'The first category!'
         image = os.path.join(data_path, "images/beam_status.png")
@@ -241,30 +246,40 @@ class EditSectionTests(QtTest):
                                          'caption': caption,
                                          'image': image,
                                          }
-        self.controller.widget.add_category_btn.click()
+        self.widget.add_category_btn.click()
 
         self.section_id = 'section_a'
         self.controller.section_id = self.section_id
-        self.controller.widget.add_section_btn.click()
+        self.widget.add_section_btn.click()
 
     def tearDown(self):
         del self.controller
         gc.collect()
 
     def test_selecting_section_adds_section_edit_to_layout(self):
-        self.controller.widget.set_selected_category(self.cat_id)
-        print("looking")
-        self.assertFalse(self.helper_is_widget_in_layout(self.controller.widget.section_edit_pane,
-                                                         self.controller.widget._hlayout))
-        self.controller.widget.set_selected_section(self.section_id)
-        print("looking")
-        self.assertTrue(self.helper_is_widget_in_layout(self.controller.widget.section_edit_pane,
-                                                        self.controller.widget._hlayout))
+        self.widget.set_selected_category(self.cat_id)
+
+        self.assertFalse(self.helper_is_widget_in_layout(self.widget.section_edit_pane,
+                                                         self.widget._hlayout))
+
+        self.widget.set_selected_section(self.section_id)
+
+        self.assertTrue(self.helper_is_widget_in_layout(self.widget.section_edit_pane,
+                                                        self.widget._hlayout))
 
     def test_selecting_section_updates_section_edit_values(self):
-        pass
+        self.widget.set_selected_section(self.section_id)
+        current_section = self.model.get_section_by_id(self.section_id)
+        section_caption = current_section['caption']
+        self.assertEqual(self.widget.section_edit_pane.section_caption_le.text(), section_caption)
 
-    def test_editing_section_updates_model(self):
+        section_parent_id = current_section['parent_id']
+        self.assertEqual(self.widget.section_edit_pane.section_parent_id_le.text(), section_parent_id)
+
+        section_level = current_section['level']
+        self.assertEqual(self.widget.section_edit_pane.section_level_le.text(), str(section_level))
+
+    def test_editing_section_updates_model(self):  # maybe this should be in a different test file
         pass
 
     def helper_is_widget_in_layout(self, widget, layout):
