@@ -75,6 +75,7 @@ class EditSectionTests(QtTest):
         self.widget.section_edit_pane.add_message_btn.click()
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
         self.assertEqual(self.widget.section_edit_pane.section_message_list.item(0).text(), message)
+        self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 1)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], message)
 
     def test_add_image_message_to_section(self):
@@ -85,6 +86,7 @@ class EditSectionTests(QtTest):
         self.widget.section_edit_pane.add_message_btn.click()
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
         self.assertEqual(self.widget.section_edit_pane.section_message_list.item(0).text(), image_filename)
+        self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 1)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], image_filename)
 
     def test_add_and_remove_two_messages_from_section(self):
@@ -98,16 +100,19 @@ class EditSectionTests(QtTest):
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image_filename, ''])
         self.widget.section_edit_pane.add_message_btn.click()
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 2)
+        self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 2)
 
         self.widget.section_edit_pane.section_message_list.setCurrentItem(
             self.widget.section_edit_pane.section_message_list.item(1), QtCore.QItemSelectionModel.Select)
         self.widget.section_edit_pane.remove_message_btn.click()
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
+        self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 1)
 
         self.widget.section_edit_pane.section_message_list.setCurrentItem(
             self.widget.section_edit_pane.section_message_list.item(0), QtCore.QItemSelectionModel.Select)
         self.widget.section_edit_pane.remove_message_btn.click()
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 0)
+        self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 0)
 
     def test_editing_section_updates_model(self):  # maybe this should be in a different test file
         pass

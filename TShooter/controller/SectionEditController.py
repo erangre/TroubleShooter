@@ -57,6 +57,8 @@ class SectionEditController(object):
 
     def remove_message_btn_clicked(self):
         selected_items = self.widget.section_edit_pane.section_message_list.selectedItems()
+        current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
         for item in selected_items:
             row = self.widget.section_edit_pane.section_message_list.row(item)
             self.widget.section_edit_pane.section_message_list.takeItem(row)
+            self.model.remove_message_from_section(current_section_id, row)

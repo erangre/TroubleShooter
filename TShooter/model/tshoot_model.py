@@ -82,6 +82,10 @@ class TroubleShooter(QtCore.QObject):
         else:
             self._all_sections[section_id]['message_type'].append(TEXT)
 
+    def remove_message_from_section(self, section_id, ind):
+        self._all_sections[section_id]['messages'].pop(ind)
+        self._all_sections[section_id]['message_type'].pop(ind)
+
     def choice_counter(self, section_id):
         return len(self._all_sections[section_id]['choices'])
 
