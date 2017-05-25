@@ -77,15 +77,15 @@ class SectionEditController(object):
                                                            solution_types, 0, False)
         if not ok:
             return
-        if solution_type == 'Message':
+        if solution_type == 'message':
             solution, ok = QtWidgets.QInputDialog.getText(self.widget,
                                                           "Solution", "Add solution message:")
-        elif solution_type == 'Section':
+        elif solution_type == 'section':
             all_sections_formatted = self.model.get_all_sections_formatted()
             solution, ok = QtWidgets.QInputDialog.getItem(self.widget, "Next Section",
                                                           "Select next section for " + choice_text + ":",
                                                           all_sections_formatted, 0, False)
-
+            solution = solution.split(':', 1)[-1]
         else:
             return
         if not ok or solution == '':

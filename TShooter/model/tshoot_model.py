@@ -7,7 +7,7 @@ from qtpy import QtCore
 
 TEXT = 0
 IMAGE = 1
-SOLUTION_TYPES = ('Message', 'Section')
+SOLUTION_TYPES = ('message', 'section')
 SECTION_SOLUTION = "Next"
 
 

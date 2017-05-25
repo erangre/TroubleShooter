@@ -28,7 +28,7 @@ class SectionEditGroupBox(QtWidgets.QGroupBox):
         self.add_message_btn = QtWidgets.QPushButton('+')
         self.remove_message_btn = QtWidgets.QPushButton('-')
 
-        self.message_lbl = QtWidgets.QLabel('User choices:')
+        self.choice_lbl = QtWidgets.QLabel('User choices:')
         self.section_choice_list = QtWidgets.QListWidget()
         self.add_choice_btn = QtWidgets.QPushButton('+')
         self.remove_choice_btn = QtWidgets.QPushButton('-')
@@ -46,9 +46,9 @@ class SectionEditGroupBox(QtWidgets.QGroupBox):
         self._grid_layout.addWidget(self.section_message_list, 3, 0, 5, 3)
         self._grid_layout.addWidget(self.add_message_btn, 4, 3, 1, 1)
         self._grid_layout.addWidget(self.remove_message_btn, 5, 3, 1, 1)
-        self._grid_layout.addWidget(self.message_lbl, 6, 0, 1, 4)
-        self._grid_layout.addWidget(self.section_message_list, 7, 0, 5, 3)
-        self._grid_layout.addWidget(self.add_message_btn, 8, 3, 1, 1)
-        self._grid_layout.addWidget(self.remove_message_btn, 9, 3, 1, 1)
+        self._grid_layout.addWidget(self.choice_lbl, 8, 0, 1, 4)
+        self._grid_layout.addWidget(self.section_choice_list, 9, 0, 5, 3)
+        self._grid_layout.addWidget(self.add_choice_btn, 10, 3, 1, 1)
+        self._grid_layout.addWidget(self.remove_choice_btn, 11, 3, 1, 1)
 
         self.setLayout(self._grid_layout)
