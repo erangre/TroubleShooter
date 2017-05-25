@@ -164,6 +164,41 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['choices']), 0)
 
+    """
+    Features for the future:
+    Edit a choice and its details
+    Move choices up and down
+    """
+
+    def test_only_new_section_appears_empty(self):
+        message = 'message_1'
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
+        QtWidgets.QInputDialog.getText = MagicMock(return_value=[message, True])
+        self.widget.section_edit_pane.add_message_btn.click()
+        self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
+
+        choice = 'Yes'
+        message = 'Clear all settings'
+        solution_type = 'message'
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[choice, True], [message, True]])
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=[solution_type, True])
+        self.widget.section_edit_pane.add_choice_btn.click()
+        self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 1)
+
+        self.section_id_b = 'section_b'
+        self.controller.section_id = self.section_id_b
+        self.widget.set_selected_category(self.cat_id)
+        self.widget.add_section_btn.click()
+
+        self.assertEqual(self.model.section_counter(self.cat_id), 2)
+        self.widget.set_selected_section(self.section_id_b)
+        self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 0)
+        self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)
+        """
+        test for existing data in messages and choices
+        """
+
+
     def helper_is_widget_in_layout(self, widget, layout):
         for ind in range(layout.count()):
             item = layout.itemAt(ind)

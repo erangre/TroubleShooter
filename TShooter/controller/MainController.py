@@ -125,3 +125,7 @@ class MainController(object):
         self.widget.section_edit_pane.section_caption_le.setText(selected_section['caption'])
         self.widget.section_edit_pane.section_parent_id_le.setText(selected_section['parent_id'])
         self.widget.section_edit_pane.section_level_le.setText(str(selected_section['level']))
+        self.widget.section_edit_pane.section_message_list.clear()
+        self.widget.section_edit_pane.section_choice_list.clearContents()
+        self.widget.section_edit_pane.section_choice_list.clear()
+        self.widget.section_edit_pane.section_choice_list.setRowCount(0)
