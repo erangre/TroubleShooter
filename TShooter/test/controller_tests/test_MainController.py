@@ -4,7 +4,7 @@ import gc
 # import numpy as np
 from qtpy import QtWidgets, QtCore
 # from qtpy.QtTest import QTest
-# from mock import MagicMock
+from mock import MagicMock
 from ..utility import QtTest, click_button
 
 from ...controller.MainController import MainController
@@ -225,66 +225,3 @@ class SectionTests(QtTest):
                                          }
         self.controller.widget.add_category_btn.click()
         self.assertIsNone(self.controller.model.get_category_by_id(subcat_id))
-
-
-class EditSectionTests(QtTest):
-    @classmethod
-    def setUpClass(cls):
-        cls.app = QtWidgets.QApplication.instance()
-        if cls.app is None:
-            cls.app = QtWidgets.QApplication([])
-
-    def setUp(self):
-        self.controller = MainController()
-        self.model = self.controller.model
-        self.widget = self.controller.widget
-
-        self.cat_id = 'first_category'
-        caption = 'The first category!'
-        image = os.path.join(data_path, "images/beam_status.png")
-        self.controller.category_info = {'id': self.cat_id,
-                                         'caption': caption,
-                                         'image': image,
-                                         }
-        self.widget.add_category_btn.click()
-
-        self.section_id = 'section_a'
-        self.controller.section_id = self.section_id
-        self.widget.add_section_btn.click()
-
-    def tearDown(self):
-        del self.controller
-        gc.collect()
-
-    def test_selecting_section_adds_section_edit_to_layout(self):
-        self.widget.set_selected_category(self.cat_id)
-
-        self.assertFalse(self.helper_is_widget_in_layout(self.widget.section_edit_pane,
-                                                         self.widget._hlayout))
-
-        self.widget.set_selected_section(self.section_id)
-
-        self.assertTrue(self.helper_is_widget_in_layout(self.widget.section_edit_pane,
-                                                        self.widget._hlayout))
-
-    def test_selecting_section_updates_section_edit_values(self):
-        self.widget.set_selected_section(self.section_id)
-        current_section = self.model.get_section_by_id(self.section_id)
-        section_caption = current_section['caption']
-        self.assertEqual(self.widget.section_edit_pane.section_caption_le.text(), section_caption)
-
-        section_parent_id = current_section['parent_id']
-        self.assertEqual(self.widget.section_edit_pane.section_parent_id_le.text(), section_parent_id)
-
-        section_level = current_section['level']
-        self.assertEqual(self.widget.section_edit_pane.section_level_le.text(), str(section_level))
-
-    def test_editing_section_updates_model(self):  # maybe this should be in a different test file
-        pass
-
-    def helper_is_widget_in_layout(self, widget, layout):
-        for ind in range(layout.count()):
-            item = layout.itemAt(ind)
-            if item.widget() == widget:
-                return True
-        return False

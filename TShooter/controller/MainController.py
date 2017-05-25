@@ -7,9 +7,11 @@ from qtpy import QtWidgets, QtCore
 
 from ..model.tshoot_model import TroubleShooter
 from ..widget.MainWidget import MainWidget
+from .SectionEditController import SectionEditController
 
 
 DEFAULT_IMAGE = ''
+
 
 class MainController(object):
     """
@@ -20,6 +22,8 @@ class MainController(object):
         self.use_settings = use_settings
         self.widget = MainWidget()
         self.model = TroubleShooter(category_id="main", level=0)
+        self.section_edit_controller = SectionEditController(model=self.model, main_widget=self.widget)
+
         self.setup_connections()
         self.category_info = {}
         self.section_id = None
@@ -117,6 +121,7 @@ class MainController(object):
 
     def update_section_edit_pane(self):
         selected_section = self.model.get_section_by_id(self.selected_item.text(0))
+        self.widget.section_edit_pane.section_id_lbl.setText(selected_section['id'])
         self.widget.section_edit_pane.section_caption_le.setText(selected_section['caption'])
         self.widget.section_edit_pane.section_parent_id_le.setText(selected_section['parent_id'])
         self.widget.section_edit_pane.section_level_le.setText(str(selected_section['level']))

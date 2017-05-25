@@ -3,6 +3,8 @@ import os
 
 from qtpy import QtWidgets, QtCore
 
+from .SectionEditWidget import SectionEditGroupBox
+
 widget_path = os.path.dirname(__file__)
 
 
@@ -80,32 +82,3 @@ class MainWidget(QtWidgets.QWidget):
 
     def set_selected_section(self, section_id):
         self._main_tree.setCurrentItem(self.sections[section_id])
-
-
-class SectionEditGroupBox(QtWidgets.QGroupBox):
-    def __init__(self, *args, **kwargs):
-        super(SectionEditGroupBox, self).__init__(*args, **kwargs)
-        self.create_widgets()
-        self.arrange_section_layout()
-
-    def create_widgets(self):
-        self.section_caption_lbl = QtWidgets.QLabel('Caption')
-        self.section_caption_le = QtWidgets.QLineEdit()
-        self.section_parent_id_lbl = QtWidgets.QLabel('Parent ID')
-        self.section_parent_id_le = QtWidgets.QLineEdit()
-        self.section_parent_id_le.setEnabled(False)
-        self.section_level_lbl = QtWidgets.QLabel('Level')
-        self.section_level_le = QtWidgets.QLineEdit()
-        self.section_level_le.setEnabled(False)
-
-    def arrange_section_layout(self):
-        self._grid_layout = QtWidgets.QGridLayout()
-
-        self._grid_layout.addWidget(self.section_parent_id_lbl, 0, 0, 1, 1)
-        self._grid_layout.addWidget(self.section_parent_id_le, 0, 1, 1, 1)
-        self._grid_layout.addWidget(self.section_level_lbl, 0, 2, 1, 1)
-        self._grid_layout.addWidget(self.section_level_le, 0, 3, 1, 1)
-        self._grid_layout.addWidget(self.section_caption_lbl, 1, 0, 1, 1)
-        self._grid_layout.addWidget(self.section_caption_le, 1, 1, 1, 1)
-
-        self.setLayout(self._grid_layout)
