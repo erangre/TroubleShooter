@@ -1,11 +1,13 @@
-from qtpy import QtCore
-from collections import OrderedDict
-from .ts_model import TroubleSection
-import os
-import yaml
 import copy
+import os
+from collections import OrderedDict
+
+import yaml
+from qtpy import QtCore
+
 TEXT = 0
 IMAGE = 1
+SOLUTION_TYPES = ('Message', 'Section')
 SECTION_SOLUTION = "Next"
 
 
@@ -54,7 +56,7 @@ class TroubleShooter(QtCore.QObject):
             return None
         self._all_categories[category_id]['sections'][section_id] = {}
         new_section = self._all_categories[category_id]['sections'][section_id]
-        new_section['id'] = section_id  # redundant?
+        new_section['id'] = section_id
         new_section['caption'] = section_caption
         new_section['parent_id'] = category_id
         new_section['level'] = self._all_categories[category_id]['level'] + 1
@@ -103,6 +105,13 @@ class TroubleShooter(QtCore.QObject):
             return True
         else:
             return False
+
+    def get_all_sections_formatted(self):
+        all_sections_formatted = []
+        for section in self._all_sections.values():
+            all_sections_formatted.append(section['parent_id'] + ':' + section['id'])
+
+        return all_sections_formatted
 
     def get_all_data(self):
         all_data = {'all_categories': self._all_categories,

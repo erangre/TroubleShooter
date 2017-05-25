@@ -120,6 +120,20 @@ class TroubleSectionCreationTest(QtTest):
 
         self.assertIsNone(new_section_b)
 
+    def test_get_all_sections_formatted(self):
+        new_section_id_a = "section_a"
+        new_section_caption = "First problem to check"
+        new_section_a = self.model.add_section_to_category(self.new_subcategory_id, new_section_id_a, new_section_caption)
+
+        new_section_id_b = "section_b"
+        new_section_caption = "Second problem to check"
+        new_section_b = self.model.add_section_to_category(self.new_subcategory_id, new_section_id_b, new_section_caption)
+
+        all_sections = self.model.get_all_sections_formatted()
+        self.assertEqual(all_sections[0], self.new_subcategory_id + ':' + new_section_id_a)
+        self.assertEqual(all_sections[1], self.new_subcategory_id + ':' + new_section_id_b)
+
+
 
 class TroubleSectionTest(QtTest):
     def setUp(self):

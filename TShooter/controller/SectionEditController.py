@@ -5,7 +5,7 @@ from qtpy import QtWidgets, QtCore
 
 # import xml.etree.cElementTree as ET
 
-from ..model.tshoot_model import TroubleShooter
+from ..model.tshoot_model import TroubleShooter, SOLUTION_TYPES
 # from ..widget.SectionEditWidget import SectionEditGroupBox
 from ..widget.MainWidget import MainWidget
 
@@ -30,6 +30,7 @@ class SectionEditController(object):
     def setup_connections(self):
         self.widget.section_edit_pane.add_message_btn.clicked.connect(self.add_message_btn_clicked)
         self.widget.section_edit_pane.remove_message_btn.clicked.connect(self.remove_message_btn_clicked)
+        self.widget.section_edit_pane.add_choice_btn.clicked.connect(self.add_choice_btn_clicked)
 
     def add_message_btn_clicked(self):
         current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
@@ -62,3 +63,34 @@ class SectionEditController(object):
             row = self.widget.section_edit_pane.section_message_list.row(item)
             self.widget.section_edit_pane.section_message_list.takeItem(row)
             self.model.remove_message_from_section(current_section_id, row)
+
+    def add_choice_btn_clicked(self):
+        current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
+        solution_types = SOLUTION_TYPES
+
+        choice_text, ok = QtWidgets.QInputDialog.getText(self.widget,
+                                                         "Add Choice", "Choice text:")
+        if not ok or choice_text == '':
+            return
+        solution_type, ok = QtWidgets.QInputDialog.getItem(self.widget, "Solution Type",
+                                                           "Select Solution type for " + choice_text + ":",
+                                                           solution_types, 0, False)
+        if not ok:
+            return
+        if solution_type == 'Message':
+            solution, ok = QtWidgets.QInputDialog.getText(self.widget,
+                                                          "Solution", "Add solution message:")
+        elif solution_type == 'Section':
+            all_sections_formatted = self.model.get_all_sections_formatted()
+            solution, ok = QtWidgets.QInputDialog.getItem(self.widget, "Next Section",
+                                                          "Select next section for " + choice_text + ":",
+                                                          all_sections_formatted, 0, False)
+
+        else:
+            return
+        if not ok or solution == '':
+            return
+
+        self.widget.section_edit_pane.section_choice_list.addItem(str(choice_text))
+        self.model.add_choice_to_section(current_section_id, choice_text, solution_type=solution_type,
+                                         solution=solution)

@@ -114,8 +114,23 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 0)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 0)
 
-    def test_editing_section_updates_model(self):  # maybe this should be in a different test file
-        pass
+    """
+    Features for the future:
+    Edit a message
+    Move messages up and down
+
+    """
+
+    def test_add_choice_with_message_solution_to_section(self):
+        self.assertEqual(self.widget.section_edit_pane.section_choice_list.count(), 0)
+        choice = 'Yes'
+        message = 'Clear all settings'
+        solution_type = 'Message'
+        # QtWidgets.QInputDialog.getItem = MagicMock(return_value=['message', True])
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[choice, True], [message, True]])
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=[solution_type, True])
+        self.widget.section_edit_pane.add_choice_btn.click()
+        self.assertEqual(self.widget.section_edit_pane.section_choice_list.count(), 1)
 
     def helper_is_widget_in_layout(self, widget, layout):
         for ind in range(layout.count()):

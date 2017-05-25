@@ -1,11 +1,7 @@
-import unittest
 import os
-import numpy as np
-from mock import MagicMock
-import yaml
 
-from ..utility import QtTest
-from ...model.cat_model import TroubleCategory
+from TShooter.obsolete.cat_model import TroubleCategory
+from TShooter.test.utility import QtTest
 from ...model.ts_model import TroubleSection
 
 unittest_path = os.path.dirname(__file__)

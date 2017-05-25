@@ -1,10 +1,7 @@
-import unittest
 import os
-import numpy as np
-from mock import MagicMock
 
-from ..utility import QtTest
-from ...model.ts_model import TroubleSection, IMAGE, TEXT
+from TShooter.obsolete.ts_model import TroubleSection, IMAGE, TEXT
+from TShooter.test.utility import QtTest
 
 unittest_path = os.path.dirname(__file__)
 data_path = os.path.join(unittest_path, '../data')
