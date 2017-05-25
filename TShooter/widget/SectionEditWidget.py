@@ -29,7 +29,9 @@ class SectionEditGroupBox(QtWidgets.QGroupBox):
         self.remove_message_btn = QtWidgets.QPushButton('-')
 
         self.choice_lbl = QtWidgets.QLabel('User choices:')
-        self.section_choice_list = QtWidgets.QListWidget()
+        self.section_choice_list = QtWidgets.QTableWidget()
+        self.section_choice_list.setColumnCount(3)
+        self.section_choice_list.setHorizontalHeaderLabels(['Choice', 'Solution Type', 'Solution'])
         self.add_choice_btn = QtWidgets.QPushButton('+')
         self.remove_choice_btn = QtWidgets.QPushButton('-')
 

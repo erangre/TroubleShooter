@@ -106,6 +106,12 @@ class TroubleShooter(QtCore.QObject):
         else:
             return False
 
+    def remove_choice_from_section(self, section_id, ind):
+        self._all_sections[section_id]['choices'].pop(ind)
+        self._all_sections[section_id]['solution_type'].pop(ind)
+        self._all_sections[section_id]['solution_message'].pop(ind)
+        self._all_sections[section_id]['solution_section_id'].pop(ind)
+
     def get_all_sections_formatted(self):
         all_sections_formatted = []
         for section in self._all_sections.values():

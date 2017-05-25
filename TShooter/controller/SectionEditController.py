@@ -31,6 +31,7 @@ class SectionEditController(object):
         self.widget.section_edit_pane.add_message_btn.clicked.connect(self.add_message_btn_clicked)
         self.widget.section_edit_pane.remove_message_btn.clicked.connect(self.remove_message_btn_clicked)
         self.widget.section_edit_pane.add_choice_btn.clicked.connect(self.add_choice_btn_clicked)
+        self.widget.section_edit_pane.remove_choice_btn.clicked.connect(self.remove_choice_btn_clicked)
 
     def add_message_btn_clicked(self):
         current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
@@ -91,6 +92,19 @@ class SectionEditController(object):
         if not ok or solution == '':
             return
 
-        self.widget.section_edit_pane.section_choice_list.addItem(str(choice_text))
+        section_choice_list = self.widget.section_edit_pane.section_choice_list
+        section_choice_list.insertRow(section_choice_list.rowCount())
+        section_choice_list.setItem(section_choice_list.rowCount() - 1, 0, QtWidgets.QTableWidgetItem(choice_text))
+        section_choice_list.setItem(section_choice_list.rowCount() - 1, 1, QtWidgets.QTableWidgetItem(solution_type))
+        section_choice_list.setItem(section_choice_list.rowCount() - 1, 2, QtWidgets.QTableWidgetItem(solution))
         self.model.add_choice_to_section(current_section_id, choice_text, solution_type=solution_type,
                                          solution=solution)
+
+    def remove_choice_btn_clicked(self):
+        section_choice_list = self.widget.section_edit_pane.section_choice_list
+        current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
+        selected_rows = section_choice_list.selectionModel().selectedRows()
+        for row in selected_rows:
+            self.model.remove_choice_from_section(current_section_id, row.row())
+            section_choice_list.removeRow(row.row())
+
