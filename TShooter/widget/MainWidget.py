@@ -4,6 +4,7 @@ import os
 from qtpy import QtWidgets, QtCore
 
 from .SectionEditWidget import SectionEditGroupBox
+from .SectionViewWidget import SectionViewPage
 
 widget_path = os.path.dirname(__file__)
 
@@ -32,6 +33,9 @@ class MainWidget(QtWidgets.QWidget):
         self.section_edit_pane = SectionEditGroupBox()
         self.section_edit_pane.setVisible(False)
 
+        self.section_view_pane = SectionViewPage()
+        self.section_view_pane.setVisible(False)
+
     def arrange_layout(self):
         self._hlayout = QtWidgets.QHBoxLayout()
         self._category_layout = QtWidgets.QVBoxLayout()
@@ -44,6 +48,7 @@ class MainWidget(QtWidgets.QWidget):
         self._category_layout.addWidget(self._main_tree)
         self._hlayout.addLayout(self._category_layout)
         self._hlayout.addWidget(self.section_edit_pane)
+        self._hlayout.addWidget(self.section_view_pane)
 
         self.setLayout(self._hlayout)
 

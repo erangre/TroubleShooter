@@ -124,9 +124,14 @@ class MainController(object):
             self.widget._hlayout.addWidget(self.widget.section_edit_pane)
             self.widget.section_edit_pane.setVisible(True)
             self.update_section_edit_pane()
+            self.widget._hlayout.addWidget(self.widget.section_view_pane)
+            self.widget.section_view_pane.setVisible(True)
+            self.update_section_view_pane()
         else:
             self.widget._hlayout.removeWidget(self.widget.section_edit_pane)
             self.widget.section_edit_pane.setVisible(False)
+            self.widget._hlayout.removeWidget(self.widget.section_view_pane)
+            self.widget.section_view_pane.setVisible(False)
 
     def update_section_edit_pane(self):
         selected_section = self.model.get_section_by_id(self.selected_item.text(0))
@@ -152,3 +157,6 @@ class MainController(object):
             else:
                 solution = selected_section['solution_section_id'][ind]
             section_choice_list.setItem(section_choice_list.rowCount() - 1, 2, QtWidgets.QTableWidgetItem(solution))
+
+    def update_section_view_pane(self):
+        pass

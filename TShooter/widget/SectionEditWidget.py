@@ -36,6 +36,7 @@ class SectionEditGroupBox(QtWidgets.QGroupBox):
         self.remove_choice_btn = QtWidgets.QPushButton('-')
 
     def arrange_section_layout(self):
+        self._main_layout = QtWidgets.QVBoxLayout()
         self._grid_layout = QtWidgets.QGridLayout()
 
         self._grid_layout.addWidget(self.section_parent_id_lbl, 0, 0, 1, 1)
@@ -53,4 +54,7 @@ class SectionEditGroupBox(QtWidgets.QGroupBox):
         self._grid_layout.addWidget(self.add_choice_btn, 10, 3, 1, 1)
         self._grid_layout.addWidget(self.remove_choice_btn, 11, 3, 1, 1)
 
-        self.setLayout(self._grid_layout)
+        self._main_layout.addLayout(self._grid_layout)
+        self._main_layout.addStretch(1)
+
+        self.setLayout(self._main_layout)
