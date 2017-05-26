@@ -1,4 +1,4 @@
-import os
+import os, sys
 import gc
 
 # import numpy as np
@@ -10,6 +10,7 @@ from ..utility import QtTest, click_button
 from ...controller.MainController import MainController
 from ...model.tshoot_model import TroubleShooter
 from ...widget.MainWidget import MainWidget
+from ..utility import excepthook
 
 unittest_path = os.path.dirname(__file__)
 data_path = os.path.join(unittest_path, '../data')
@@ -24,6 +25,7 @@ class CategoryTests(QtTest):
 
     def setUp(self):
         self.controller = MainController()
+        # sys.excepthook = excepthook
 
     def tearDown(self):
         del self.controller
@@ -225,3 +227,14 @@ class SectionTests(QtTest):
                                          }
         self.controller.widget.add_category_btn.click()
         self.assertIsNone(self.controller.model.get_category_by_id(subcat_id))
+
+    def test_adding_section_when_section_selected_adds_section_to_parent_category(self):
+        section_id = 'section_a'
+        self.controller.section_id = section_id
+        self.controller.widget.add_section_btn.click()
+        self.assertEqual(self.controller.model.section_counter(self.cat_id), 1)
+
+        section_id = 'section_b'
+        self.controller.section_id = section_id
+        self.controller.widget.add_section_btn.click()
+        self.assertEqual(self.controller.model.section_counter(self.cat_id), 2)

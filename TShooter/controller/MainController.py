@@ -88,10 +88,15 @@ class MainController(object):
 
         parent_id = None
 
-        if self.widget.get_selected_categories():
+        selected_categories = self.widget.get_selected_categories()
+        if selected_categories:
             for tree_item_id, tree_item in self.widget.categories.items():
-                if self.widget.get_selected_categories()[0] == tree_item:
+                if selected_categories[0] == tree_item:
                     parent_id = tree_item_id
+            if not parent_id:
+                for tree_item_id, tree_item in self.widget.sections.items():
+                    if selected_categories[0] == tree_item:
+                        parent_id = self.model.get_section_by_id(tree_item_id)['parent_id']
         else:
             parent_id = None
 
