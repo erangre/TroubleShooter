@@ -51,6 +51,10 @@ class CategoryTests(QtTest):
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['parent_id'], parent_id)
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['image'], image)
 
+    """
+    Add tests to delete categories and sections
+    """
+
     def test_add_subcategory(self):
         cat_id = 'test_subcategory'
         caption = 'caption_test'

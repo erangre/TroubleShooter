@@ -115,7 +115,11 @@ class MainController(object):
         self.widget.add_section(parent_id, section_id)
 
     def tree_item_selection_changed(self):
-        self.selected_item = self.widget.get_selected_categories()[0]
+        selected_items = self.widget.get_selected_categories()
+        if len(selected_items) == 0:
+            return
+        self.selected_item = selected_items[0]
+
         if self.selected_item in self.widget.sections.values():
             self.widget._hlayout.addWidget(self.widget.section_edit_pane)
             self.widget.section_edit_pane.setVisible(True)
