@@ -129,3 +129,17 @@ class MainController(object):
         self.widget.section_edit_pane.section_choice_list.clearContents()
         self.widget.section_edit_pane.section_choice_list.clear()
         self.widget.section_edit_pane.section_choice_list.setRowCount(0)
+        for message in selected_section['messages']:
+            self.widget.section_edit_pane.section_message_list.addItem(message)
+        for ind in range(0, len(selected_section['choices'])):
+            section_choice_list = self.widget.section_edit_pane.section_choice_list
+            section_choice_list.insertRow(section_choice_list.rowCount())
+            section_choice_list.setItem(section_choice_list.rowCount() - 1, 0, QtWidgets.QTableWidgetItem(
+                selected_section['choices'][ind]))
+            section_choice_list.setItem(section_choice_list.rowCount() - 1, 1,
+                                        QtWidgets.QTableWidgetItem(selected_section['solution_type'][ind]))
+            if selected_section['solution_section_id'][ind] is None:
+                solution = selected_section['solution_message'][ind]
+            else:
+                solution = selected_section['solution_section_id'][ind]
+            section_choice_list.setItem(section_choice_list.rowCount() - 1, 2, QtWidgets.QTableWidgetItem(solution))

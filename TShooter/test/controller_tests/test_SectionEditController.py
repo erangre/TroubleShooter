@@ -1,4 +1,4 @@
-import os
+import os, sys
 import gc
 
 # import numpy as np
@@ -10,6 +10,7 @@ from ..utility import QtTest, click_button
 from ...controller.MainController import MainController
 from ...model.tshoot_model import TroubleShooter
 from ...widget.MainWidget import MainWidget
+from ..utility import excepthook
 
 unittest_path = os.path.dirname(__file__)
 data_path = os.path.join(unittest_path, '../data')
@@ -23,6 +24,7 @@ class EditSectionTests(QtTest):
             cls.app = QtWidgets.QApplication([])
 
     def setUp(self):
+        # sys.excepthook = excepthook
         self.controller = MainController()
         self.model = self.controller.model
         self.widget = self.controller.widget
@@ -194,10 +196,10 @@ class EditSectionTests(QtTest):
         self.widget.set_selected_section(self.section_id_b)
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 0)
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)
-        """
-        test for existing data in messages and choices
-        """
 
+        self.widget.set_selected_section(self.section_id)
+        self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
+        self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 1)
 
     def helper_is_widget_in_layout(self, widget, layout):
         for ind in range(layout.count()):
