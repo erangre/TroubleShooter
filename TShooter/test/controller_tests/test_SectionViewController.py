@@ -133,6 +133,11 @@ class ViewSectionTests(QtTest):
                 self.assertEqual(self.widget.section_view_pane.section_id_lbl.text(),
                                  self.section_id)
 
+    """
+    1. work on image message
+    2. previous button when no link used. (or maybe prev is always previous within category and link uses a back button.
+    """
+
     def helper_is_widget_in_layout(self, widget, layout):
         for ind in range(layout.count()):
             item = layout.itemAt(ind)
