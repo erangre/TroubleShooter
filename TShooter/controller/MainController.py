@@ -2,12 +2,14 @@
 # import csv
 from sys import platform as _platform
 from qtpy import QtWidgets, QtCore
+from functools import partial
 
 # import xml.etree.cElementTree as ET
 
-from ..model.tshoot_model import TroubleShooter
+from ..model.tshoot_model import TroubleShooter, SECTION_SOLUTION
 from ..widget.MainWidget import MainWidget
 from .SectionEditController import SectionEditController
+from .SectionViewController import SectionViewController
 
 
 DEFAULT_IMAGE = ''
@@ -23,10 +25,12 @@ class MainController(object):
         self.widget = MainWidget()
         self.model = TroubleShooter(category_id="main", level=0)
         self.section_edit_controller = SectionEditController(model=self.model, main_widget=self.widget)
+        self.section_view_controller = SectionViewController(model=self.model, main_widget=self.widget)
 
         self.setup_connections()
         self.category_info = {}
         self.section_id = None
+        self.choice_click_functions = []
 
     def setup_connections(self):
         self.widget.add_category_btn.clicked.connect(self.add_category_btn_clicked)
@@ -140,8 +144,8 @@ class MainController(object):
         self.widget.section_edit_pane.section_parent_id_le.setText(selected_section['parent_id'])
         self.widget.section_edit_pane.section_level_le.setText(str(selected_section['level']))
         self.widget.section_edit_pane.section_message_list.clear()
-        self.widget.section_edit_pane.section_choice_list.clearContents()
-        self.widget.section_edit_pane.section_choice_list.clear()
+        # self.widget.section_edit_pane.section_choice_list.clearContents()  # removed these because they were deleting the header labels
+        # self.widget.section_edit_pane.section_choice_list.clear()
         self.widget.section_edit_pane.section_choice_list.setRowCount(0)
         for message in selected_section['messages']:
             self.widget.section_edit_pane.section_message_list.addItem(message)
@@ -159,4 +163,59 @@ class MainController(object):
             section_choice_list.setItem(section_choice_list.rowCount() - 1, 2, QtWidgets.QTableWidgetItem(solution))
 
     def update_section_view_pane(self):
-        pass
+        self.widget.section_view_pane.next_section_btn.setEnabled(False)
+        self.widget.section_view_pane.previous_section_btn.setEnabled(False)
+        self.clear_layout(self.widget.section_view_pane.message_layout)
+        self.clear_layout(self.widget.section_view_pane.choices_layout)
+        self.widget.section_view_pane.solution_message_lbl.setVisible(False)
+        # self.clear_layout(self.widget.section_view_pane.solution_layout)
+        selected_section = self.model.get_section_by_id(self.selected_item.text(0))
+        self.widget.section_view_pane.section_id_lbl.setText(selected_section['id'])
+        self.widget.section_view_pane.section_caption_lbl.setText(selected_section['caption'])
+        for msg in selected_section['messages']:
+            self.widget.section_view_pane.messages.append(QtWidgets.QLabel(msg))
+            self.widget.section_view_pane.message_layout.addWidget(self.widget.section_view_pane.messages[-1])
+        for ind in range(0, len(selected_section['choices'])):
+            self.widget.section_view_pane.choices.append(QtWidgets.QPushButton(selected_section['choices'][ind]))
+            self.choice_click_functions.append(self.create_choice_click_function(selected_section, ind))
+            self.widget.section_view_pane.choices[-1].clicked.connect(self.choice_click_functions[-1])
+            self.widget.section_view_pane.choices_layout.addWidget(self.widget.section_view_pane.choices[-1])
+
+    def clear_layout(self, layout):
+        """
+        :param layout:
+        :type layout: QtWidgets.QLayout
+        :return:
+        """
+        for ind in reversed(range(layout.count())):
+            widget_to_remove = layout.itemAt(ind).widget()
+            layout.removeWidget(widget_to_remove)
+            widget_to_remove.setParent(None)
+            widget_to_remove.deleteLater()
+
+    def create_choice_click_function(self, selected_section, ind):
+        if selected_section['solution_type'][ind] == 'message':
+            def choice_click_function():
+                self.widget.section_view_pane.solution_message_lbl.setText(selected_section['solution_message'][ind])
+                self.widget.section_view_pane.solution_message_lbl.setVisible(True)
+        elif selected_section['solution_type'][ind] == 'section':
+            def choice_click_function():
+                self.widget.section_view_pane.solution_message_lbl.setText(SECTION_SOLUTION)
+                self.widget.section_view_pane.next_section_btn.setEnabled(True)
+                self.widget.section_view_pane.solution_message_lbl.setVisible(True)
+                # self.widget.section_view_pane.next_section_btn.clicked.connect(
+                #     partial(self.widget.set_selected_section, selected_section['solution_section_id'][ind]))
+                self.widget.section_view_pane.next_section_btn.clicked.connect(
+                    self.create_next_btn_clicked_function(selected_section, ind))
+        else:
+            choice_click_function = None
+
+        return choice_click_function
+
+    def create_next_btn_clicked_function(self, selected_section, ind):
+        def next_btn_clicked_function():
+            self.widget.set_selected_section(selected_section['solution_section_id'][ind])
+            self.widget.section_view_pane.previous_section_btn.clicked.connect(
+                partial(self.widget.set_selected_section, selected_section['id']))
+            self.widget.section_view_pane.previous_section_btn.setEnabled(True)
+        return next_btn_clicked_function
