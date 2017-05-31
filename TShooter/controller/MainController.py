@@ -164,7 +164,9 @@ class MainController(object):
 
     def update_section_view_pane(self):
         self.widget.section_view_pane.next_section_btn.setEnabled(False)
+        self.widget.section_view_pane.next_section_btn.setVisible(False)
         self.widget.section_view_pane.previous_section_btn.setEnabled(False)
+        self.widget.section_view_pane.previous_section_btn.setVisible(False)
         self.clear_layout(self.widget.section_view_pane.message_layout)
         self.clear_layout(self.widget.section_view_pane.choices_layout)
         self.widget.section_view_pane.solution_message_lbl.setVisible(False)
@@ -202,6 +204,7 @@ class MainController(object):
             def choice_click_function():
                 self.widget.section_view_pane.solution_message_lbl.setText(SECTION_SOLUTION)
                 self.widget.section_view_pane.next_section_btn.setEnabled(True)
+                self.widget.section_view_pane.next_section_btn.setVisible(True)
                 self.widget.section_view_pane.solution_message_lbl.setVisible(True)
                 # self.widget.section_view_pane.next_section_btn.clicked.connect(
                 #     partial(self.widget.set_selected_section, selected_section['solution_section_id'][ind]))
@@ -218,4 +221,5 @@ class MainController(object):
             self.widget.section_view_pane.previous_section_btn.clicked.connect(
                 partial(self.widget.set_selected_section, selected_section['id']))
             self.widget.section_view_pane.previous_section_btn.setEnabled(True)
+            self.widget.section_view_pane.previous_section_btn.setVisible(True)
         return next_btn_clicked_function

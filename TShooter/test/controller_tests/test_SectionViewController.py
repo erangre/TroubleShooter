@@ -135,7 +135,8 @@ class ViewSectionTests(QtTest):
 
     """
     1. work on image message
-    2. previous button when no link used. (or maybe prev is always previous within category and link uses a back button.
+    2. ??? previous button when no link used. (or maybe prev is always previous within category and link uses a back button.
+    3. Make an option for auto next.
     """
 
     def helper_is_widget_in_layout(self, widget, layout):
