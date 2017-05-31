@@ -23,6 +23,8 @@ class MainWidget(QtWidgets.QWidget):
         self.add_category("main", "Main")
 
     def create_widgets(self):
+        self.save_tshooter_btn = QtWidgets.QPushButton('Save')
+
         self.add_category_btn = QtWidgets.QPushButton('Add Category')
         self.add_section_btn = QtWidgets.QPushButton('Add Section')
 
@@ -37,13 +39,17 @@ class MainWidget(QtWidgets.QWidget):
         self.section_view_pane.setVisible(False)
 
     def arrange_layout(self):
+        self._file_layout = QtWidgets.QHBoxLayout()
+        self._btn_category_layout = QtWidgets.QHBoxLayout()
         self._hlayout = QtWidgets.QHBoxLayout()
         self._category_layout = QtWidgets.QVBoxLayout()
-        self._btn_category_layout = QtWidgets.QHBoxLayout()
+
+        self._file_layout.addWidget(self.save_tshooter_btn)
 
         self._btn_category_layout.addWidget(self.add_category_btn)
         self._btn_category_layout.addWidget(self.add_section_btn)
 
+        self._category_layout.addLayout(self._file_layout)
         self._category_layout.addLayout(self._btn_category_layout)
         self._category_layout.addWidget(self._main_tree)
         self._hlayout.addLayout(self._category_layout)

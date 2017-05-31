@@ -33,6 +33,7 @@ class MainController(object):
         self.choice_click_functions = []
 
     def setup_connections(self):
+        self.widget.save_tshooter_btn.clicked.connect(self.save_tshooter_btn_clicked)
         self.widget.add_category_btn.clicked.connect(self.add_category_btn_clicked)
         self.widget.add_section_btn.clicked.connect(self.add_section_btn_clicked)
         self.widget._main_tree.itemSelectionChanged.connect(self.tree_item_selection_changed)
@@ -223,3 +224,11 @@ class MainController(object):
             self.widget.section_view_pane.previous_section_btn.setEnabled(True)
             self.widget.section_view_pane.previous_section_btn.setVisible(True)
         return next_btn_clicked_function
+
+    def save_tshooter_btn_clicked(self):
+
+        filename, ok = QtWidgets.QFileDialog.getSaveFileName(self.widget, 'Enter a filename for saving troubleshooter data')
+
+        if not ok or filename is None or filename == '':
+            return
+        self.model.export_category_to_yaml(filename)
