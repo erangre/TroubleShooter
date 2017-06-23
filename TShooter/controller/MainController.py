@@ -34,8 +34,13 @@ class MainController(object):
 
     def setup_connections(self):
         self.widget.save_tshooter_btn.clicked.connect(self.save_tshooter_btn_clicked)
+        self.widget.load_tshooter_btn.clicked.connect(self.load_tshooter_btn_clicked)
+        self.widget.clear_tshooter_btn.clicked.connect(self.clear_tshooter_btn_clicked)
+
         self.widget.add_category_btn.clicked.connect(self.add_category_btn_clicked)
         self.widget.add_section_btn.clicked.connect(self.add_section_btn_clicked)
+        self.widget.remove_category_btn.clicked.connect(self.remove_category_btn_clicked)
+
         self.widget._main_tree.itemSelectionChanged.connect(self.tree_item_selection_changed)
 
     def show_window(self):
@@ -51,7 +56,9 @@ class MainController(object):
         subcat_caption = self.category_info.get('caption', None)
         subcat_image = self.category_info.get('image', None)
         parent_id = self.category_info.get('parent_id', None)
+        self.add_category(subcat_id, subcat_caption, subcat_image, parent_id)
 
+    def add_category(self, subcat_id, subcat_caption, subcat_image, parent_id):
         # prevent adding a subcategory in a section
         for tree_item_id, tree_item in self.widget.sections.items():
             if self.widget.get_selected_categories()[0] == tree_item:
@@ -96,16 +103,16 @@ class MainController(object):
         selected_categories = self.widget.get_selected_categories()
         if selected_categories:
             for tree_item_id, tree_item in self.widget.categories.items():
-                if selected_categories[0] == tree_item:
+                if selected_categories[0] == tree_item:  # parent is selected category
                     parent_id = tree_item_id
             if not parent_id:
                 for tree_item_id, tree_item in self.widget.sections.items():
-                    if selected_categories[0] == tree_item:
+                    if selected_categories[0] == tree_item:  # parent is selected section's parent category
                         parent_id = self.model.get_section_by_id(tree_item_id)['parent_id']
         else:
             parent_id = None
 
-        if not parent_id or parent_id == "main":
+        if not parent_id or parent_id == "main":  # don't create sections in main
             return
         # prevent sections being made in category with subcategory
         for category_id, category in self.widget.categories.items():
@@ -118,6 +125,56 @@ class MainController(object):
                 return
         self.model.add_section_to_category(parent_id, section_id, section_id)
         self.widget.add_section(parent_id, section_id)
+
+    def remove_category_btn_clicked(self):
+        selected_categories = self.widget.get_selected_categories()
+        if selected_categories:
+            for tree_item_id, tree_item in self.widget.categories.items():
+                if selected_categories[0] == tree_item:
+                    self.remove_category(tree_item_id)
+                    return
+            for tree_item_id, tree_item in self.widget.sections.items():
+                if selected_categories[0] == tree_item:
+                    self.remove_section(tree_item_id)
+                    return
+
+    def remove_category(self, category_id):
+        temp_subcats = []
+        temp_sections = []
+        for subcat_id in self.model.get_category_by_id(category_id)['subcategories']:
+            temp_subcats.append(subcat_id)
+        for section_id in self.model.get_category_by_id(category_id)['sections']:
+            temp_sections.append(section_id)
+
+        for subcat_id in temp_subcats:
+            self.remove_category(subcat_id)
+        for section_id in temp_sections:
+            self.remove_section(section_id)
+
+        top_level_tree_item_ind = self.widget.get_index_of_top_level_tree_item(category_id)
+        if top_level_tree_item_ind == -1:
+            parent_id = self.model.get_category_by_id(category_id)['parent_id']
+            self.widget.remove_non_top_level_tree_item(category_id, "category", parent_id)
+        else:
+            self.widget.remove_top_level_tree_item(category_id, top_level_tree_item_ind)
+
+        self.model.remove_category(category_id)
+        del temp_sections
+        del temp_subcats
+
+    def remove_section(self, section_id):
+        parent_id = self.model.get_section_by_id(section_id)['parent_id']
+        self.widget.remove_non_top_level_tree_item(section_id, "section", parent_id)
+        self.model.remove_section(section_id)
+
+    def clear_tshooter_btn_clicked(self):
+        temp_cats = []
+        for tree_item_id, tree_item in self.widget.categories.items():
+            temp_cats.append(tree_item_id)
+        for tree_item_id in temp_cats:
+            if self.model.get_category_by_id(tree_item_id)['parent_id'] == 'main':
+                self.remove_category(tree_item_id)
+        del temp_cats
 
     def tree_item_selection_changed(self):
         selected_items = self.widget.get_selected_categories()
@@ -227,8 +284,29 @@ class MainController(object):
 
     def save_tshooter_btn_clicked(self):
 
-        filename, ok = QtWidgets.QFileDialog.getSaveFileName(self.widget, 'Enter a filename for saving troubleshooter data')
+        filename, ok = QtWidgets.QFileDialog.getSaveFileName(self.widget,
+                                                             'Enter a filename for saving troubleshooter data')
 
         if not ok or filename is None or filename == '':
             return
         self.model.export_category_to_yaml(filename)
+
+    def load_tshooter_btn_clicked(self):
+        tshooter_file, _ = QtWidgets.QFileDialog.getOpenFileName(self.widget, None, 'Choose troubleshooter to open')
+        if not tshooter_file[0]:
+            return
+        self.clear_tshooter_btn_clicked()  # first clear everything
+        self.model.import_category_from_yaml(tshooter_file)
+        all_data = self.model.get_all_data()
+        for category_id in all_data['all_categories']:
+            category = all_data['all_categories'][category_id]
+            if category['id'] == 'main':
+                continue
+            if category['parent_id'] == "main":
+                self.widget.add_category(category['id'], category['caption'])
+            else:
+                self.widget.add_subcategory(category['parent_id'], category['id'], category['caption'])
+
+        for section_id in all_data['all_sections']:
+            section = all_data['all_sections'][section_id]
+            self.widget.add_section(section['parent_id'], section_id)

@@ -51,10 +51,6 @@ class CategoryTests(QtTest):
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['parent_id'], parent_id)
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['image'], image)
 
-    """
-    Add tests to delete categories and sections
-    """
-
     def test_add_subcategory(self):
         cat_id = 'test_subcategory'
         caption = 'caption_test'
@@ -117,6 +113,24 @@ class CategoryTests(QtTest):
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['level'], level)
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['parent_id'], parent_id)
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['image'], image)
+
+    def test_remove_category(self):
+        cat_id = 'test_subcategory'
+        caption = 'caption_test'
+        image = os.path.join(data_path, "images/beam_status.png")
+        parent_id = 'main'
+        cat_level = 1
+
+        self.controller.category_info = {'id': cat_id,
+                                         'caption': caption,
+                                         'image': image,
+                                         }
+
+        self.controller.widget.add_category_btn.click()
+        tree_widget_item = self.controller.widget.categories[cat_id]
+        self.assertEqual(self.controller.widget._main_tree.currentItem(), tree_widget_item)
+        self.controller.widget.remove_category_btn.click()
+        self.assertNotEqual(self.controller.widget._main_tree.currentItem(), tree_widget_item)
 
 
 class SectionTests(QtTest):
@@ -328,6 +342,8 @@ class SaveLoadTests(QtTest):
         QtWidgets.QInputDialog.getItem = MagicMock(return_value=[solution_type, True])
         self.widget.section_edit_pane.add_choice_btn.click()
 
+        self.n_categories_in_main = self.model.subcategory_counter('main')
+
     def tearDown(self):
         del self.controller
         gc.collect()
@@ -337,3 +353,21 @@ class SaveLoadTests(QtTest):
         QtWidgets.QFileDialog.getSaveFileName = MagicMock(return_value=(filename, True))
         self.widget.save_tshooter_btn.click()
         self.assertTrue(os.path.isfile(filename))
+
+    def test_clear_button_clears_everything(self):
+        self.widget.clear_tshooter_btn.click()
+        self.assertEqual(self.model.subcategory_counter('main'), 0)
+        self.fail()
+
+    def test_load_button_fills_tree(self):
+        # sys.excepthook = excepthook
+        filename = os.path.join(data_path, 'tshooter_temp1.yml')
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=(filename, True))
+        self.widget.load_tshooter_btn.click()
+        self.assertEqual(self.model.subcategory_counter('main'), 2)
+        self.assertEqual(self.model.section_counter('first_category'), 2)
+        self.assertEqual(self.model.section_counter('second_category'), 1)
+
+        # test if exists in widget
+        self.assertEqual(len(self.widget.categories), 3)
+        self.assertEqual(len(self.widget.sections), 3)

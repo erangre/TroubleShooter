@@ -12,7 +12,7 @@ SECTION_SOLUTION = "Next"
 
 
 class TroubleShooter(QtCore.QObject):
-    def __init__(self, category_id="name", level=0, parent=None):
+    def __init__(self, category_id="main", level=0, parent=None):
         super(TroubleShooter, self).__init__()
         self._all_categories = OrderedDict()
         self._all_sections = OrderedDict()
@@ -36,7 +36,7 @@ class TroubleShooter(QtCore.QObject):
             return None
         self._all_categories[category_id]['subcategories'][subcategory_id] = {}
         new_category = self._all_categories[category_id]['subcategories'][subcategory_id]
-        new_category['id'] = subcategory_id  # redundant?
+        new_category['id'] = subcategory_id
         new_category['caption'] = subcategory_caption
         new_category['image'] = subcategory_image
         new_category['parent_id'] = category_id
@@ -47,6 +47,12 @@ class TroubleShooter(QtCore.QObject):
         self._all_categories[subcategory_id]['sections'] = OrderedDict()
 
         return self._all_categories[subcategory_id]
+
+    def remove_category(self, category_id):
+        parent_category_id = self._all_categories[category_id]['parent_id']
+        del self._all_categories[parent_category_id]['subcategories'][category_id]
+        del self._all_categories[category_id]
+        return parent_category_id
 
     def section_counter(self, category_id):
         return len(self._all_categories[category_id]['sections'])
@@ -73,6 +79,12 @@ class TroubleShooter(QtCore.QObject):
 
     def get_section_by_id(self, section_id):
         return self._all_sections.get(section_id, None)
+
+    def remove_section(self, section_id):
+        parent_category_id = self._all_sections[section_id]['parent_id']
+        del self._all_categories[parent_category_id]['sections'][section_id]
+        del self._all_sections[section_id]
+        return parent_category_id
 
     def message_counter(self, section_id):
         return len(self._all_sections[section_id]['messages'])

@@ -24,9 +24,12 @@ class MainWidget(QtWidgets.QWidget):
 
     def create_widgets(self):
         self.save_tshooter_btn = QtWidgets.QPushButton('Save')
+        self.load_tshooter_btn = QtWidgets.QPushButton('Load')
+        self.clear_tshooter_btn = QtWidgets.QPushButton('Clear')
 
         self.add_category_btn = QtWidgets.QPushButton('Add Category')
         self.add_section_btn = QtWidgets.QPushButton('Add Section')
+        self.remove_category_btn = QtWidgets.QPushButton('Remove')
 
         self._main_tree = QtWidgets.QTreeWidget()
         self._main_tree.setColumnCount(2)
@@ -45,9 +48,12 @@ class MainWidget(QtWidgets.QWidget):
         self._category_layout = QtWidgets.QVBoxLayout()
 
         self._file_layout.addWidget(self.save_tshooter_btn)
+        self._file_layout.addWidget(self.load_tshooter_btn)
+        self._file_layout.addWidget(self.clear_tshooter_btn)
 
         self._btn_category_layout.addWidget(self.add_category_btn)
         self._btn_category_layout.addWidget(self.add_section_btn)
+        self._btn_category_layout.addWidget(self.remove_category_btn)
 
         self._category_layout.addLayout(self._file_layout)
         self._category_layout.addLayout(self._btn_category_layout)
@@ -77,6 +83,23 @@ class MainWidget(QtWidgets.QWidget):
         self.categories[subcat_id].setText(1, "sub-category")
         self.categories[parent_id].addChild(self.categories[subcat_id])
         self._main_tree.setCurrentItem(self.categories[subcat_id])
+
+    def remove_top_level_tree_item(self, category_id, tree_item_ind):
+        self._main_tree.takeTopLevelItem(tree_item_ind)
+        del self.categories[category_id]
+
+    def remove_non_top_level_tree_item(self, tree_item_id, tree_item_type, parent_id):
+        if tree_item_type == "category":
+            tree_item = self.categories[tree_item_id]
+            self.categories[parent_id].removeChild(tree_item)
+            del self.categories[tree_item_id]
+        elif tree_item_type == "section":
+            tree_item = self.sections[tree_item_id]
+            self.categories[parent_id].removeChild(tree_item)
+            del self.sections[tree_item_id]
+
+    def get_index_of_top_level_tree_item(self, tree_item_id):
+        return self._main_tree.indexOfTopLevelItem(self.categories[tree_item_id])
 
     def get_selected_categories(self):
         return self._main_tree.selectedItems()

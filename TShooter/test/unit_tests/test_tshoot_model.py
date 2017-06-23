@@ -69,6 +69,24 @@ class TroubleCategoryTest(QtTest):
 
         self.assertIsNone(new_sub_b)
 
+    def test_remove_category(self):
+        counter = self.model.subcategory_counter("main")
+        self.assertEqual(counter, 0)
+        main_category_id = "main"
+        main_category = self.model.get_category_by_id(main_category_id)
+
+        new_sub_a_id = "subcategory_a"
+        new_sub_a_caption = "The first category of problems"
+        new_sub_a_image = os.path.join(data_path, "images/beam_status.png")
+
+        new_sub_a = self.model.add_subcategory(main_category_id, new_sub_a_id, new_sub_a_caption, new_sub_a_image)
+        counter = self.model.subcategory_counter("main")
+        self.assertEqual(counter, 1)
+
+        parent_category = self.model.remove_category(new_sub_a_id)
+        counter = self.model.subcategory_counter(parent_category)
+        self.assertEqual(counter, 0)
+
 
 class TroubleSectionCreationTest(QtTest):
     def setUp(self):
@@ -133,6 +151,18 @@ class TroubleSectionCreationTest(QtTest):
         self.assertEqual(all_sections[0], self.new_subcategory_id + ':' + new_section_id_a)
         self.assertEqual(all_sections[1], self.new_subcategory_id + ':' + new_section_id_b)
 
+    def test_remove_section(self):
+        next_ind = self.model.section_counter(self.new_subcategory_id)
+        self.assertEqual(next_ind, 0)
+        new_section_id = "section_a"
+        new_section_caption = "First problem to check"
+        new_section = self.model.add_section_to_category(self.new_subcategory_id, new_section_id, new_section_caption)
+        next_ind = self.model.section_counter(self.new_subcategory_id)
+        self.assertEqual(next_ind, 1)
+
+        parent_category = self.model.remove_section(new_section_id)
+        next_ind = self.model.section_counter(parent_category)
+        self.assertEqual(next_ind, 0)
 
 
 class TroubleSectionTest(QtTest):
