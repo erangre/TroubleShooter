@@ -21,35 +21,31 @@ class TroubleCategoryTest(QtTest):
     def tearDown(self):
         del self.model
 
+    def helper_add_subcategory(self, parent_category_id, cat_id, caption, image):
+        prev_ind = self.model.subcategory_counter(parent_category_id)
+        new_sub_cat = self.model.add_subcategory(parent_category_id, cat_id, caption, image)
+        next_ind = self.model.subcategory_counter(parent_category_id)
+        self.assertEqual(next_ind, prev_ind + 1)
+        self.assertEqual(new_sub_cat['id'], cat_id)
+        self.assertEqual(new_sub_cat['parent_id'], parent_category_id)
+        self.assertEqual(new_sub_cat['level'], self.model.get_category_by_id(parent_category_id)['level'] + 1)
+
     def test_subcategory_counter(self):
         new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
-        next_ind = self.model.subcategory_counter("main")
-        self.assertEqual(next_ind, 0)
-        self.model.add_subcategory("main", "subcategory_a", "first category", new_subcategory_image)
-        next_ind = self.model.subcategory_counter("main")
-        self.assertEqual(next_ind, 1)
+        self.helper_add_subcategory("main", "subcategory_a", "first category", new_subcategory_image)
 
     def test_add_subcategory_to_category(self):
         main_category_id = "main"
-        main_category = self.model.get_category_by_id(main_category_id)
 
         new_sub_a_id = "subcategory_a"
         new_sub_a_caption = "The first category of problems"
         new_sub_a_image = os.path.join(data_path, "images/beam_status.png")
-
-        new_sub_a = self.model.add_subcategory(main_category_id, new_sub_a_id, new_sub_a_caption, new_sub_a_image)
-        self.assertEqual(new_sub_a['id'], new_sub_a_id)
-        self.assertEqual(new_sub_a['parent_id'], main_category_id)
-        self.assertEqual(new_sub_a['level'], main_category['level'] + 1)
+        self.helper_add_subcategory(main_category_id, new_sub_a_id, new_sub_a_caption, new_sub_a_image)
 
         new_sub_b_id = "subcategory_b"
         new_sub_b_caption = "The first subcategory of problems"
         new_sub_b_image = os.path.join(data_path, "images/beam_status.png")
-
-        new_sub_b = self.model.add_subcategory(new_sub_a_id, new_sub_b_id, new_sub_b_caption, new_sub_b_image)
-        self.assertEqual(new_sub_b['id'], new_sub_b_id)
-        self.assertEqual(new_sub_b['parent_id'], new_sub_a_id)
-        self.assertEqual(new_sub_b['level'], new_sub_a['level'] + 1)
+        self.helper_add_subcategory(main_category_id, new_sub_b_id, new_sub_b_caption, new_sub_b_image)
 
     def test_add_existing_category_id_results_in_None(self):
         main_category_id = "main"
