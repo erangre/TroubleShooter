@@ -10,7 +10,7 @@ from ..model.tshoot_model import TroubleShooter, SECTION_SOLUTION
 from ..widget.MainWidget import MainWidget
 from .SectionEditController import SectionEditController
 from .SectionViewController import SectionViewController
-
+from ..widget.utils import QMsgBoxOKCancel
 
 DEFAULT_IMAGE = ''
 
@@ -128,6 +128,9 @@ class MainController(object):
 
     def remove_category_btn_clicked(self):
         selected_categories = self.widget.get_selected_categories()
+        retval = QMsgBoxOKCancel('Are you sure you want to remove ' + selected_categories[0].text(0) + '?')
+        if not retval == QtWidgets.QMessageBox.Ok:
+            return
         if selected_categories:
             for tree_item_id, tree_item in self.widget.categories.items():
                 if selected_categories[0] == tree_item:
@@ -168,6 +171,9 @@ class MainController(object):
         self.model.remove_section(section_id)
 
     def clear_tshooter_btn_clicked(self):
+        retval = QMsgBoxOKCancel("Are you sure you want to clear all categories and sections? (there is no undo)")
+        if not retval == QtWidgets.QMessageBox.Ok:
+            return
         temp_cats = []
         for tree_item_id, tree_item in self.widget.categories.items():
             temp_cats.append(tree_item_id)

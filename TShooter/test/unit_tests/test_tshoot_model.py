@@ -109,6 +109,7 @@ class TroubleSectionCreationTest(QtTest):
         self.model.add_section_to_category(self.new_subcategory_id, new_section_id, new_section_caption)
         next_ind = self.model.section_counter(self.new_subcategory_id)
         self.assertEqual(next_ind, 1)
+        self.assertEqual(self.model.all_section_counter(), 1)
 
     def test_add_section_to_category(self):
         new_section_id = "section_a"

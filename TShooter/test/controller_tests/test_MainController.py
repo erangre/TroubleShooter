@@ -129,6 +129,7 @@ class CategoryTests(QtTest):
         self.controller.widget.add_category_btn.click()
         tree_widget_item = self.controller.widget.categories[cat_id]
         self.assertEqual(self.controller.widget._main_tree.currentItem(), tree_widget_item)
+        QtWidgets.QMessageBox.exec_ = MagicMock(return_value=QtWidgets.QMessageBox.Ok)
         self.controller.widget.remove_category_btn.click()
         self.assertNotEqual(self.controller.widget._main_tree.currentItem(), tree_widget_item)
 
@@ -355,9 +356,17 @@ class SaveLoadTests(QtTest):
         self.assertTrue(os.path.isfile(filename))
 
     def test_clear_button_clears_everything(self):
+        QtWidgets.QMessageBox.exec_ = MagicMock(return_value=QtWidgets.QMessageBox.Ok)
         self.widget.clear_tshooter_btn.click()
         self.assertEqual(self.model.subcategory_counter('main'), 0)
-        self.fail()
+        self.assertEqual(self.model.all_section_counter(), 0)
+        self.assertEqual(len(self.widget.categories), 1)  # main category should still exist
+        self.assertEqual(len(self.widget.sections), 0)
+
+    def test_clear_and_cancel_does_not_clear(self):
+        QtWidgets.QMessageBox.exec_ = MagicMock(return_value=QtWidgets.QMessageBox.Cancel)
+        self.widget.clear_tshooter_btn.click()
+        self.assertNotEqual(self.model.subcategory_counter('main'), 0)
 
     def test_load_button_fills_tree(self):
         # sys.excepthook = excepthook

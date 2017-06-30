@@ -57,6 +57,9 @@ class TroubleShooter(QtCore.QObject):
     def section_counter(self, category_id):
         return len(self._all_categories[category_id]['sections'])
 
+    def all_section_counter(self):
+        return len(self._all_sections)
+
     def add_section_to_category(self, category_id, section_id, section_caption):
         if section_id in self._all_sections:
             return None
