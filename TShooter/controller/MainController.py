@@ -1,12 +1,12 @@
 # import os
 # import csv
 from sys import platform as _platform
-from qtpy import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore, QtGui
 from functools import partial
 
 # import xml.etree.cElementTree as ET
 
-from ..model.tshoot_model import TroubleShooter, SECTION_SOLUTION
+from ..model.tshoot_model import TroubleShooter, SECTION_SOLUTION, IMAGE, TEXT
 from ..widget.MainWidget import MainWidget
 from .SectionEditController import SectionEditController
 from .SectionViewController import SectionViewController
@@ -238,9 +238,13 @@ class MainController(object):
         selected_section = self.model.get_section_by_id(self.selected_item.text(0))
         self.widget.section_view_pane.section_id_lbl.setText(selected_section['id'])
         self.widget.section_view_pane.section_caption_lbl.setText(selected_section['caption'])
-        for msg in selected_section['messages']:
+        for msg, msg_type in zip(selected_section['messages'], selected_section['message_type']):
             self.widget.section_view_pane.messages.append(QtWidgets.QLabel(msg))
-            self.widget.section_view_pane.message_layout.addWidget(self.widget.section_view_pane.messages[-1])
+            if msg_type == TEXT:
+                self.widget.section_view_pane.message_layout.addWidget(self.widget.section_view_pane.messages[-1])
+            elif msg_type == IMAGE:
+                self.widget.section_view_pane.messages[-1].setPixmap(QtGui.QPixmap(msg))
+                self.widget.section_view_pane.message_layout.addWidget(self.widget.section_view_pane.messages[-1])
         for ind in range(0, len(selected_section['choices'])):
             self.widget.section_view_pane.choices.append(QtWidgets.QPushButton(selected_section['choices'][ind]))
             self.choice_click_functions.append(self.create_choice_click_function(selected_section, ind))
@@ -293,7 +297,7 @@ class MainController(object):
         filename, ok = QtWidgets.QFileDialog.getSaveFileName(self.widget,
                                                              'Enter a filename for saving troubleshooter data')
 
-        if not ok or filename is None or filename == '':
+        if not filename:
             return
         self.model.export_category_to_yaml(filename)
 
