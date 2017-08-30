@@ -187,21 +187,21 @@ class TroubleSectionTest(QtTest):
     def test_message_counter(self):
         next_ind = self.model.message_counter(self.new_section_id)
         self.assertEqual(next_ind, 0)
-        self.model.add_message_to_section(self.new_section_id, "test message")
+        self.model.add_message_to_section(self.new_section_id, "test message", TEXT)
         next_ind = self.model.message_counter(self.new_section_id)
         self.assertEqual(next_ind, 1)
 
     def test_add_text_message(self):
         msg1 = "test message"
         next_ind = self.model.message_counter(self.new_section_id)
-        self.model.add_message_to_section(self.new_section_id, msg1)
+        self.model.add_message_to_section(self.new_section_id, msg1, TEXT)
         self.assertEqual(self.new_section['messages'][next_ind], msg1)
         self.assertEqual(self.new_section['message_type'][next_ind], TEXT)
 
     def test_add_image_as_message(self):
         img1 = os.path.join(data_path, "images/beam_status.png")
         next_ind = self.model.message_counter(self.new_section_id)
-        self.model.add_message_to_section(self.new_section_id, img1)
+        self.model.add_message_to_section(self.new_section_id, img1, IMAGE)
         self.assertEqual(self.new_section['messages'][next_ind], img1)
         self.assertEqual(self.new_section['message_type'][next_ind], IMAGE)
 

@@ -92,12 +92,16 @@ class TroubleShooter(QtCore.QObject):
     def message_counter(self, section_id):
         return len(self._all_sections[section_id]['messages'])
 
-    def add_message_to_section(self, section_id, message):
+    def add_message_to_section(self, section_id, message, message_type):
         self._all_sections[section_id]['messages'].append(message)
-        if os.path.isfile(message):
+        if message_type == IMAGE and os.path.isfile(message):
             self._all_sections[section_id]['message_type'].append(IMAGE)
-        else:
+            return True
+        elif message_type == TEXT and message:
             self._all_sections[section_id]['message_type'].append(TEXT)
+            return True
+        else:
+            return False
 
     def remove_message_from_section(self, section_id, ind):
         self._all_sections[section_id]['messages'].pop(ind)

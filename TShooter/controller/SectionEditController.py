@@ -5,7 +5,7 @@ from qtpy import QtWidgets, QtCore
 
 # import xml.etree.cElementTree as ET
 
-from ..model.tshoot_model import TroubleShooter, SOLUTION_TYPES
+from ..model.tshoot_model import TroubleShooter, SOLUTION_TYPES, TEXT, IMAGE
 # from ..widget.SectionEditWidget import SectionEditGroupBox
 from ..widget.MainWidget import MainWidget
 
@@ -46,8 +46,10 @@ class SectionEditController(object):
                                                               "New Message Text", "Input message text:")
             if not ok:
                 return
+            msg_type = TEXT
         elif message_type == 'Image':
             message_text, ok = QtWidgets.QFileDialog.getOpenFileName(self.widget, "Choose Image")
+            msg_type = IMAGE
         else:
             return
 
@@ -55,7 +57,7 @@ class SectionEditController(object):
             return
 
         self.widget.section_edit_pane.section_message_list.addItem(str(message_text))
-        self.model.add_message_to_section(current_section_id, message_text)
+        self.model.add_message_to_section(current_section_id, message_text, msg_type)
 
     def remove_message_btn_clicked(self):
         selected_items = self.widget.section_edit_pane.section_message_list.selectedItems()
