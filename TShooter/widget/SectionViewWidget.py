@@ -6,7 +6,7 @@ from qtpy import QtWidgets, QtCore
 widget_path = os.path.dirname(__file__)
 
 
-class SectionViewPage(QtWidgets.QGroupBox):
+class SectionViewPage(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super(SectionViewPage, self).__init__(*args, **kwargs)
         self.create_widgets()
@@ -22,7 +22,15 @@ class SectionViewPage(QtWidgets.QGroupBox):
         self.next_section_btn = QtWidgets.QPushButton('Next')
 
     def arrange_section_layout(self):
+        self._outer_layout = QtWidgets.QVBoxLayout()
         self._main_layout = QtWidgets.QVBoxLayout()
+        self.scroll_widget = QtWidgets.QWidget()
+        self.scroll = QtWidgets.QScrollArea()
+        self.scroll_widget.setLayout(self._main_layout)
+        self.scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setWidget(self.scroll_widget)
+
         self._top_nav_layout = QtWidgets.QHBoxLayout()
         self.message_layout = QtWidgets.QVBoxLayout()
         self.choices_layout = QtWidgets.QHBoxLayout()
@@ -42,5 +50,5 @@ class SectionViewPage(QtWidgets.QGroupBox):
         self._main_layout.addLayout(self.solution_layout)
         self._main_layout.addStretch(1)
         self._main_layout.addLayout(self._bottom_nav_layout)
-
-        self.setLayout(self._main_layout)
+        self._outer_layout.addWidget(self.scroll)
+        self.setLayout(self._outer_layout)

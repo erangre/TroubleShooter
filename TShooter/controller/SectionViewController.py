@@ -29,4 +29,3 @@ class SectionViewController(object):
 
     def setup_connections(self):
         pass
-
