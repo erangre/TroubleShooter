@@ -3,10 +3,14 @@
 from sys import platform as _platform
 from qtpy import QtWidgets, QtCore, QtGui
 from functools import partial
-
+try:
+    import epics
+    ep = True
+except ImportError:
+    ep = False
 # import xml.etree.cElementTree as ET
 
-from ..model.tshoot_model import TroubleShooter, SECTION_SOLUTION, IMAGE, TEXT
+from ..model.tshoot_model import TroubleShooter, SECTION_SOLUTION, IMAGE, TEXT, PV
 from ..widget.MainWidget import MainWidget
 from .SectionEditController import SectionEditController
 from .SectionViewController import SectionViewController
@@ -238,12 +242,17 @@ class MainController(object):
         selected_section = self.model.get_section_by_id(self.selected_item.text(0))
         self.widget.section_view_pane.section_id_lbl.setText(selected_section['id'])
         self.widget.section_view_pane.section_caption_lbl.setText(selected_section['caption'])
-        for msg, msg_type in zip(selected_section['messages'], selected_section['message_type']):
+        for msg, msg_type, pv in zip(selected_section['messages'], selected_section['message_type'],
+                                     selected_section['message_pv']):
+            if ep and msg_type == PV:
+                msg = msg.format(epics.caget(pv))
             self.widget.section_view_pane.messages.append(QtWidgets.QLabel(msg))
             if msg_type == TEXT:
                 self.widget.section_view_pane.message_layout.addWidget(self.widget.section_view_pane.messages[-1])
             elif msg_type == IMAGE:
                 self.widget.section_view_pane.messages[-1].setPixmap(QtGui.QPixmap(msg))
+                self.widget.section_view_pane.message_layout.addWidget(self.widget.section_view_pane.messages[-1])
+            elif msg_type == PV:
                 self.widget.section_view_pane.message_layout.addWidget(self.widget.section_view_pane.messages[-1])
         for ind in range(0, len(selected_section['choices'])):
             self.widget.section_view_pane.choices.append(QtWidgets.QPushButton(selected_section['choices'][ind]))

@@ -5,6 +5,7 @@ import gc
 from qtpy import QtWidgets, QtCore, QtGui
 # from qtpy.QtTest import QTest
 from mock import MagicMock
+import epics
 from ..utility import QtTest, click_button
 
 from ...controller.MainController import MainController
@@ -31,7 +32,7 @@ class ViewSectionTests(QtTest):
 
         self.cat_id = 'first_category'
         caption = 'The first category!'
-        image = os.path.join(data_path, "images/beam_status.png")
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         self.controller.category_info = {'id': self.cat_id,
                                          'caption': caption,
                                          'image': image,
@@ -47,9 +48,20 @@ class ViewSectionTests(QtTest):
         QtWidgets.QInputDialog.getText = MagicMock(return_value=[self.message_1, True])
         self.widget.section_edit_pane.add_message_btn.click()
 
-        self.image_filename = os.path.join(data_path, "images/beam_status.png")  # add an image message
+        # add an image message
+        self.image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[self.image_filename, ''])
+        self.widget.section_edit_pane.add_message_btn.click()
+
+        self.message_3 = 'Energy is {0} eV'  # add a PV message
+        test_value = 37077
+        self.pv = "13IDA:CDEn:E_RBV"
+        self.expected_message_3 = self.message_3.format(test_value)
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['PV_string', True])
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[self.message_3, True], [self.pv, True]])
+        epics.caget = MagicMock(return_value=37077)
+
         self.widget.section_edit_pane.add_message_btn.click()
 
         self.choice_1 = 'Yes'  # add a choice with text solution
@@ -101,6 +113,7 @@ class ViewSectionTests(QtTest):
         for msg in self.widget.section_view_pane.messages:
             messages.append(msg.text())
         self.assertIn(self.message_1, messages)
+        self.assertIn(self.expected_message_3, messages)
         # self.assertIn(self.image_filename, messages)
 
     def test_selecting_section_updates_section_view_choices(self):
@@ -133,11 +146,9 @@ class ViewSectionTests(QtTest):
                 self.assertEqual(self.widget.section_view_pane.section_id_lbl.text(),
                                  self.section_id)
 
-    """
-    1. work on image message
-    2. ??? previous button when no link used. (or maybe prev is always previous within category and link uses a back button.
-    3. Make an option for auto next.
-    """
+    # TODO - Work on image message
+    # TODO - ??? Previous button when no link used (or maybe prev is always prev within category and link uses back btn
+    # TODO - Make an option for auto next
 
     def helper_is_widget_in_layout(self, widget, layout):
         for ind in range(layout.count()):

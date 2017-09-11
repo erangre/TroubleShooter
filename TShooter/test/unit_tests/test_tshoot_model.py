@@ -8,10 +8,10 @@ import copy
 from ..utility import QtTest
 # from ...model.cat_model import TroubleCategory
 # from ...model.ts_model import TroubleSection
-from ...model.tshoot_model import TroubleShooter, IMAGE, TEXT, SECTION_SOLUTION
+from ...model.tshoot_model import TroubleShooter, IMAGE, TEXT, PV, SECTION_SOLUTION
 
 unittest_path = os.path.dirname(__file__)
-data_path = os.path.join(unittest_path, '../data')
+data_path = os.path.normpath(os.path.join(unittest_path, '../data'))
 
 
 class TroubleCategoryTest(QtTest):
@@ -197,6 +197,7 @@ class TroubleSectionTest(QtTest):
         self.model.add_message_to_section(self.new_section_id, msg1, TEXT)
         self.assertEqual(self.new_section['messages'][next_ind], msg1)
         self.assertEqual(self.new_section['message_type'][next_ind], TEXT)
+        self.assertEqual(self.new_section['message_pv'][next_ind], None)
 
     def test_add_image_as_message(self):
         img1 = os.path.join(data_path, "images/beam_status.png")
@@ -204,6 +205,17 @@ class TroubleSectionTest(QtTest):
         self.model.add_message_to_section(self.new_section_id, img1, IMAGE)
         self.assertEqual(self.new_section['messages'][next_ind], img1)
         self.assertEqual(self.new_section['message_type'][next_ind], IMAGE)
+        self.assertEqual(self.new_section['message_pv'][next_ind], None)
+
+
+    def test_add_pv_as_message(self):
+        msg1 = "this is the value {}"
+        pv = "13IDD:m20"
+        next_ind = self.model.message_counter(self.new_section_id)
+        self.model.add_message_to_section(self.new_section_id, msg1, PV, pv)
+        self.assertEqual(self.new_section['messages'][next_ind], msg1)
+        self.assertEqual(self.new_section['message_type'][next_ind], PV)
+        self.assertEqual(self.new_section['message_pv'][next_ind], pv)
 
     def test_add_multiple_messages(self):
         self.test_add_text_message()

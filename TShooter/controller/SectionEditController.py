@@ -5,7 +5,7 @@ from qtpy import QtWidgets, QtCore
 
 # import xml.etree.cElementTree as ET
 
-from ..model.tshoot_model import TroubleShooter, SOLUTION_TYPES, TEXT, IMAGE
+from ..model.tshoot_model import TroubleShooter, SOLUTION_TYPES, TEXT, IMAGE, PV
 # from ..widget.SectionEditWidget import SectionEditGroupBox
 from ..widget.MainWidget import MainWidget
 
@@ -35,7 +35,7 @@ class SectionEditController(object):
 
     def add_message_btn_clicked(self):
         current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
-        item_types = ('Text', 'Image')
+        item_types = ('Text', 'Image', 'PV_string')
         message_type, ok = QtWidgets.QInputDialog.getItem(self.widget, "Message Type",
                                                           "Select message type:", item_types, 0, False)
         if not ok:
@@ -47,9 +47,21 @@ class SectionEditController(object):
             if not ok:
                 return
             msg_type = TEXT
+            pv = None
         elif message_type == 'Image':
             message_text, ok = QtWidgets.QFileDialog.getOpenFileName(self.widget, "Choose Image")
             msg_type = IMAGE
+            pv = None
+        elif message_type == 'PV_string':
+            user_msg = "Input message, using {} as a placeholder for the PV value:"
+            message_text, ok = QtWidgets.QInputDialog.getText(self.widget, "New PV string", user_msg)
+            if not ok:
+                return
+            pv, ok = QtWidgets.QInputDialog.getText(self.widget, "New PV", "Please input the PV to read")
+            if not ok:
+                return
+            msg_type = PV
+
         else:
             return
 
@@ -57,7 +69,7 @@ class SectionEditController(object):
             return
 
         self.widget.section_edit_pane.section_message_list.addItem(str(message_text))
-        self.model.add_message_to_section(current_section_id, message_text, msg_type)
+        self.model.add_message_to_section(current_section_id, message_text, msg_type, pv)
 
     def remove_message_btn_clicked(self):
         selected_items = self.widget.section_edit_pane.section_message_list.selectedItems()

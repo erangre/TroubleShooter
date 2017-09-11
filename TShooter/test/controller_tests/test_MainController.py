@@ -13,7 +13,7 @@ from ...widget.MainWidget import MainWidget
 from ..utility import excepthook
 
 unittest_path = os.path.dirname(__file__)
-data_path = os.path.join(unittest_path, '../data')
+data_path = os.path.normpath(os.path.join(unittest_path, '../data'))
 
 
 class CategoryTests(QtTest):
@@ -350,7 +350,7 @@ class SaveLoadTests(QtTest):
         gc.collect()
 
     def test_save_button_creates_file(self):
-        filename = os.path.join(data_path, 'tshooter_temp1.yml')
+        filename = os.path.normpath(os.path.join(data_path, 'tshooter_temp1.yml'))
         QtWidgets.QFileDialog.getSaveFileName = MagicMock(return_value=(filename, True))
         self.widget.save_tshooter_btn.click()
         self.assertTrue(os.path.isfile(filename))
@@ -370,7 +370,7 @@ class SaveLoadTests(QtTest):
 
     def test_load_button_fills_tree(self):
         # sys.excepthook = excepthook
-        filename = os.path.join(data_path, 'tshooter_temp1.yml')
+        filename = os.path.normpath(os.path.join(data_path, 'tshooter_temp1.yml'))
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=(filename, True))
         self.widget.load_tshooter_btn.click()
         self.assertEqual(self.model.subcategory_counter('main'), 2)

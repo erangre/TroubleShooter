@@ -7,8 +7,10 @@ from qtpy import QtWidgets, QtCore, QtGui
 from mock import MagicMock
 from ..utility import QtTest, click_button
 
+import epics
+
 from ...controller.MainController import MainController
-from ...model.tshoot_model import TroubleShooter
+from ...model.tshoot_model import TroubleShooter, SECTION_SOLUTION
 from ...widget.MainWidget import MainWidget
 from ..utility import excepthook
 
@@ -31,7 +33,7 @@ class EditSectionTests(QtTest):
 
         self.cat_id = 'first_category'
         caption = 'The first category!'
-        image = os.path.join(data_path, "images/beam_status.png")
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         self.controller.category_info = {'id': self.cat_id,
                                          'caption': caption,
                                          'image': image,
@@ -82,7 +84,7 @@ class EditSectionTests(QtTest):
 
     def test_add_image_message_to_section(self):
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 0)
-        image_filename = os.path.join(data_path, "images/beam_status.png")
+        image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image_filename, ''])
         self.widget.section_edit_pane.add_message_btn.click()
@@ -91,13 +93,32 @@ class EditSectionTests(QtTest):
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 1)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], image_filename)
 
+    def test_add_pv_message_to_section(self):
+        # sys.excepthook = excepthook
+
+        self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 0)
+        message = 'Energy is {0} eV'
+        test_value = 37077
+        pv = "13IDA:CDEn:E_RBV"
+        expected_message = message.format(test_value)
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['PV_string', True])
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[message, True], [pv, True]])
+        epics.caget = MagicMock(return_value=37077)
+
+        self.widget.section_edit_pane.add_message_btn.click()
+        self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
+        self.assertEqual(self.widget.section_edit_pane.section_message_list.item(0).text(), message)
+        self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 1)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], message)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['message_pv'][0], pv)
+
     def test_add_and_remove_two_messages_from_section(self):
         QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
         QtWidgets.QInputDialog.getText = MagicMock(return_value=['message_1', True])
         self.widget.section_edit_pane.add_message_btn.click()
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
 
-        image_filename = os.path.join(data_path, "images/beam_status.png")
+        image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image_filename, ''])
         self.widget.section_edit_pane.add_message_btn.click()
@@ -116,12 +137,8 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 0)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 0)
 
-    """
-    Features for the future:
-    Edit a message
-    Move messages up and down
-
-    """
+    # TODO - Allow edit message
+    # TODO - Allow move msg up.down
 
     def test_add_choice_with_message_solution_to_section(self):
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)
@@ -150,7 +167,7 @@ class EditSectionTests(QtTest):
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['choices']), 1)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][0], choice)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_type'][0], solution_type)
-        self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_message'][0], "Next")
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_message'][0], SECTION_SOLUTION)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_section_id'][0], next_section_id)
 
     def test_remove_choice_from_section(self):
@@ -166,11 +183,8 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['choices']), 0)
 
-    """
-    Features for the future:
-    Edit a choice and its details
-    Move choices up and down
-    """
+    # TODO - Edit a choice and its details
+    # TODO - Move choice up and down
 
     def test_only_new_section_appears_empty(self):
         message = 'message_1'

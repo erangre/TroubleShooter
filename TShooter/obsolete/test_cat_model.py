@@ -23,7 +23,7 @@ class TroubleCategoryTest(QtTest):
         self.assertEqual(next_ind, 1)
 
     def test_subcategory_counter(self):
-        new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
+        new_subcategory_image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         next_ind = self.model.subcategory_counter
         self.assertEqual(next_ind, 0)
         self.model.add_subcategory("subcategory_a", "first category", new_subcategory_image)
@@ -42,7 +42,7 @@ class TroubleCategoryTest(QtTest):
     def test_add_subcategory_to_category(self):
         new_subcategory_name = "subcategory_a"
         new_subcategory_caption = "The first category of problems"
-        new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
+        new_subcategory_image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         # next_ind = self.model.subcategory_counter
         new_subcategory = self.model.add_subcategory(new_subcategory_name, new_subcategory_caption,
                                                      new_subcategory_image)  # type: TroubleCategory
@@ -53,7 +53,7 @@ class TroubleCategoryTest(QtTest):
     def test_add_section_to_subcategory(self):
         new_subcategory_name = "subcategory_a"
         new_subcategory_caption = "The first category of problems"
-        new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
+        new_subcategory_image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         # next_ind = self.model.subcategory_counter
         new_subcategory = self.model.add_subcategory(new_subcategory_name, new_subcategory_caption,
                                                      new_subcategory_image)  # type: TroubleCategory
@@ -77,10 +77,10 @@ class MainCategoryTest(QtTest):
     def test_export_category_to_yaml(self):
         new_subcategory_name = "subcategory_a"
         new_subcategory_caption = "The first category of problems"
-        new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
+        new_subcategory_image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         # self.cat_model.add_subcategory(new_subcategory_name, new_subcategory_caption, new_subcategory_image)
 
-        output_file = os.path.join(data_path, 'output1.yml')
+        output_file = os.path.normpath(os.path.join(data_path, 'output1.yml'))
         self.cat_model.export_category_to_yaml(output_file)
         self.assertTrue(os.path.isfile(output_file))
 
@@ -91,10 +91,10 @@ class MainCategoryTest(QtTest):
     def test_import_category_from_yaml(self):
         new_subcategory_name = "subcategory_a"
         new_subcategory_caption = "The first category of problems"
-        new_subcategory_image = os.path.join(data_path, "images/beam_status.png")
+        new_subcategory_image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         self.cat_model.add_subcategory(new_subcategory_name, new_subcategory_caption, new_subcategory_image)
 
-        output_file = os.path.join(data_path, 'output1.yml')
+        output_file = os.path.normpath(os.path.join(data_path, 'output1.yml'))
         self.cat_model.export_category_to_yaml(output_file)
         self.assertTrue(os.path.isfile(output_file))
 

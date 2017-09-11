@@ -65,7 +65,7 @@ class MainWidget(QtWidgets.QWidget):
         self.setLayout(self._hlayout)
 
     def set_stylesheet(self):
-        file = open(os.path.join(widget_path, "stylesheet.qss"))
+        file = open(os.path.normpath(os.path.join(widget_path, "stylesheet.qss")))
         stylesheet = file.read()
         self.setStyleSheet(stylesheet)
         file.close()

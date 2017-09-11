@@ -7,8 +7,9 @@ from qtpy import QtCore
 
 TEXT = 0
 IMAGE = 1
+PV = 2
 SOLUTION_TYPES = ('message', 'section')
-SECTION_SOLUTION = "Next"
+SECTION_SOLUTION = "Click Next"
 
 
 class TroubleShooter(QtCore.QObject):
@@ -71,6 +72,7 @@ class TroubleShooter(QtCore.QObject):
         new_section['level'] = self._all_categories[category_id]['level'] + 1
         new_section['messages'] = []
         new_section['message_type'] = []
+        new_section['message_pv'] = []
         new_section['choices'] = []
         new_section['solution_type'] = []
         new_section['solution_message'] = []
@@ -92,14 +94,19 @@ class TroubleShooter(QtCore.QObject):
     def message_counter(self, section_id):
         return len(self._all_sections[section_id]['messages'])
 
-    def add_message_to_section(self, section_id, message, message_type):
+    def add_message_to_section(self, section_id, message, message_type, pv=None):
         self._all_sections[section_id]['messages'].append(message)
         if message_type == IMAGE and os.path.isfile(message):
             self._all_sections[section_id]['message_type'].append(IMAGE)
+            self._all_sections[section_id]['message_pv'].append(None)
             return True
         elif message_type == TEXT and message:
             self._all_sections[section_id]['message_type'].append(TEXT)
+            self._all_sections[section_id]['message_pv'].append(None)
             return True
+        elif message_type == PV and message:
+            self._all_sections[section_id]['message_type'].append(PV)
+            self._all_sections[section_id]['message_pv'].append(pv)
         else:
             return False
 
