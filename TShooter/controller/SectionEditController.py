@@ -10,10 +10,11 @@ from ..model.tshoot_model import TroubleShooter, SOLUTION_TYPES, TEXT, IMAGE, PV
 from ..widget.MainWidget import MainWidget
 
 
-class SectionEditController(object):
+class SectionEditController(QtCore.QObject):
     """
     Class for editing sections
     """
+    section_modified = QtCore.Signal()
 
     def __init__(self, model=None, main_widget=None):
         """
@@ -23,6 +24,7 @@ class SectionEditController(object):
         :type model: TroubleShooter
         :type main_widget: MainWidget
         """
+        super(SectionEditController, self).__init__()
         self.widget = main_widget
         self.model = model
         self.setup_connections()
@@ -70,6 +72,7 @@ class SectionEditController(object):
 
         self.widget.section_edit_pane.section_message_list.addItem(str(message_text))
         self.model.add_message_to_section(current_section_id, message_text, msg_type, pv)
+        self.section_modified.emit()
 
     def remove_message_btn_clicked(self):
         selected_items = self.widget.section_edit_pane.section_message_list.selectedItems()
@@ -78,6 +81,7 @@ class SectionEditController(object):
             row = self.widget.section_edit_pane.section_message_list.row(item)
             self.widget.section_edit_pane.section_message_list.takeItem(row)
             self.model.remove_message_from_section(current_section_id, row)
+        self.section_modified.emit()
 
     def add_choice_btn_clicked(self):
         current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
@@ -113,6 +117,7 @@ class SectionEditController(object):
         section_choice_list.setItem(section_choice_list.rowCount() - 1, 2, QtWidgets.QTableWidgetItem(solution))
         self.model.add_choice_to_section(current_section_id, choice_text, solution_type=solution_type,
                                          solution=solution)
+        self.section_modified.emit()
 
     def remove_choice_btn_clicked(self):
         section_choice_list = self.widget.section_edit_pane.section_choice_list
@@ -121,4 +126,4 @@ class SectionEditController(object):
         for row in selected_rows:
             self.model.remove_choice_from_section(current_section_id, row.row())
             section_choice_list.removeRow(row.row())
-
+        self.section_modified.emit()

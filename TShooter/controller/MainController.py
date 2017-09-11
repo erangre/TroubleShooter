@@ -46,6 +46,7 @@ class MainController(object):
         self.widget.remove_category_btn.clicked.connect(self.remove_category_btn_clicked)
 
         self.widget._main_tree.itemSelectionChanged.connect(self.tree_item_selection_changed)
+        self.section_edit_controller.section_modified.connect(self.tree_item_selection_changed)
 
     def show_window(self):
         self.widget.show()
