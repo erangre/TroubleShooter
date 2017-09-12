@@ -1,4 +1,4 @@
-# import os
+import os
 # import csv
 from sys import platform as _platform
 from qtpy import QtWidgets, QtCore
@@ -34,6 +34,8 @@ class SectionEditController(QtCore.QObject):
         self.widget.section_edit_pane.remove_message_btn.clicked.connect(self.remove_message_btn_clicked)
         self.widget.section_edit_pane.add_choice_btn.clicked.connect(self.add_choice_btn_clicked)
         self.widget.section_edit_pane.remove_choice_btn.clicked.connect(self.remove_choice_btn_clicked)
+        self.widget.section_edit_pane.section_message_list.itemDoubleClicked.connect(
+            self.section_message_list_dbl_clicked)
 
     def add_message_btn_clicked(self):
         current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
@@ -81,6 +83,40 @@ class SectionEditController(QtCore.QObject):
             row = self.widget.section_edit_pane.section_message_list.row(item)
             self.widget.section_edit_pane.section_message_list.takeItem(row)
             self.model.remove_message_from_section(current_section_id, row)
+        self.section_modified.emit()
+
+    def section_message_list_dbl_clicked(self, list_item):
+        row = self.widget.section_edit_pane.section_message_list.row(list_item)
+        current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
+        current_section = self.model.get_section_by_id(current_section_id)
+        msg_type = current_section['message_type'][row]
+        if msg_type == TEXT:
+            new_message_text, ok = QtWidgets.QInputDialog.getText(self.widget, "New Message Text",
+                                                                  "Input new message text:", text=list_item.text())
+            if not ok:
+                return
+            self.model.modify_message_in_section(current_section_id, row, new_message_text)
+            list_item.setText(new_message_text)
+        elif msg_type == IMAGE:
+            base_dir = os.path.dirname(list_item.text())
+            new_message_text, ok = QtWidgets.QFileDialog.getOpenFileName(self.widget, "Choose Image",
+                                                                         directory=base_dir)
+            self.model.modify_message_in_section(current_section_id, row, new_message_text)
+            list_item.setText(new_message_text)
+        elif msg_type == PV:
+            user_msg = "Input new message, using {} as a placeholder for the PV value:"
+            new_message_text, ok = QtWidgets.QInputDialog.getText(self.widget, "New PV string", user_msg,
+                                                                  text=list_item.text())
+            if not ok:
+                return
+            old_pv = current_section['message_pv'][row]
+            new_pv, ok = QtWidgets.QInputDialog.getText(self.widget, "New PV", "Please input the new PV to read",
+                                                        text=old_pv)
+            if not ok:
+                return
+            self.model.modify_message_in_section(current_section_id, row, new_message_text)
+            self.model.modify_message_pv_in_section(current_section_id, row, new_pv)
+            list_item.setText(new_message_text)
         self.section_modified.emit()
 
     def add_choice_btn_clicked(self):

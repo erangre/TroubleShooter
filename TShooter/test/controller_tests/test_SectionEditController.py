@@ -94,8 +94,6 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], image_filename)
 
     def test_add_pv_message_to_section(self):
-        # sys.excepthook = excepthook
-
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 0)
         message = 'Energy is {0} eV'
         test_value = 37077
@@ -139,6 +137,62 @@ class EditSectionTests(QtTest):
 
     # TODO - Allow edit message
     # TODO - Allow move msg up.down
+
+    def test_edit_text_message(self):
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
+        QtWidgets.QInputDialog.getText = MagicMock(return_value=['message_1', True])
+        self.widget.section_edit_pane.add_message_btn.click()
+
+        list_item = self.widget.section_edit_pane.section_message_list.item(0)
+        self.widget.section_edit_pane.section_message_list.setCurrentItem(
+            list_item, QtCore.QItemSelectionModel.Select)
+
+        new_message = 'message_2'
+        QtWidgets.QInputDialog.getText = MagicMock(return_value=[new_message, True])
+        self.widget.section_edit_pane.section_message_list.itemDoubleClicked.emit(
+            list_item)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], new_message)
+        self.assertEqual(list_item.text(), new_message)
+
+    def test_edit_image_message(self):
+        image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image_filename, ''])
+        self.widget.section_edit_pane.add_message_btn.click()
+
+        list_item = self.widget.section_edit_pane.section_message_list.item(0)
+        self.widget.section_edit_pane.section_message_list.setCurrentItem(
+            list_item, QtCore.QItemSelectionModel.Select)
+
+        new_image_filename = os.path.normpath(os.path.join(data_path, "images/garfield.png"))
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[new_image_filename, ''])
+        self.widget.section_edit_pane.section_message_list.itemDoubleClicked.emit(
+            list_item)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], new_image_filename)
+        self.assertEqual(list_item.text(), new_image_filename)
+
+    def test_edit_pv_message(self):
+        message = 'Energy is {0} eV'
+        # test_value = 37077
+        pv = "13IDA:CDEn:E_RBV"
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['PV_string', True])
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[message, True], [pv, True]])
+        # epics.caget = MagicMock(return_value=37077)
+        self.widget.section_edit_pane.add_message_btn.click()
+
+        list_item = self.widget.section_edit_pane.section_message_list.item(0)
+        self.widget.section_edit_pane.section_message_list.setCurrentItem(
+            list_item, QtCore.QItemSelectionModel.Select)
+
+        new_message = 'Wavelength is {0} A'
+        new_pv = "13IDA:CDEn:WL_RBV"
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[new_message, True], [new_pv, True]])
+        self.widget.section_edit_pane.section_message_list.itemDoubleClicked.emit(
+            list_item)
+
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], new_message)
+        self.assertEqual(list_item.text(), new_message)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['message_pv'][0], new_pv)
 
     def test_add_choice_with_message_solution_to_section(self):
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)

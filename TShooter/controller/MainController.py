@@ -312,8 +312,8 @@ class MainController(object):
         self.model.export_category_to_yaml(filename)
 
     def load_tshooter_btn_clicked(self):
-        tshooter_file, _ = QtWidgets.QFileDialog.getOpenFileName(self.widget, None, 'Choose troubleshooter to open')
-        if not tshooter_file[0]:
+        tshooter_file, _ = QtWidgets.QFileDialog.getOpenFileName(self.widget, caption='Choose troubleshooter to open')
+        if not tshooter_file or not tshooter_file[0]:
             return
         self.clear_tshooter_btn_clicked()  # first clear everything
         self.model.import_category_from_yaml(tshooter_file)

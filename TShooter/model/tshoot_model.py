@@ -114,6 +114,12 @@ class TroubleShooter(QtCore.QObject):
         self._all_sections[section_id]['messages'].pop(ind)
         self._all_sections[section_id]['message_type'].pop(ind)
 
+    def modify_message_in_section(self, section_id, ind, new_message):
+        self._all_sections[section_id]['messages'][ind] = new_message
+
+    def modify_message_pv_in_section(self, section_id, ind, new_pv):
+        self._all_sections[section_id]['message_pv'][ind] = new_pv
+
     def choice_counter(self, section_id):
         return len(self._all_sections[section_id]['choices'])
 
