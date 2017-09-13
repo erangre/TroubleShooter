@@ -135,7 +135,6 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 0)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 0)
 
-    # TODO - Allow edit message
     # TODO - Allow move msg up.down
 
     def test_edit_text_message(self):
@@ -173,11 +172,9 @@ class EditSectionTests(QtTest):
 
     def test_edit_pv_message(self):
         message = 'Energy is {0} eV'
-        # test_value = 37077
         pv = "13IDA:CDEn:E_RBV"
         QtWidgets.QInputDialog.getItem = MagicMock(return_value=['PV_string', True])
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[message, True], [pv, True]])
-        # epics.caget = MagicMock(return_value=37077)
         self.widget.section_edit_pane.add_message_btn.click()
 
         list_item = self.widget.section_edit_pane.section_message_list.item(0)
@@ -193,6 +190,28 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], new_message)
         self.assertEqual(list_item.text(), new_message)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['message_pv'][0], new_pv)
+
+    def test_move_message_up(self):
+        sys.excepthook = excepthook
+
+        message = "message_1"
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
+        QtWidgets.QInputDialog.getText = MagicMock(return_value=[message, True])
+        self.widget.section_edit_pane.add_message_btn.click()
+
+        image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image_filename, ''])
+        self.widget.section_edit_pane.add_message_btn.click()
+
+        list_item = self.widget.section_edit_pane.section_message_list.item(1)
+        self.widget.section_edit_pane.section_message_list.setCurrentItem(
+            list_item, QtCore.QItemSelectionModel.Select)
+
+        self.widget.section_edit_pane.move_message_up_btn.click()
+        list_item = self.widget.section_edit_pane.section_message_list.item(0)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], image_filename)
+        self.assertEqual(list_item.text(), image_filename)
 
     def test_add_choice_with_message_solution_to_section(self):
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)

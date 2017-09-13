@@ -120,6 +120,13 @@ class TroubleShooter(QtCore.QObject):
     def modify_message_pv_in_section(self, section_id, ind, new_pv):
         self._all_sections[section_id]['message_pv'][ind] = new_pv
 
+    def move_message_up(self, section_id, ind):
+        current_section = self.get_section_by_id(section_id)
+        if ind > 0:
+            current_section['messages'].insert(ind - 1, current_section['messages'].pop(ind))
+            current_section['message_type'].insert(ind - 1, current_section['message_type'].pop(ind))
+            current_section['message_pv'].insert(ind - 1, current_section['message_pv'].pop(ind))
+
     def choice_counter(self, section_id):
         return len(self._all_sections[section_id]['choices'])
 
