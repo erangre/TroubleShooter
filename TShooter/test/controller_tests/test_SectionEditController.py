@@ -8,6 +8,7 @@ from mock import MagicMock
 from ..utility import QtTest, click_button
 
 import epics
+import time
 
 from ...controller.MainController import MainController
 from ...model.tshoot_model import TroubleShooter, SECTION_SOLUTION
@@ -154,6 +155,7 @@ class EditSectionTests(QtTest):
         self.assertEqual(list_item.text(), new_message)
 
     def test_edit_image_message(self):
+        # sys.excepthook = excepthook
         image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image_filename, ''])
@@ -167,6 +169,7 @@ class EditSectionTests(QtTest):
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[new_image_filename, ''])
         self.widget.section_edit_pane.section_message_list.itemDoubleClicked.emit(
             list_item)
+        time.sleep(0.2)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], new_image_filename)
         self.assertEqual(list_item.text(), new_image_filename)
 
