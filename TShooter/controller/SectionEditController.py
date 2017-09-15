@@ -37,6 +37,7 @@ class SectionEditController(QtCore.QObject):
         self.widget.section_edit_pane.section_message_list.itemDoubleClicked.connect(
             self.section_message_list_dbl_clicked)
         self.widget.section_edit_pane.move_message_up_btn.clicked.connect(self.move_message_up_btn_clicked)
+        self.widget.section_edit_pane.move_message_down_btn.clicked.connect(self.move_message_down_btn_clicked)
 
     def add_message_btn_clicked(self):
         current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
@@ -128,6 +129,16 @@ class SectionEditController(QtCore.QObject):
             self.model.move_message_up(current_section_id, row)
             item_to_move_up = self.widget.section_edit_pane.section_message_list.takeItem(row)
             self.widget.section_edit_pane.section_message_list.insertItem(row - 1, item_to_move_up)
+
+    def move_message_down_btn_clicked(self):
+        print("moving down")
+        selected_items = self.widget.section_edit_pane.section_message_list.selectedItems()
+        current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
+        for list_item in selected_items:
+            row = self.widget.section_edit_pane.section_message_list.row(list_item)
+            self.model.move_message_down(current_section_id, row)
+            item_to_move_down = self.widget.section_edit_pane.section_message_list.takeItem(row)
+            self.widget.section_edit_pane.section_message_list.insertItem(row + 1, item_to_move_down)
 
         # TODO - add movement in widget.
         # TODO - later change everything so that edit widget updates to model

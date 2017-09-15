@@ -192,8 +192,6 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.model.get_section_by_id(self.section_id)['message_pv'][0], new_pv)
 
     def test_move_message_up(self):
-        sys.excepthook = excepthook
-
         message = "message_1"
         QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
         QtWidgets.QInputDialog.getText = MagicMock(return_value=[message, True])
@@ -212,6 +210,26 @@ class EditSectionTests(QtTest):
         list_item = self.widget.section_edit_pane.section_message_list.item(0)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], image_filename)
         self.assertEqual(list_item.text(), image_filename)
+
+    def test_move_message_down(self):
+        message = "message_1"
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
+        QtWidgets.QInputDialog.getText = MagicMock(return_value=[message, True])
+        self.widget.section_edit_pane.add_message_btn.click()
+
+        image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image_filename, ''])
+        self.widget.section_edit_pane.add_message_btn.click()
+
+        list_item = self.widget.section_edit_pane.section_message_list.item(0)
+        self.widget.section_edit_pane.section_message_list.setCurrentItem(
+            list_item, QtCore.QItemSelectionModel.Select)
+
+        self.widget.section_edit_pane.move_message_down_btn.click()
+        list_item = self.widget.section_edit_pane.section_message_list.item(1)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][1], message)
+        self.assertEqual(list_item.text(), message)
 
     def test_add_choice_with_message_solution_to_section(self):
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)
