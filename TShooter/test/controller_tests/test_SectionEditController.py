@@ -74,10 +74,10 @@ class EditSectionTests(QtTest):
 
     def test_add_text_message_to_section(self):
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 0)
+
         message = 'message_1'
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
-        QtWidgets.QInputDialog.getText = MagicMock(return_value=[message, True])
-        self.widget.section_edit_pane.add_message_btn.click()
+        self.helper_create_text_message(message)
+
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
         self.assertEqual(self.widget.section_edit_pane.section_message_list.item(0).text(), message)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 1)
@@ -85,10 +85,10 @@ class EditSectionTests(QtTest):
 
     def test_add_image_message_to_section(self):
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 0)
+
         image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
-        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image_filename, ''])
-        self.widget.section_edit_pane.add_message_btn.click()
+        self.helper_create_image_message(image_filename)
+
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
         self.assertEqual(self.widget.section_edit_pane.section_message_list.item(0).text(), image_filename)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 1)
@@ -96,15 +96,13 @@ class EditSectionTests(QtTest):
 
     def test_add_pv_message_to_section(self):
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 0)
+
         message = 'Energy is {0} eV'
         test_value = 37077
         pv = "13IDA:CDEn:E_RBV"
         expected_message = message.format(test_value)
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['PV_string', True])
-        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[message, True], [pv, True]])
-        epics.caget = MagicMock(return_value=37077)
+        self.helper_create_pv_message(message, pv)
 
-        self.widget.section_edit_pane.add_message_btn.click()
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
         self.assertEqual(self.widget.section_edit_pane.section_message_list.item(0).text(), message)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 1)
@@ -112,15 +110,11 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.model.get_section_by_id(self.section_id)['message_pv'][0], pv)
 
     def test_add_and_remove_two_messages_from_section(self):
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
-        QtWidgets.QInputDialog.getText = MagicMock(return_value=['message_1', True])
-        self.widget.section_edit_pane.add_message_btn.click()
+        self.helper_create_text_message('message_1')
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
 
         image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
-        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image_filename, ''])
-        self.widget.section_edit_pane.add_message_btn.click()
+        self.helper_create_image_message(image_filename)
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 2)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 2)
 
@@ -136,13 +130,8 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 0)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 0)
 
-    # TODO - Allow move msg up.down
-
     def test_edit_text_message(self):
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
-        QtWidgets.QInputDialog.getText = MagicMock(return_value=['message_1', True])
-        self.widget.section_edit_pane.add_message_btn.click()
-
+        self.helper_create_text_message('message_1')
         list_item = self.widget.section_edit_pane.section_message_list.item(0)
         self.widget.section_edit_pane.section_message_list.setCurrentItem(
             list_item, QtCore.QItemSelectionModel.Select)
@@ -157,9 +146,7 @@ class EditSectionTests(QtTest):
     def test_edit_image_message(self):
         # sys.excepthook = excepthook
         image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
-        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image_filename, ''])
-        self.widget.section_edit_pane.add_message_btn.click()
+        self.helper_create_image_message(image_filename)
 
         list_item = self.widget.section_edit_pane.section_message_list.item(0)
         self.widget.section_edit_pane.section_message_list.setCurrentItem(
@@ -176,9 +163,7 @@ class EditSectionTests(QtTest):
     def test_edit_pv_message(self):
         message = 'Energy is {0} eV'
         pv = "13IDA:CDEn:E_RBV"
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['PV_string', True])
-        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[message, True], [pv, True]])
-        self.widget.section_edit_pane.add_message_btn.click()
+        self.helper_create_pv_message(message, pv)
 
         list_item = self.widget.section_edit_pane.section_message_list.item(0)
         self.widget.section_edit_pane.section_message_list.setCurrentItem(
@@ -196,14 +181,10 @@ class EditSectionTests(QtTest):
 
     def test_move_message_up(self):
         message = "message_1"
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
-        QtWidgets.QInputDialog.getText = MagicMock(return_value=[message, True])
-        self.widget.section_edit_pane.add_message_btn.click()
+        self.helper_create_text_message(message)
 
         image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
-        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image_filename, ''])
-        self.widget.section_edit_pane.add_message_btn.click()
+        self.helper_create_image_message(image_filename)
 
         list_item = self.widget.section_edit_pane.section_message_list.item(1)
         self.widget.section_edit_pane.section_message_list.setCurrentItem(
@@ -216,14 +197,10 @@ class EditSectionTests(QtTest):
 
     def test_move_message_down(self):
         message = "message_1"
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
-        QtWidgets.QInputDialog.getText = MagicMock(return_value=[message, True])
-        self.widget.section_edit_pane.add_message_btn.click()
+        self.helper_create_text_message(message)
 
         image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
-        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image_filename, ''])
-        self.widget.section_edit_pane.add_message_btn.click()
+        self.helper_create_image_message(image_filename)
 
         list_item = self.widget.section_edit_pane.section_message_list.item(0)
         self.widget.section_edit_pane.section_message_list.setCurrentItem(
@@ -315,3 +292,20 @@ class EditSectionTests(QtTest):
             if item.widget() == widget:
                 return True
         return False
+
+    def helper_create_text_message(self, message):
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
+        QtWidgets.QInputDialog.getText = MagicMock(return_value=[message, True])
+        self.widget.section_edit_pane.add_message_btn.click()
+
+    def helper_create_image_message(self, image_filename):
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image_filename, ''])
+        self.widget.section_edit_pane.add_message_btn.click()
+
+    def helper_create_pv_message(self, message, pv):
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['PV_string', True])
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[message, True], [pv, True]])
+        epics.caget = MagicMock(return_value=37077)
+
+        self.widget.section_edit_pane.add_message_btn.click()
