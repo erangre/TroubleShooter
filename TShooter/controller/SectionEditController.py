@@ -38,6 +38,8 @@ class SectionEditController(QtCore.QObject):
             self.section_message_list_dbl_clicked)
         self.widget.section_edit_pane.move_message_up_btn.clicked.connect(self.move_message_up_btn_clicked)
         self.widget.section_edit_pane.move_message_down_btn.clicked.connect(self.move_message_down_btn_clicked)
+        self.widget.section_edit_pane.section_choice_list.itemDoubleClicked.connect(
+            self.section_choice_list_dbl_clicked)
 
     def add_message_btn_clicked(self):
         current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
@@ -140,8 +142,7 @@ class SectionEditController(QtCore.QObject):
             item_to_move_down = self.widget.section_edit_pane.section_message_list.takeItem(row)
             self.widget.section_edit_pane.section_message_list.insertItem(row + 1, item_to_move_down)
 
-        # TODO - add movement in widget.
-        # TODO - later change everything so that edit widget updates to model
+        # TODO - change everything so that edit widget updates to model
 
         self.section_modified.emit()
 
@@ -191,4 +192,37 @@ class SectionEditController(QtCore.QObject):
         for row in selected_rows:
             self.model.remove_choice_from_section(current_section_id, row.row())
             section_choice_list.removeRow(row.row())
+        self.section_modified.emit()
+
+    def section_choice_list_dbl_clicked(self, list_item):
+        row = self.widget.section_edit_pane.section_choice_list.row(list_item)
+        choice_item = self.widget.section_edit_pane.section_choice_list.item(row, 0)
+        current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
+        current_section = self.model.get_section_by_id(current_section_id)
+        solution_type = current_section['solution_type'][row]
+
+        new_choice_text, ok = QtWidgets.QInputDialog.getText(self.widget,
+                                                             "Add Choice", "Choice text:", text=choice_item.text())
+        if not ok:
+            return
+
+        self.model.modify_choice_in_section(current_section_id, row, new_choice_text)
+        choice_item.setText(new_choice_text)
+
+        if solution_type == 'message':
+            old_message_item = self.widget.section_edit_pane.section_choice_list.item(row, 2)
+            new_message_text, ok = QtWidgets.QInputDialog.getText(self.widget, "New Solution Message Text",
+                                                                  "Input new solution message text:",
+                                                                  text=old_message_item.text())
+            if not ok:
+                return
+            self.model.modify_solution_message_in_section(current_section_id, row, new_message_text)
+        elif solution_type == 'section':
+            all_sections_formatted = self.model.get_all_sections_formatted()
+            new_solution, ok = QtWidgets.QInputDialog.getItem(self.widget, "Next Section",
+                                                              "Select next section for " + new_choice_text + ":",
+                                                              all_sections_formatted, 0, False)
+            solution = new_solution.split(':', 1)[-1]
+            self.model.modify_solution_section_in_section(current_section_id, row, solution)
+
         self.section_modified.emit()

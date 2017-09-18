@@ -258,6 +258,7 @@ class SectionTests(QtTest):
         self.controller.widget.add_section_btn.click()
         self.assertEqual(self.controller.model.section_counter(self.cat_id), 2)
 
+    # TODO - test for existing names when adding sections (maybe also for categroies)
 
 class SaveLoadTests(QtTest):
     @classmethod

@@ -254,7 +254,66 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['choices']), 0)
 
-    # TODO - Edit a choice and its details
+    def test_edit_choice_with_message_solution(self):
+        # sys.excepthook = excepthook
+        choice = 'Yes'
+        message = 'Clear all settings'
+        solution_type = 'message'
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[choice, True], [message, True]])
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=[solution_type, True])
+        self.widget.section_edit_pane.add_choice_btn.click()
+
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][0], choice)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_type'][0], solution_type)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_message'][0], message)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_section_id'][0], None)
+
+        list_item = self.widget.section_edit_pane.section_choice_list.item(0, 0)
+        self.widget.section_edit_pane.section_choice_list.setCurrentItem(
+            list_item, QtCore.QItemSelectionModel.Select)
+
+        new_choice = 'Maybe'
+        new_message = 'Do Nothing'
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[new_choice, True], [new_message, True]])
+        self.widget.section_edit_pane.section_choice_list.itemDoubleClicked.emit(
+            list_item)
+        list_item = self.widget.section_edit_pane.section_choice_list.item(0, 0)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][0], new_choice)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_message'][0], new_message)
+        self.assertEqual(list_item.text(), new_choice)
+
+    def test_edit_choice_with_section_solution(self):
+        # sys.excepthook = excepthook
+        choice = 'No'
+        solution_type = 'section'
+        next_section_id = 'section_b'
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[choice, True]])
+        QtWidgets.QInputDialog.getItem = MagicMock(side_effect=[[solution_type, True], [next_section_id, True]])
+        self.widget.section_edit_pane.add_choice_btn.click()
+        self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 1)
+        self.assertEqual(len(self.model.get_section_by_id(self.section_id)['choices']), 1)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][0], choice)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_type'][0], solution_type)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_message'][0], SECTION_SOLUTION)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_section_id'][0], next_section_id)
+
+        list_item = self.widget.section_edit_pane.section_choice_list.item(0, 0)
+        self.widget.section_edit_pane.section_choice_list.setCurrentItem(
+            list_item, QtCore.QItemSelectionModel.Select)
+
+        new_choice = 'Maybe'
+        new_next_section_id = 'section_c'
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[new_choice, True]])
+        QtWidgets.QInputDialog.getItem = MagicMock(side_effect=[[new_next_section_id, True]])
+
+        self.widget.section_edit_pane.section_choice_list.itemDoubleClicked.emit(
+            list_item)
+        list_item = self.widget.section_edit_pane.section_choice_list.item(0, 0)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][0], new_choice)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_message'][0], SECTION_SOLUTION)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_section_id'][0], new_next_section_id)
+        self.assertEqual(list_item.text(), new_choice)
+
     # TODO - Move choice up and down
 
     def test_only_new_section_appears_empty(self):

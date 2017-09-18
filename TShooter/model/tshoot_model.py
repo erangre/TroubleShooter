@@ -158,6 +158,15 @@ class TroubleShooter(QtCore.QObject):
         self._all_sections[section_id]['solution_message'].pop(ind)
         self._all_sections[section_id]['solution_section_id'].pop(ind)
 
+    def modify_choice_in_section(self, section_id, row, new_choice_text):
+        self._all_sections[section_id]['choices'][row] = new_choice_text
+
+    def modify_solution_message_in_section(self, section_id, row, new_message_text):
+        self._all_sections[section_id]['solution_message'][row] = new_message_text
+
+    def modify_solution_section_in_section(self, section_id, row, new_solution):
+        self._all_sections[section_id]['solution_section_id'][row] = new_solution
+
     def get_all_sections_formatted(self):
         all_sections_formatted = []
         for section in self._all_sections.values():
