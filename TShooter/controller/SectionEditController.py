@@ -100,13 +100,11 @@ class SectionEditController(QtCore.QObject):
             if not ok:
                 return
             self.model.modify_message_in_section(current_section_id, row, new_message_text)
-            list_item.setText(new_message_text)
         elif msg_type == IMAGE:
             base_dir = os.path.dirname(list_item.text())
             new_message_text, ok = QtWidgets.QFileDialog.getOpenFileName(self.widget, "Choose Image",
                                                                          directory=base_dir)
             self.model.modify_message_in_section(current_section_id, row, new_message_text)
-            list_item.setText(new_message_text)
         elif msg_type == PV:
             user_msg = "Input new message, using {} as a placeholder for the PV value:"
             new_message_text, ok = QtWidgets.QInputDialog.getText(self.widget, "New PV string", user_msg,
@@ -120,34 +118,37 @@ class SectionEditController(QtCore.QObject):
                 return
             self.model.modify_message_in_section(current_section_id, row, new_message_text)
             self.model.modify_message_pv_in_section(current_section_id, row, new_pv)
-            list_item.setText(new_message_text)
         self.section_modified.emit()
 
     def move_message_up_btn_clicked(self):
         selected_items = self.widget.section_edit_pane.section_message_list.selectedItems()
+        if len(selected_items) == 0:
+            return
         current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
         for list_item in selected_items:
             row = self.widget.section_edit_pane.section_message_list.row(list_item)
             self.model.move_message_up(current_section_id, row)
-            item_to_move_up = self.widget.section_edit_pane.section_message_list.takeItem(row)
-            self.widget.section_edit_pane.section_message_list.insertItem(row - 1, item_to_move_up)
+
+        self.section_modified.emit()
+
+        self.widget.section_edit_pane.section_message_list.setCurrentItem(
+            self.widget.section_edit_pane.section_message_list.item(row - 1), QtCore.QItemSelectionModel.Select)
 
     def move_message_down_btn_clicked(self):
-        print("moving down")
         selected_items = self.widget.section_edit_pane.section_message_list.selectedItems()
+        if len(selected_items) == 0:
+            return
         current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
         for list_item in selected_items:
             row = self.widget.section_edit_pane.section_message_list.row(list_item)
             self.model.move_message_down(current_section_id, row)
-            item_to_move_down = self.widget.section_edit_pane.section_message_list.takeItem(row)
-            self.widget.section_edit_pane.section_message_list.insertItem(row + 1, item_to_move_down)
 
         # TODO - change everything so that edit widget updates to model
 
         self.section_modified.emit()
 
         self.widget.section_edit_pane.section_message_list.setCurrentItem(
-            self.widget.section_edit_pane.section_message_list.item(row - 1), QtCore.QItemSelectionModel.Select)
+            self.widget.section_edit_pane.section_message_list.item(row + 1), QtCore.QItemSelectionModel.Select)
 
     def add_choice_btn_clicked(self):
         current_section_id = self.widget.section_edit_pane.section_id_lbl.text()

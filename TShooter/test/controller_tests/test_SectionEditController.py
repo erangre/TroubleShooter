@@ -131,6 +131,7 @@ class EditSectionTests(QtTest):
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 0)
 
     def test_edit_text_message(self):
+        # sys.excepthook = excepthook
         self.helper_create_text_message('message_1')
         list_item = self.widget.section_edit_pane.section_message_list.item(0)
         self.widget.section_edit_pane.section_message_list.setCurrentItem(
