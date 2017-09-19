@@ -272,13 +272,27 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_message'][0], SECTION_SOLUTION)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_section_id'][0], next_section_id)
 
-    def test_remove_choice_from_section(self):
+    def test_remove_choice_from_section_when_row_selected(self):
         choice = 'Yes'
         message = 'Clear all settings'
         self.helper_create_message_choice(choice, message)
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 1)
         self.widget.section_edit_pane.section_choice_list.selectRow(0)
         self.widget.section_edit_pane.remove_choice_btn.click()
+        self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)
+        self.assertEqual(len(self.model.get_section_by_id(self.section_id)['choices']), 0)
+
+    def test_remove_choice_from_section_when_item_selected(self):
+        choice = 'Yes'
+        message = 'Clear all settings'
+        self.helper_create_message_choice(choice, message)
+        self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 1)
+        list_item = self.widget.section_edit_pane.section_choice_list.item(0, 0)
+        self.widget.section_edit_pane.section_choice_list.setCurrentItem(
+            list_item, QtCore.QItemSelectionModel.Select)
+
+        self.widget.section_edit_pane.remove_choice_btn.click()
+
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['choices']), 0)
 

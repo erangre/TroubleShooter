@@ -190,9 +190,17 @@ class SectionEditController(QtCore.QObject):
         section_choice_list = self.widget.section_edit_pane.section_choice_list
         current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
         selected_rows = section_choice_list.selectionModel().selectedRows()
-        for row in selected_rows:
-            self.model.remove_choice_from_section(current_section_id, row.row())
-            section_choice_list.removeRow(row.row())
+        if len(selected_rows) > 0:
+            for row in selected_rows:
+                self.model.remove_choice_from_section(current_section_id, row.row())
+                section_choice_list.removeRow(row.row())
+        else:
+            selected_items = self.widget.section_edit_pane.section_choice_list.selectedItems()
+            if len(selected_items) == 0:
+                return
+            for list_item in selected_items:
+                row = self.widget.section_edit_pane.section_choice_list.row(list_item)
+                self.model.remove_choice_from_section(current_section_id, row)
         self.section_modified.emit()
 
     def section_choice_list_dbl_clicked(self, list_item):
