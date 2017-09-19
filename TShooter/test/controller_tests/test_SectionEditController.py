@@ -350,8 +350,6 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_section_id'][0], new_next_section_id)
         self.assertEqual(list_item.text(), new_choice)
 
-    # TODO - Move choice up and down
-
     def test_only_new_section_appears_empty(self):
         message = 'message_1'
         self.helper_create_text_message(message)
