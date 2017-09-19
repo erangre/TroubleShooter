@@ -133,6 +133,23 @@ class CategoryTests(QtTest):
         self.controller.widget.remove_category_btn.click()
         self.assertNotEqual(self.controller.widget._main_tree.currentItem(), tree_widget_item)
 
+    def test_cannot_add_same_category_twice(self):
+        cat_id = 'test_subcategory'
+        caption = 'caption_test'
+        image = os.path.join(data_path, "images/beam_status.png")
+        parent_id = 'main'
+        level = 1
+        self.controller.category_info = {'id': cat_id,
+                                         'caption': caption,
+                                         'image': image,
+                                         }
+        self.controller.widget.add_category_btn.click()
+        self.assertEqual(self.controller.model.subcategory_counter("main"), 1)
+        self.controller.widget.add_category_btn.click()
+        self.assertEqual(self.controller.model.subcategory_counter("main"), 1)
+
+    # TODO - Add option to edit category icon and caption
+
 
 class SectionTests(QtTest):
     @classmethod
@@ -258,7 +275,20 @@ class SectionTests(QtTest):
         self.controller.widget.add_section_btn.click()
         self.assertEqual(self.controller.model.section_counter(self.cat_id), 2)
 
-    # TODO - test for existing names when adding sections (maybe also for categroies)
+    def test_cannot_add_section_with_existing_name(self):
+        section_id = 'section_a'
+        self.controller.section_id = section_id
+        self.controller.widget.add_section_btn.click()
+        self.assertEqual(self.controller.model.section_counter(self.cat_id), 1)
+
+        section_id = 'section_a'
+        self.controller.section_id = section_id
+        self.controller.widget.add_section_btn.click()
+        self.assertEqual(self.controller.model.section_counter(self.cat_id), 1)
+        # Note: This test doesn't actually make sure that you cannot add with an existing name.
+        # This is because it might be adding the same one again and the model doesn't change but the widget has two of
+        # the same section.
+
 
 class SaveLoadTests(QtTest):
     @classmethod
