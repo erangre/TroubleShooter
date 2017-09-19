@@ -131,7 +131,6 @@ class EditSectionTests(QtTest):
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 0)
 
     def test_edit_text_message(self):
-        # sys.excepthook = excepthook
         self.helper_create_text_message('message_1')
         list_item = self.widget.section_edit_pane.section_message_list.item(0)
         self.widget.section_edit_pane.section_message_list.setCurrentItem(
@@ -216,10 +215,7 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)
         choice = 'Yes'
         message = 'Clear all settings'
-        solution_type = 'message'
-        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[choice, True], [message, True]])
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=[solution_type, True])
-        self.widget.section_edit_pane.add_choice_btn.click()
+        solution_type = self.helper_create_message_choice(choice, message)
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 1)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['choices']), 1)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][0], choice)
@@ -230,11 +226,8 @@ class EditSectionTests(QtTest):
     def test_add_choice_with_section_solution_to_section(self):
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)
         choice = 'No'
-        solution_type = 'section'
         next_section_id = 'section_b'
-        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[choice, True]])
-        QtWidgets.QInputDialog.getItem = MagicMock(side_effect=[[solution_type, True], [next_section_id, True]])
-        self.widget.section_edit_pane.add_choice_btn.click()
+        solution_type = self.helper_create_section_choice(choice, next_section_id)
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 1)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['choices']), 1)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][0], choice)
@@ -245,10 +238,7 @@ class EditSectionTests(QtTest):
     def test_remove_choice_from_section(self):
         choice = 'Yes'
         message = 'Clear all settings'
-        solution_type = 'message'
-        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[choice, True], [message, True]])
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=[solution_type, True])
-        self.widget.section_edit_pane.add_choice_btn.click()
+        self.helper_create_message_choice(choice, message)
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 1)
         self.widget.section_edit_pane.section_choice_list.selectRow(0)
         self.widget.section_edit_pane.remove_choice_btn.click()
@@ -256,13 +246,10 @@ class EditSectionTests(QtTest):
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['choices']), 0)
 
     def test_edit_choice_with_message_solution(self):
-        # sys.excepthook = excepthook
         choice = 'Yes'
         message = 'Clear all settings'
-        solution_type = 'message'
-        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[choice, True], [message, True]])
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=[solution_type, True])
-        self.widget.section_edit_pane.add_choice_btn.click()
+
+        solution_type = self.helper_create_message_choice(choice, message)
 
         self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][0], choice)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_type'][0], solution_type)
@@ -286,11 +273,8 @@ class EditSectionTests(QtTest):
     def test_edit_choice_with_section_solution(self):
         # sys.excepthook = excepthook
         choice = 'No'
-        solution_type = 'section'
         next_section_id = 'section_b'
-        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[choice, True]])
-        QtWidgets.QInputDialog.getItem = MagicMock(side_effect=[[solution_type, True], [next_section_id, True]])
-        self.widget.section_edit_pane.add_choice_btn.click()
+        solution_type = self.helper_create_section_choice(choice, next_section_id)
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 1)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['choices']), 1)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][0], choice)
@@ -319,17 +303,12 @@ class EditSectionTests(QtTest):
 
     def test_only_new_section_appears_empty(self):
         message = 'message_1'
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
-        QtWidgets.QInputDialog.getText = MagicMock(return_value=[message, True])
-        self.widget.section_edit_pane.add_message_btn.click()
+        self.helper_create_text_message(message)
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
 
         choice = 'Yes'
         message = 'Clear all settings'
-        solution_type = 'message'
-        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[choice, True], [message, True]])
-        QtWidgets.QInputDialog.getItem = MagicMock(return_value=[solution_type, True])
-        self.widget.section_edit_pane.add_choice_btn.click()
+        self.helper_create_message_choice(choice, message)
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 1)
 
         self.section_id_b = 'section_b'
@@ -369,3 +348,17 @@ class EditSectionTests(QtTest):
         epics.caget = MagicMock(return_value=37077)
 
         self.widget.section_edit_pane.add_message_btn.click()
+
+    def helper_create_message_choice(self, choice, message):
+        solution_type = 'message'
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[choice, True], [message, True]])
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=[solution_type, True])
+        self.widget.section_edit_pane.add_choice_btn.click()
+        return solution_type
+
+    def helper_create_section_choice(self, choice, next_section_id):
+        solution_type = 'section'
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[choice, True]])
+        QtWidgets.QInputDialog.getItem = MagicMock(side_effect=[[solution_type, True], [next_section_id, True]])
+        self.widget.section_edit_pane.add_choice_btn.click()
+        return solution_type
