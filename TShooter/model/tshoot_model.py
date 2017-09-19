@@ -167,6 +167,22 @@ class TroubleShooter(QtCore.QObject):
     def modify_solution_section_in_section(self, section_id, row, new_solution):
         self._all_sections[section_id]['solution_section_id'][row] = new_solution
 
+    def move_choice_up(self, section_id, ind):
+        current_section = self.get_section_by_id(section_id)
+        if ind > 0:
+            current_section['choices'].insert(ind - 1, current_section['choices'].pop(ind))
+            current_section['solution_type'].insert(ind - 1, current_section['solution_type'].pop(ind))
+            current_section['solution_message'].insert(ind - 1, current_section['solution_message'].pop(ind))
+            current_section['solution_section_id'].insert(ind - 1, current_section['solution_section_id'].pop(ind))
+
+    def move_choice_down(self, section_id, ind):
+        current_section = self.get_section_by_id(section_id)
+        if ind < len(current_section['choices']):
+            current_section['choices'].insert(ind + 1, current_section['choices'].pop(ind))
+            current_section['solution_type'].insert(ind + 1, current_section['solution_type'].pop(ind))
+            current_section['solution_message'].insert(ind + 1, current_section['solution_message'].pop(ind))
+            current_section['solution_section_id'].insert(ind + 1, current_section['solution_section_id'].pop(ind))
+
     def get_all_sections_formatted(self):
         all_sections_formatted = []
         for section in self._all_sections.values():

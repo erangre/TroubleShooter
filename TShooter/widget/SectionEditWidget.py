@@ -36,6 +36,8 @@ class SectionEditGroupBox(QtWidgets.QGroupBox):
         self.section_choice_list.setHorizontalHeaderLabels(('Choice', 'Solution Type', 'Solution'))
         self.add_choice_btn = QtWidgets.QPushButton('+')
         self.remove_choice_btn = QtWidgets.QPushButton('-')
+        self.move_choice_up_btn = QtWidgets.QPushButton(u'\u2191')
+        self.move_choice_down_btn = QtWidgets.QPushButton(u'\u2193')
 
     def arrange_section_layout(self):
         self._main_layout = QtWidgets.QVBoxLayout()
@@ -55,8 +57,10 @@ class SectionEditGroupBox(QtWidgets.QGroupBox):
         self._grid_layout.addWidget(self.move_message_down_btn, 6, 3, 1, 1)
         self._grid_layout.addWidget(self.choice_lbl, 8, 0, 1, 4)
         self._grid_layout.addWidget(self.section_choice_list, 9, 0, 5, 3)
+        self._grid_layout.addWidget(self.move_choice_up_btn, 9, 3, 1, 1)
         self._grid_layout.addWidget(self.add_choice_btn, 10, 3, 1, 1)
         self._grid_layout.addWidget(self.remove_choice_btn, 11, 3, 1, 1)
+        self._grid_layout.addWidget(self.move_choice_down_btn, 12, 3, 1, 1)
 
         self._main_layout.addLayout(self._grid_layout)
         self._main_layout.addStretch(1)

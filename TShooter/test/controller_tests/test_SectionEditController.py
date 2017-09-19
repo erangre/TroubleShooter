@@ -223,6 +223,43 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_message'][0], message)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_section_id'][0], None)
 
+    def test_move_choice_up(self):
+        choice_1 = 'Yes'
+        message_1 = 'Clear all settings'
+        self.helper_create_message_choice(choice_1, message_1)
+
+        choice_2 = 'No'
+        next_section_id_2 = 'section_b'
+        self.helper_create_section_choice(choice_2, next_section_id_2)
+
+        list_item = self.widget.section_edit_pane.section_choice_list.item(1, 0)
+        self.widget.section_edit_pane.section_choice_list.setCurrentItem(
+            list_item, QtCore.QItemSelectionModel.Select)
+
+        self.widget.section_edit_pane.move_choice_up_btn.click()
+        list_item = self.widget.section_edit_pane.section_choice_list.item(0, 0)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][0], choice_2)
+        self.assertEqual(list_item.text(), choice_2)
+
+    def test_move_choice_down(self):
+        sys.excepthook = excepthook
+        choice_1 = 'Yes'
+        message_1 = 'Clear all settings'
+        self.helper_create_message_choice(choice_1, message_1)
+
+        choice_2 = 'No'
+        next_section_id_2 = 'section_b'
+        self.helper_create_section_choice(choice_2, next_section_id_2)
+
+        list_item = self.widget.section_edit_pane.section_choice_list.item(0, 0)
+        self.widget.section_edit_pane.section_choice_list.setCurrentItem(
+            list_item, QtCore.QItemSelectionModel.Select)
+
+        self.widget.section_edit_pane.move_choice_down_btn.click()
+        list_item = self.widget.section_edit_pane.section_choice_list.item(1, 0)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][1], choice_1)
+        self.assertEqual(list_item.text(), choice_1)
+
     def test_add_choice_with_section_solution_to_section(self):
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)
         choice = 'No'

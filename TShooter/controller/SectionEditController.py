@@ -40,6 +40,8 @@ class SectionEditController(QtCore.QObject):
         self.widget.section_edit_pane.move_message_down_btn.clicked.connect(self.move_message_down_btn_clicked)
         self.widget.section_edit_pane.section_choice_list.itemDoubleClicked.connect(
             self.section_choice_list_dbl_clicked)
+        self.widget.section_edit_pane.move_choice_up_btn.clicked.connect(self.move_choice_up_btn_clicked)
+        self.widget.section_edit_pane.move_choice_down_btn.clicked.connect(self.move_choice_down_btn_clicked)
 
     def add_message_btn_clicked(self):
         current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
@@ -143,8 +145,6 @@ class SectionEditController(QtCore.QObject):
             row = self.widget.section_edit_pane.section_message_list.row(list_item)
             self.model.move_message_down(current_section_id, row)
 
-        # TODO - change everything so that edit widget updates to model
-
         self.section_modified.emit()
 
         self.widget.section_edit_pane.section_message_list.setCurrentItem(
@@ -227,3 +227,31 @@ class SectionEditController(QtCore.QObject):
             self.model.modify_solution_section_in_section(current_section_id, row, solution)
 
         self.section_modified.emit()
+
+    def move_choice_up_btn_clicked(self):
+        selected_items = self.widget.section_edit_pane.section_choice_list.selectedItems()
+        if len(selected_items) == 0:
+            return
+        current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
+        for list_item in selected_items:
+            row = self.widget.section_edit_pane.section_choice_list.row(list_item)
+            self.model.move_choice_up(current_section_id, row)
+
+        self.section_modified.emit()
+
+        self.widget.section_edit_pane.section_choice_list.setCurrentItem(
+            self.widget.section_edit_pane.section_choice_list.item(row - 1, 0), QtCore.QItemSelectionModel.Select)
+
+    def move_choice_down_btn_clicked(self):
+        selected_items = self.widget.section_edit_pane.section_choice_list.selectedItems()
+        if len(selected_items) == 0:
+            return
+        current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
+        for list_item in selected_items:
+            row = self.widget.section_edit_pane.section_choice_list.row(list_item)
+            self.model.move_choice_down(current_section_id, row)
+
+        self.section_modified.emit()
+
+        self.widget.section_edit_pane.section_choice_list.setCurrentItem(
+            self.widget.section_edit_pane.section_choice_list.item(row + 1, 0), QtCore.QItemSelectionModel.Select)
