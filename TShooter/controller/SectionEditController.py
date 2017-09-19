@@ -75,7 +75,8 @@ class SectionEditController(QtCore.QObject):
         else:
             return
 
-        if message_text is None or message_text == '':
+        if message_text is None or message_text == '' or \
+                        message_text in self.model.get_section_by_id(current_section_id)['messages']:
             return
 
         self.widget.section_edit_pane.section_message_list.addItem(str(message_text))
@@ -156,7 +157,7 @@ class SectionEditController(QtCore.QObject):
 
         choice_text, ok = QtWidgets.QInputDialog.getText(self.widget,
                                                          "Add Choice", "Choice text:")
-        if not ok or choice_text == '':
+        if not ok or choice_text == '' or choice_text in self.model.get_section_by_id(current_section_id)['choices']:
             return
         solution_type, ok = QtWidgets.QInputDialog.getItem(self.widget, "Solution Type",
                                                            "Select Solution type for " + choice_text + ":",

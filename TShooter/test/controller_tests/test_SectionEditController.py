@@ -109,6 +109,12 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], message)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['message_pv'][0], pv)
 
+    def test_cannot_add_existing_message(self):
+        message = 'message_1'
+        self.helper_create_text_message(message)
+        self.helper_create_text_message(message)
+        self.assertEqual(self.model.message_counter(self.section_id), 1)
+
     def test_add_and_remove_two_messages_from_section(self):
         self.helper_create_text_message('message_1')
         self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
@@ -223,43 +229,6 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_message'][0], message)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_section_id'][0], None)
 
-    def test_move_choice_up(self):
-        choice_1 = 'Yes'
-        message_1 = 'Clear all settings'
-        self.helper_create_message_choice(choice_1, message_1)
-
-        choice_2 = 'No'
-        next_section_id_2 = 'section_b'
-        self.helper_create_section_choice(choice_2, next_section_id_2)
-
-        list_item = self.widget.section_edit_pane.section_choice_list.item(1, 0)
-        self.widget.section_edit_pane.section_choice_list.setCurrentItem(
-            list_item, QtCore.QItemSelectionModel.Select)
-
-        self.widget.section_edit_pane.move_choice_up_btn.click()
-        list_item = self.widget.section_edit_pane.section_choice_list.item(0, 0)
-        self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][0], choice_2)
-        self.assertEqual(list_item.text(), choice_2)
-
-    def test_move_choice_down(self):
-        sys.excepthook = excepthook
-        choice_1 = 'Yes'
-        message_1 = 'Clear all settings'
-        self.helper_create_message_choice(choice_1, message_1)
-
-        choice_2 = 'No'
-        next_section_id_2 = 'section_b'
-        self.helper_create_section_choice(choice_2, next_section_id_2)
-
-        list_item = self.widget.section_edit_pane.section_choice_list.item(0, 0)
-        self.widget.section_edit_pane.section_choice_list.setCurrentItem(
-            list_item, QtCore.QItemSelectionModel.Select)
-
-        self.widget.section_edit_pane.move_choice_down_btn.click()
-        list_item = self.widget.section_edit_pane.section_choice_list.item(1, 0)
-        self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][1], choice_1)
-        self.assertEqual(list_item.text(), choice_1)
-
     def test_add_choice_with_section_solution_to_section(self):
         self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 0)
         choice = 'No'
@@ -271,6 +240,14 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_type'][0], solution_type)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_message'][0], SECTION_SOLUTION)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_section_id'][0], next_section_id)
+
+    def test_cannot_add_existing_choice(self):
+        choice = 'Yes'
+        message = 'Clear all settings'
+        self.helper_create_message_choice(choice, message)
+        self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 1)
+        self.helper_create_message_choice(choice, message)
+        self.assertEqual(self.widget.section_edit_pane.section_choice_list.rowCount(), 1)
 
     def test_remove_choice_from_section_when_row_selected(self):
         choice = 'Yes'
@@ -349,6 +326,43 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_message'][0], SECTION_SOLUTION)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_section_id'][0], new_next_section_id)
         self.assertEqual(list_item.text(), new_choice)
+
+    def test_move_choice_up(self):
+        choice_1 = 'Yes'
+        message_1 = 'Clear all settings'
+        self.helper_create_message_choice(choice_1, message_1)
+
+        choice_2 = 'No'
+        next_section_id_2 = 'section_b'
+        self.helper_create_section_choice(choice_2, next_section_id_2)
+
+        list_item = self.widget.section_edit_pane.section_choice_list.item(1, 0)
+        self.widget.section_edit_pane.section_choice_list.setCurrentItem(
+            list_item, QtCore.QItemSelectionModel.Select)
+
+        self.widget.section_edit_pane.move_choice_up_btn.click()
+        list_item = self.widget.section_edit_pane.section_choice_list.item(0, 0)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][0], choice_2)
+        self.assertEqual(list_item.text(), choice_2)
+
+    def test_move_choice_down(self):
+        sys.excepthook = excepthook
+        choice_1 = 'Yes'
+        message_1 = 'Clear all settings'
+        self.helper_create_message_choice(choice_1, message_1)
+
+        choice_2 = 'No'
+        next_section_id_2 = 'section_b'
+        self.helper_create_section_choice(choice_2, next_section_id_2)
+
+        list_item = self.widget.section_edit_pane.section_choice_list.item(0, 0)
+        self.widget.section_edit_pane.section_choice_list.setCurrentItem(
+            list_item, QtCore.QItemSelectionModel.Select)
+
+        self.widget.section_edit_pane.move_choice_down_btn.click()
+        list_item = self.widget.section_edit_pane.section_choice_list.item(1, 0)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['choices'][1], choice_1)
+        self.assertEqual(list_item.text(), choice_1)
 
     def test_only_new_section_appears_empty(self):
         message = 'message_1'

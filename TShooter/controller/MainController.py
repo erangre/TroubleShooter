@@ -94,7 +94,7 @@ class MainController(object):
             if subcat_image == '':
                 subcat_image = DEFAULT_IMAGE
 
-        if self.model.get_category_by_id(subcat_id):
+        if self.model.get_category_by_id(subcat_id) or subcat_id == '' or subcat_caption == '':
             return
 
         self.model.add_subcategory(parent_id, subcat_id, subcat_caption, subcat_image)
@@ -131,7 +131,7 @@ class MainController(object):
             section_id, ok = QtWidgets.QInputDialog.getText(self.widget, 'Create a new section', 'Section ID')
             if not ok:
                 return
-        if self.model.get_section_by_id(section_id):
+        if self.model.get_section_by_id(section_id) or section_id == '':
             return
         self.model.add_section_to_category(parent_id, section_id, section_id)
         self.widget.add_section(parent_id, section_id)
