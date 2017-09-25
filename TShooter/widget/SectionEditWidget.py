@@ -10,6 +10,7 @@ class SectionEditGroupBox(QtWidgets.QGroupBox):
     def __init__(self, *args, **kwargs):
         super(SectionEditGroupBox, self).__init__(*args, **kwargs)
         self.create_widgets()
+        self.style_widgets()
         self.arrange_section_layout()
 
     def create_widgets(self):
@@ -38,6 +39,9 @@ class SectionEditGroupBox(QtWidgets.QGroupBox):
         self.remove_choice_btn = QtWidgets.QPushButton('-')
         self.move_choice_up_btn = QtWidgets.QPushButton(u'\u2191')
         self.move_choice_down_btn = QtWidgets.QPushButton(u'\u2193')
+
+    def style_widgets(self):
+        self.section_caption_le.setEnabled(False)
 
     def arrange_section_layout(self):
         self._main_layout = QtWidgets.QVBoxLayout()

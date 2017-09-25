@@ -149,6 +149,7 @@ class CategoryTests(QtTest):
         self.assertEqual(self.controller.model.subcategory_counter("main"), 1)
 
     # TODO - Add option to edit category icon and caption
+    # TODO - Add View of Categories
 
 
 class SectionTests(QtTest):

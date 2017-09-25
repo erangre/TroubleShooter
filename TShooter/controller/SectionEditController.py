@@ -75,13 +75,19 @@ class SectionEditController(QtCore.QObject):
         else:
             return
 
-        if message_text is None or message_text == '' or \
-                        message_text in self.model.get_section_by_id(current_section_id)['messages']:
+        if self.is_message_text_bad(message_text, current_section_id):
             return
 
         self.widget.section_edit_pane.section_message_list.addItem(str(message_text))
         self.model.add_message_to_section(current_section_id, message_text, msg_type, pv)
         self.section_modified.emit()
+
+    def is_message_text_bad(self, message_text, current_section_id):
+        if message_text is None or message_text == '' or \
+                        message_text in self.model.get_section_by_id(current_section_id)['messages']:
+            return True
+        else:
+            return False
 
     def remove_message_btn_clicked(self):
         selected_items = self.widget.section_edit_pane.section_message_list.selectedItems()
@@ -102,11 +108,19 @@ class SectionEditController(QtCore.QObject):
                                                                   "Input new message text:", text=list_item.text())
             if not ok:
                 return
+
+            if self.is_message_text_bad(new_message_text, current_section_id):
+                return
+
             self.model.modify_message_in_section(current_section_id, row, new_message_text)
         elif msg_type == IMAGE:
             base_dir = os.path.dirname(list_item.text())
             new_message_text, ok = QtWidgets.QFileDialog.getOpenFileName(self.widget, "Choose Image",
                                                                          directory=base_dir)
+
+            if self.is_message_text_bad(new_message_text, current_section_id):
+                return
+
             self.model.modify_message_in_section(current_section_id, row, new_message_text)
         elif msg_type == PV:
             user_msg = "Input new message, using {} as a placeholder for the PV value:"
@@ -114,6 +128,10 @@ class SectionEditController(QtCore.QObject):
                                                                   text=list_item.text())
             if not ok:
                 return
+
+            if self.is_message_text_bad(new_message_text, current_section_id):
+                return
+
             old_pv = current_section['message_pv'][row]
             new_pv, ok = QtWidgets.QInputDialog.getText(self.widget, "New PV", "Please input the new PV to read",
                                                         text=old_pv)
@@ -157,7 +175,7 @@ class SectionEditController(QtCore.QObject):
 
         choice_text, ok = QtWidgets.QInputDialog.getText(self.widget,
                                                          "Add Choice", "Choice text:")
-        if not ok or choice_text == '' or choice_text in self.model.get_section_by_id(current_section_id)['choices']:
+        if not ok or self.is_choice_text_bad(choice_text, current_section_id):
             return
         solution_type, ok = QtWidgets.QInputDialog.getItem(self.widget, "Solution Type",
                                                            "Select Solution type for " + choice_text + ":",
@@ -187,6 +205,13 @@ class SectionEditController(QtCore.QObject):
                                          solution=solution)
         self.section_modified.emit()
 
+    def is_choice_text_bad(self, choice_text, current_section_id):
+        if choice_text is None or choice_text == '' or \
+                        choice_text in self.model.get_section_by_id(current_section_id)['choices']:
+            return True
+        else:
+            return False
+
     def remove_choice_btn_clicked(self):
         section_choice_list = self.widget.section_edit_pane.section_choice_list
         current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
@@ -213,7 +238,7 @@ class SectionEditController(QtCore.QObject):
 
         new_choice_text, ok = QtWidgets.QInputDialog.getText(self.widget,
                                                              "Add Choice", "Choice text:", text=choice_item.text())
-        if not ok:
+        if not ok or self.is_choice_text_bad(new_choice_text, current_section_id):
             return
 
         self.model.modify_choice_in_section(current_section_id, row, new_choice_text)
