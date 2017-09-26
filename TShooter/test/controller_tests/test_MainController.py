@@ -151,6 +151,26 @@ class CategoryTests(QtTest):
     # TODO - Add option to edit category icon and caption
     # TODO - Add View of Categories
 
+    def test_edit_category(self):
+        cat_id = 'test_subcategory'
+        caption = 'caption_test'
+        image = os.path.join(data_path, "images/beam_status.png")
+        parent_id = 'main'
+        level = 1
+        self.controller.category_info = {'id': cat_id,
+                                         'caption': caption,
+                                         'image': image,
+                                         }
+        self.controller.widget.add_category_btn.click()
+        new_caption = 'caption_changed'
+        new_image = os.path.join(data_path, "images/garfield.png")
+        QtWidgets.QInputDialog.getText = MagicMock(return_value=[new_caption, True])
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[new_image, ''])
+        self.controller.widget.edit_category_btn.click()
+        self.assertEqual(self.controller.model.get_category_by_id(cat_id)['caption'], new_caption)
+        self.assertEqual(self.controller.model.get_category_by_id(cat_id)['level'], level)
+        self.assertEqual(self.controller.model.get_category_by_id(cat_id)['parent_id'], parent_id)
+        self.assertEqual(self.controller.model.get_category_by_id(cat_id)['image'], new_image)
 
 class SectionTests(QtTest):
     @classmethod

@@ -49,6 +49,10 @@ class TroubleShooter(QtCore.QObject):
 
         return self._all_categories[subcategory_id]
 
+    def edit_category(self, category_id, subcat_caption, subcat_image):
+        self._all_categories[category_id]['caption'] = subcat_caption
+        self._all_categories[category_id]['image'] = subcat_image
+
     def remove_category(self, category_id):
         parent_category_id = self._all_categories[category_id]['parent_id']
         del self._all_categories[parent_category_id]['subcategories'][category_id]

@@ -43,6 +43,7 @@ class MainController(object):
 
         self.widget.add_category_btn.clicked.connect(self.add_category_btn_clicked)
         self.widget.add_section_btn.clicked.connect(self.add_section_btn_clicked)
+        self.widget.edit_category_btn.clicked.connect(self.edit_category_btn_clicked)
         self.widget.remove_category_btn.clicked.connect(self.remove_category_btn_clicked)
 
         self.widget._main_tree.itemSelectionChanged.connect(self.tree_item_selection_changed)
@@ -135,6 +136,41 @@ class MainController(object):
             return
         self.model.add_section_to_category(parent_id, section_id, section_id)
         self.widget.add_section(parent_id, section_id)
+
+    def edit_category_btn_clicked(self):
+        selected_categories = self.widget.get_selected_categories()
+
+        if selected_categories:
+            for tree_item_id, tree_item in self.widget.categories.items():
+                if selected_categories[0] == tree_item:
+                    self.edit_category(tree_item_id)
+                    return
+            for tree_item_id, tree_item in self.widget.sections.items():
+                if selected_categories[0] == tree_item:
+                    self.edit_section(tree_item_id)
+                    return
+
+    def edit_category(self, category_id):
+        subcat_caption, ok = QtWidgets.QInputDialog.getText(self.widget, 'Edit category',
+                                                            'New Category Caption')
+        if not ok:
+            return
+        subcat_image, _ = QtWidgets.QFileDialog.getOpenFileName(self.widget, None, 'Choose new image for subcategory')
+        if subcat_image == '':
+            subcat_image = DEFAULT_IMAGE
+
+        self.model.edit_category(category_id, subcat_caption, subcat_image)
+        # TODO - Change caption in the tree widget
+        # TODO - Check if it is possible to refactor the whole way the tree works. For every change to load from the
+        # model instead of editing the tree widget
+
+    def edit_section(self, section_id):
+        pass
+        # section_id, ok = QtWidgets.QInputDialog.getText(self.widget, 'Create a new section', 'Section ID')
+        # if not ok:
+        #     return
+        # if self.model.get_section_by_id(section_id) or section_id == '':
+        #     return
 
     def remove_category_btn_clicked(self):
         selected_categories = self.widget.get_selected_categories()

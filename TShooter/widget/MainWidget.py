@@ -29,6 +29,7 @@ class MainWidget(QtWidgets.QWidget):
 
         self.add_category_btn = QtWidgets.QPushButton('Add Category')
         self.add_section_btn = QtWidgets.QPushButton('Add Section')
+        self.edit_category_btn = QtWidgets.QPushButton('Edit')
         self.remove_category_btn = QtWidgets.QPushButton('Remove')
 
         self._main_tree = QtWidgets.QTreeWidget()
@@ -53,6 +54,7 @@ class MainWidget(QtWidgets.QWidget):
 
         self._btn_category_layout.addWidget(self.add_category_btn)
         self._btn_category_layout.addWidget(self.add_section_btn)
+        self._btn_category_layout.addWidget(self.edit_category_btn)
         self._btn_category_layout.addWidget(self.remove_category_btn)
 
         self._category_layout.addLayout(self._file_layout)
