@@ -38,11 +38,9 @@ class CategoryTests(QtTest):
         image = os.path.join(data_path, "images/beam_status.png")
         parent_id = 'main'
         level = 1
-        self.controller.category_info = {'id': cat_id,
-                                         'caption': caption,
-                                         'image': image,
-                                         }
-        self.controller.widget.add_category_btn.click()
+
+        self.helper_create_category(cat_id, caption, image)
+
         self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.categories[cat_id])
         self.assertIsNotNone(self.controller.widget.categories.get(cat_id, None))
         self.assertEqual(self.controller.widget.categories.get(cat_id, None).text(0), caption)
@@ -57,24 +55,15 @@ class CategoryTests(QtTest):
         image = os.path.join(data_path, "images/beam_status.png")
         parent_id = 'main'
         cat_level = 1
-
-        self.controller.category_info = {'id': cat_id,
-                                         'caption': caption,
-                                         'image': image,
-                                         }
-
-        self.controller.widget.add_category_btn.click()
+        self.helper_create_category(cat_id, caption, image)
 
         subcat_id = 'test_sub_cat'
         subcat_caption = 'sub cat!'
         subcat_parent_id = cat_id
         subcat_level = 2
+        subcat_image = os.path.join(data_path, "images/garfield.png")
 
-        self.controller.category_info = {'id': subcat_id,
-                                         'caption': subcat_caption,
-                                         'image': image,
-                                         }
-        self.controller.widget.add_category_btn.click()
+        self.helper_create_category(subcat_id, subcat_caption, subcat_image)
 
         self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.categories[subcat_id])
         added_sub_category = self.controller.model.get_category_by_id(subcat_id)
@@ -85,25 +74,19 @@ class CategoryTests(QtTest):
         cat_id = 'test_subcategory'
         caption = 'caption_test'
         image = os.path.join(data_path, "images/beam_status.png")
-        self.controller.category_info = {'id': cat_id,
-                                         'caption': caption,
-                                         'image': image,
-                                         }
-        self.controller.widget.add_category_btn.click()
+
+        self.helper_create_category(cat_id, caption, image)
 
         # simulate the user choosing the main category again
         self.controller.widget.set_selected_category("main")
 
         cat_id = 'test_subcategory2'
         caption = 'caption_test2'
-        image = os.path.join(data_path, "images/beam_status.png")
+        image = os.path.join(data_path, "images/garfield.png")
         parent_id = 'main'
         level = 1
-        self.controller.category_info = {'id': cat_id,
-                                         'caption': caption,
-                                         'image': image,
-                                         }
-        self.controller.widget.add_category_btn.click()
+
+        self.helper_create_category(cat_id, caption, image)
 
         self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.categories[cat_id])
 
@@ -121,12 +104,8 @@ class CategoryTests(QtTest):
         parent_id = 'main'
         cat_level = 1
 
-        self.controller.category_info = {'id': cat_id,
-                                         'caption': caption,
-                                         'image': image,
-                                         }
+        self.helper_create_category(cat_id, caption, image)
 
-        self.controller.widget.add_category_btn.click()
         tree_widget_item = self.controller.widget.categories[cat_id]
         self.assertEqual(self.controller.widget._main_tree.currentItem(), tree_widget_item)
         QtWidgets.QMessageBox.exec_ = MagicMock(return_value=QtWidgets.QMessageBox.Ok)
@@ -139,13 +118,10 @@ class CategoryTests(QtTest):
         image = os.path.join(data_path, "images/beam_status.png")
         parent_id = 'main'
         level = 1
-        self.controller.category_info = {'id': cat_id,
-                                         'caption': caption,
-                                         'image': image,
-                                         }
-        self.controller.widget.add_category_btn.click()
+
+        self.helper_create_category(cat_id, caption, image)
         self.assertEqual(self.controller.model.subcategory_counter("main"), 1)
-        self.controller.widget.add_category_btn.click()
+        self.helper_create_category(cat_id, caption, image)
         self.assertEqual(self.controller.model.subcategory_counter("main"), 1)
 
     # TODO - Add View of Categories
@@ -157,11 +133,7 @@ class CategoryTests(QtTest):
         image = os.path.join(data_path, "images/beam_status.png")
         parent_id = 'main'
         level = 1
-        self.controller.category_info = {'id': cat_id,
-                                         'caption': caption,
-                                         'image': image,
-                                         }
-        self.controller.widget.add_category_btn.click()
+        self.helper_create_category(cat_id, caption, image)
         new_caption = 'caption_changed'
         new_image = os.path.join(data_path, "images/garfield.png")
         QtWidgets.QInputDialog.getText = MagicMock(return_value=[new_caption, True])
@@ -171,6 +143,12 @@ class CategoryTests(QtTest):
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['level'], level)
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['parent_id'], parent_id)
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['image'], new_image)
+
+    def helper_create_category(self, cat_id, caption, image):
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image, ''])
+        self.controller.widget.add_category_btn.click()
+
 
 class SectionTests(QtTest):
     @classmethod
@@ -184,11 +162,8 @@ class SectionTests(QtTest):
         self.cat_id = 'first_category'
         caption = 'The first category!'
         image = os.path.join(data_path, "images/beam_status.png")
-        self.controller.category_info = {'id': self.cat_id,
-                                         'caption': caption,
-                                         'image': image,
-                                         }
-        self.controller.widget.add_category_btn.click()
+
+        self.helper_create_category(self.cat_id, caption, image)
 
     def tearDown(self):
         del self.controller
@@ -240,11 +215,8 @@ class SectionTests(QtTest):
         subcat_caption = 'sub cat!'
         image = os.path.join(data_path, "images/beam_status.png")
 
-        self.controller.category_info = {'id': subcat_id,
-                                         'caption': subcat_caption,
-                                         'image': image,
-                                         }
-        self.controller.widget.add_category_btn.click()
+        self.helper_create_category(subcat_id, subcat_caption, image)
+
         self.controller.widget.set_selected_category(self.cat_id)
         section_id = 'section_a'
         self.controller.section_id = section_id
@@ -310,6 +282,11 @@ class SectionTests(QtTest):
         # This is because it might be adding the same one again and the model doesn't change but the widget has two of
         # the same section.
 
+    def helper_create_category(self, cat_id, caption, image):
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image, ''])
+        self.controller.widget.add_category_btn.click()
+
 
 class SaveLoadTests(QtTest):
     @classmethod
@@ -327,11 +304,7 @@ class SaveLoadTests(QtTest):
         self.cat_id = 'first_category'
         caption = 'The first category!'
         image = os.path.join(data_path, "images/beam_status.png")
-        self.controller.category_info = {'id': self.cat_id,
-                                         'caption': caption,
-                                         'image': image,
-                                         }
-        self.widget.add_category_btn.click()
+        self.helper_create_category(self.cat_id, caption, image)
 
         self.section_id = 'section_a'
         self.controller.section_id = self.section_id
@@ -372,12 +345,8 @@ class SaveLoadTests(QtTest):
 
         self.cat_id2 = 'second_category'
         caption = 'The second category!'
-        image = os.path.join(data_path, "images/beam_status.png")
-        self.controller.category_info = {'id': self.cat_id2,
-                                         'caption': caption,
-                                         'image': image,
-                                         }
-        self.widget.add_category_btn.click()
+        image = os.path.join(data_path, "images/garfield.png")
+        self.helper_create_category(self.cat_id2, caption, image)
 
         self.section_id_c = 'section_c'
         self.controller.section_id = self.section_id_c
@@ -432,3 +401,8 @@ class SaveLoadTests(QtTest):
         # test if exists in widget
         self.assertEqual(len(self.widget.categories), 3)
         self.assertEqual(len(self.widget.sections), 3)
+
+    def helper_create_category(self, cat_id, caption, image):
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image, ''])
+        self.controller.widget.add_category_btn.click()

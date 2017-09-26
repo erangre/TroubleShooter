@@ -58,19 +58,13 @@ class MainController(object):
             self.widget.raise_()
 
     def add_category_btn_clicked(self):
-        subcat_id = self.category_info.get('id', None)
-        subcat_caption = self.category_info.get('caption', None)
-        subcat_image = self.category_info.get('image', None)
-        parent_id = self.category_info.get('parent_id', None)
-        self.add_category(subcat_id, subcat_caption, subcat_image, parent_id)
-
-    def add_category(self, subcat_id, subcat_caption, subcat_image, parent_id):
+        parent_id = None
         # prevent adding a subcategory in a section
         for tree_item_id, tree_item in self.widget.sections.items():
             if self.widget.get_selected_categories()[0] == tree_item:
                 return
 
-        if not parent_id and self.widget.get_selected_categories():
+        if self.widget.get_selected_categories():
             for tree_item_id, tree_item in self.widget.categories.items():
                 if self.widget.get_selected_categories()[0] == tree_item:
                     parent_id = tree_item_id
@@ -82,18 +76,17 @@ class MainController(object):
             if self.model.get_section_by_id(section_id)['parent_id'] == parent_id:
                 return
 
-        if not subcat_id:
-            subcat_id, ok = QtWidgets.QInputDialog.getText(self.widget, 'Create a new subcategory', 'Category ID')
+        subcat_id, ok = QtWidgets.QInputDialog.getText(self.widget, 'Create a new subcategory', 'Category ID')
 
-            if not ok:
-                return
-            subcat_caption, ok = QtWidgets.QInputDialog.getText(self.widget, 'Create a new subcategory',
-                                                                'Category Caption')
-            if not ok:
-                return
-            subcat_image, _ = QtWidgets.QFileDialog.getOpenFileName(self.widget, None, 'Choose image for subcategory')
-            if subcat_image == '':
-                subcat_image = DEFAULT_IMAGE
+        if not ok:
+            return
+        subcat_caption, ok = QtWidgets.QInputDialog.getText(self.widget, 'Create a new subcategory',
+                                                            'Category Caption')
+        if not ok:
+            return
+        subcat_image, _ = QtWidgets.QFileDialog.getOpenFileName(self.widget, None, 'Choose image for subcategory')
+        if subcat_image == '':
+            subcat_image = DEFAULT_IMAGE
 
         if self.model.get_category_by_id(subcat_id) or subcat_id == '' or subcat_caption == '':
             return
