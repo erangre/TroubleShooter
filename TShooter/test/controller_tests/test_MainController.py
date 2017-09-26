@@ -148,8 +148,8 @@ class CategoryTests(QtTest):
         self.controller.widget.add_category_btn.click()
         self.assertEqual(self.controller.model.subcategory_counter("main"), 1)
 
-    # TODO - Add option to edit category icon and caption
     # TODO - Add View of Categories
+    # TODO - When editing category read default values
 
     def test_edit_category(self):
         cat_id = 'test_subcategory'
