@@ -70,6 +70,8 @@ class CategoryTests(QtTest):
         self.assertEqual(added_sub_category['level'], subcat_level)
         self.assertEqual(added_sub_category['parent_id'], cat_id)
 
+        # TODO - add category id in tree_widget column
+
     def test_add_two_categories(self):
         cat_id = 'test_subcategory'
         caption = 'caption_test'
@@ -143,6 +145,7 @@ class CategoryTests(QtTest):
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['level'], level)
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['parent_id'], parent_id)
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['image'], new_image)
+        self.assertEqual(self.controller.widget.categories.get(cat_id, None).text(0), new_caption)
 
     def helper_create_category(self, cat_id, caption, image):
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])

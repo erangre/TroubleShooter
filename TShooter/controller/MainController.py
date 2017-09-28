@@ -151,11 +151,11 @@ class MainController(object):
         subcat_image, _ = QtWidgets.QFileDialog.getOpenFileName(self.widget, None, 'Choose new image for subcategory')
         if subcat_image == '':
             subcat_image = DEFAULT_IMAGE
+        tree_item = self.widget.categories.get(category_id, None)
 
+        if tree_item is not None:
+            tree_item.setText(0, subcat_caption)
         self.model.edit_category(category_id, subcat_caption, subcat_image)
-        # TODO - Change caption in the tree widget
-        # TODO - Check if it is possible to refactor the whole way the tree works. For every change to load from the
-        # model instead of editing the tree widget
 
     def edit_section(self, section_id):
         pass
