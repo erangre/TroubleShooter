@@ -37,6 +37,9 @@ class ViewSectionTests(QtTest):
                                          'caption': caption,
                                          'image': image,
                                          }
+        self.image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[self.cat_id, True], [caption, True]])
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[self.image_filename, ''])
         self.widget.add_category_btn.click()
 
         self.section_id = 'section_a'
@@ -77,11 +80,9 @@ class ViewSectionTests(QtTest):
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[self.choice_2, True]])
         QtWidgets.QInputDialog.getItem = MagicMock(side_effect=[[solution_type, True], [self.next_section_id, True]])
         self.widget.section_edit_pane.add_choice_btn.click()
-
         self.section_id_b = 'section_b'
         self.controller.section_id = self.section_id_b
         self.widget.add_section_btn.click()
-
         self.widget.set_selected_category(self.cat_id)  # go to a category and back to update before testing
         self.widget.set_selected_section(self.section_id)
 
@@ -90,7 +91,6 @@ class ViewSectionTests(QtTest):
         gc.collect()
 
     def test_selecting_section_adds_section_view_to_layout(self):
-        pass
         self.widget.set_selected_category(self.cat_id)
 
         self.assertFalse(self.helper_is_widget_in_layout(self.widget.section_view_pane,
@@ -127,7 +127,6 @@ class ViewSectionTests(QtTest):
     def test_clicking_on_choice_button_reveals_solution(self):
         self.assertFalse(self.widget.section_view_pane.next_section_btn.isEnabled())
         current_section = self.model.get_section_by_id(self.section_id)
-
         for ind in range(0, len(self.widget.section_view_pane.choices)):
             choice_btn = self.widget.section_view_pane.choices[ind]
             choice_btn.click()
@@ -135,6 +134,7 @@ class ViewSectionTests(QtTest):
                 self.assertEqual(self.widget.section_view_pane.solution_message_lbl.text(),
                                  current_section['solution_message'][ind])
             elif current_section['solution_type'][ind] == 'section':
+                print(self.widget.section_view_pane.solution_message_lbl.text())
                 self.assertEqual(self.widget.section_view_pane.solution_message_lbl.text(),
                                  SECTION_SOLUTION)
                 self.assertTrue(self.widget.section_view_pane.next_section_btn.isEnabled())

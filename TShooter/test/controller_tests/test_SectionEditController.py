@@ -5,9 +5,9 @@ import gc
 from qtpy import QtWidgets, QtCore, QtGui
 # from qtpy.QtTest import QTest
 from mock import MagicMock
+import epics
 from ..utility import QtTest, click_button
 
-import epics
 import time
 
 from ...controller.MainController import MainController
@@ -27,6 +27,7 @@ class EditSectionTests(QtTest):
             cls.app = QtWidgets.QApplication([])
 
     def setUp(self):
+        # TODO: When editing, even if name doesn't change allow change to other properties.
         # sys.excepthook = excepthook
         self.controller = MainController()
         self.model = self.controller.model
@@ -39,6 +40,8 @@ class EditSectionTests(QtTest):
                                          'caption': caption,
                                          'image': image,
                                          }
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[self.cat_id, True], [caption, True]])
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image, ''])
         self.widget.add_category_btn.click()
 
         self.section_id = 'section_a'
@@ -147,22 +150,23 @@ class EditSectionTests(QtTest):
         self.widget.section_edit_pane.section_message_list.itemDoubleClicked.emit(
             list_item)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], new_message)
+        list_item = self.widget.section_edit_pane.section_message_list.item(0)
         self.assertEqual(list_item.text(), new_message)
 
     def test_edit_image_message(self):
         # sys.excepthook = excepthook
         image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         self.helper_create_image_message(image_filename)
-
         list_item = self.widget.section_edit_pane.section_message_list.item(0)
         self.widget.section_edit_pane.section_message_list.setCurrentItem(
             list_item, QtCore.QItemSelectionModel.Select)
-
         new_image_filename = os.path.normpath(os.path.join(data_path, "images/garfield.png"))
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[new_image_filename, ''])
         self.widget.section_edit_pane.section_message_list.itemDoubleClicked.emit(
             list_item)
         time.sleep(0.2)
+
+        list_item = self.widget.section_edit_pane.section_message_list.item(0)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], new_image_filename)
         self.assertEqual(list_item.text(), new_image_filename)
 
@@ -182,6 +186,7 @@ class EditSectionTests(QtTest):
             list_item)
 
         self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], new_message)
+        list_item = self.widget.section_edit_pane.section_message_list.item(0)
         self.assertEqual(list_item.text(), new_message)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['message_pv'][0], new_pv)
 
@@ -346,7 +351,7 @@ class EditSectionTests(QtTest):
         self.assertEqual(list_item.text(), choice_2)
 
     def test_move_choice_down(self):
-        sys.excepthook = excepthook
+        # sys.excepthook = excepthook
         choice_1 = 'Yes'
         message_1 = 'Clear all settings'
         self.helper_create_message_choice(choice_1, message_1)

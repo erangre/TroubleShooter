@@ -270,6 +270,7 @@ class MainController(object):
         self.widget.section_view_pane.next_section_btn.setVisible(False)
         self.widget.section_view_pane.previous_section_btn.setEnabled(False)
         self.widget.section_view_pane.previous_section_btn.setVisible(False)
+        self.widget.section_view_pane.choices = []
         self.clear_layout(self.widget.section_view_pane.message_layout)
         self.clear_layout(self.widget.section_view_pane.choices_layout)
         self.widget.section_view_pane.solution_message_lbl.setVisible(False)

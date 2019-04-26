@@ -117,6 +117,7 @@ class TroubleShooter(QtCore.QObject):
     def remove_message_from_section(self, section_id, ind):
         self._all_sections[section_id]['messages'].pop(ind)
         self._all_sections[section_id]['message_type'].pop(ind)
+        self._all_sections[section_id]['message_pv'].pop(ind)
 
     def modify_message_in_section(self, section_id, ind, new_message):
         self._all_sections[section_id]['messages'][ind] = new_message
@@ -206,6 +207,6 @@ class TroubleShooter(QtCore.QObject):
 
     def import_category_from_yaml(self, input_file):
         stream = open(input_file, 'r')
-        all_data = yaml.load(stream)
+        all_data = yaml.full_load(stream)
         self._all_categories = copy.deepcopy(all_data['all_categories'])
         self._all_sections = copy.deepcopy(all_data['all_sections'])

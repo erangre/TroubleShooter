@@ -4,6 +4,7 @@ import unittest
 from qtpy import QtWidgets, QtCore
 from qtpy.QtTest import QTest
 import os
+import traceback
 
 unittest_data_path = os.path.join(os.path.dirname(__file__), 'data')
 
