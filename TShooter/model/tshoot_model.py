@@ -201,12 +201,40 @@ class TroubleShooter(QtCore.QObject):
         return all_data
 
     def export_category_to_yaml(self, output_file):
+        all_data = copy.deepcopy(self.get_all_data())
+
+        for section in all_data['all_sections']:
+            section_data = all_data['all_sections'][section]
+            for ind in range(len(section_data['messages'])):
+                if section_data['message_type'][ind] == IMAGE:
+                    section_data['messages'][ind] = os.path.relpath(section_data['messages'][ind],
+                                                                    os.path.dirname(output_file))
+
+        for category in all_data['all_categories']:
+            cat_data = all_data['all_categories'][category]
+            if cat_data['image'] is not None:
+                cat_data['image'] = os.path.relpath(cat_data['image'], os.path.dirname(output_file))
+
         stream = open(output_file, "w")
-        yaml.dump(self.get_all_data(), stream)
+        yaml.dump(all_data, stream)
         stream.close()
+        del all_data
 
     def import_category_from_yaml(self, input_file):
         stream = open(input_file, 'r')
         all_data = yaml.full_load(stream)
         self._all_categories = copy.deepcopy(all_data['all_categories'])
         self._all_sections = copy.deepcopy(all_data['all_sections'])
+
+        for section in self._all_sections:
+            section_data = self._all_sections[section]
+            for ind in range(len(section_data['messages'])):
+                if section_data['message_type'][ind] == IMAGE:
+                    section_data['messages'][ind] = os.path.normpath(os.path.join(os.path.dirname(input_file),
+                                                                                  section_data['messages'][ind]))
+
+        for category in self._all_categories:
+            cat_data = self._all_categories[category]
+            if cat_data['image'] is not None:
+                cat_data['image'] = os.path.normpath(os.path.join(os.path.dirname(input_file),
+                                                                  cat_data['image']))
