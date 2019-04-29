@@ -27,7 +27,6 @@ class EditSectionTests(QtTest):
             cls.app = QtWidgets.QApplication([])
 
     def setUp(self):
-        # TODO: When editing, even if name doesn't change allow change to other properties.
         # sys.excepthook = excepthook
         self.controller = MainController()
         self.model = self.controller.model
@@ -188,6 +187,25 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], new_message)
         list_item = self.widget.section_edit_pane.section_message_list.item(0)
         self.assertEqual(list_item.text(), new_message)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['message_pv'][0], new_pv)
+
+    def test_edit_pv_message_with_no_change_to_text(self):
+        message = 'Energy is {0} eV'
+        pv = "13IDA:CDEn:E_RBV"
+        self.helper_create_pv_message(message, pv)
+
+        list_item = self.widget.section_edit_pane.section_message_list.item(0)
+        self.widget.section_edit_pane.section_message_list.setCurrentItem(
+            list_item, QtCore.QItemSelectionModel.Select)
+
+        new_pv = "13IDA:CDEn:WL_RBV"
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[message, True], [new_pv, True]])
+        self.widget.section_edit_pane.section_message_list.itemDoubleClicked.emit(
+            list_item)
+
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], message)
+        list_item = self.widget.section_edit_pane.section_message_list.item(0)
+        self.assertEqual(list_item.text(), message)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['message_pv'][0], new_pv)
 
     def test_move_message_up(self):

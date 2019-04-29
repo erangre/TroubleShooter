@@ -129,8 +129,9 @@ class SectionEditController(QtCore.QObject):
             if not ok:
                 return
 
-            if self.is_message_text_bad(new_message_text, current_section_id):
-                return
+            if not new_message_text == current_section['messages'][row]:
+                if self.is_message_text_bad(new_message_text, current_section_id):
+                    return
 
             old_pv = current_section['message_pv'][row]
             new_pv, ok = QtWidgets.QInputDialog.getText(self.widget, "New PV", "Please input the new PV to read",
