@@ -234,13 +234,17 @@ class SectionEditController(QtCore.QObject):
         row = self.widget.section_edit_pane.section_choice_list.row(list_item)
         choice_item = self.widget.section_edit_pane.section_choice_list.item(row, 0)
         current_section_id = self.widget.section_edit_pane.section_id_lbl.text()
-        current_section = self.model.get_section_by_id(current_section_id)
+        current_section = self.model.get_section_by_id(current_section_id)  # type:
         solution_type = current_section['solution_type'][row]
 
         new_choice_text, ok = QtWidgets.QInputDialog.getText(self.widget,
                                                              "Add Choice", "Choice text:", text=choice_item.text())
-        if not ok or self.is_choice_text_bad(new_choice_text, current_section_id):
+        if not ok:
             return
+
+        if not new_choice_text == self.widget.section_edit_pane.section_choice_list.item(row, 0).text():
+            if self.is_choice_text_bad(new_choice_text, current_section_id):
+                return
 
         self.model.modify_choice_in_section(current_section_id, row, new_choice_text)
         choice_item.setText(new_choice_text)

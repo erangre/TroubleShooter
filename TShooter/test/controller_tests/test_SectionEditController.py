@@ -350,6 +350,25 @@ class EditSectionTests(QtTest):
         self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_section_id'][0], new_next_section_id)
         self.assertEqual(list_item.text(), new_choice)
 
+    def test_edit_choice_with_no_change_to_btn_text(self):
+        choice = 'Yes'
+        message = 'Clear all settings'
+
+        solution_type = self.helper_create_message_choice(choice, message)
+
+        list_item = self.widget.section_edit_pane.section_choice_list.item(0, 0)
+        self.widget.section_edit_pane.section_choice_list.setCurrentItem(
+            list_item, QtCore.QItemSelectionModel.Select)
+
+        new_choice = 'Yes'
+        new_message = 'Do Nothing'
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[new_choice, True], [new_message, True]])
+        self.widget.section_edit_pane.section_choice_list.itemDoubleClicked.emit(
+            list_item)
+        list_item = self.widget.section_edit_pane.section_choice_list.item(0, 0)
+        self.assertEqual(self.model.get_section_by_id(self.section_id)['solution_message'][0], new_message)
+        self.assertEqual(list_item.text(), new_choice)
+
     def test_move_choice_up(self):
         choice_1 = 'Yes'
         message_1 = 'Clear all settings'
