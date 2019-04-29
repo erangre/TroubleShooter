@@ -22,6 +22,8 @@ class MainWidget(QtWidgets.QWidget):
 
         self.add_category("main", "Main")
 
+        self.view_mode = False
+
     def create_widgets(self):
         self.save_tshooter_btn = QtWidgets.QPushButton('Save')
         self.load_tshooter_btn = QtWidgets.QPushButton('Load')
@@ -37,10 +39,15 @@ class MainWidget(QtWidgets.QWidget):
         self._main_tree.setHeaderLabels(["caption", "type"])
 
         self.section_edit_pane = SectionEditGroupBox()
+
         self.section_edit_pane.setVisible(False)
 
         self.section_view_pane = SectionViewPage()
         self.section_view_pane.setVisible(False)
+
+        self.edit_category_frame = QtWidgets.QFrame()
+        self.view_category_frame = QtWidgets.QFrame()
+        self.view_category_frame.setVisible(False)
 
     def arrange_layout(self):
         self._file_layout = QtWidgets.QHBoxLayout()
@@ -60,7 +67,11 @@ class MainWidget(QtWidgets.QWidget):
         self._category_layout.addLayout(self._file_layout)
         self._category_layout.addLayout(self._btn_category_layout)
         self._category_layout.addWidget(self._main_tree)
+
+        self.edit_category_frame.setLayout(self._category_layout)
+
         self._hlayout.addLayout(self._category_layout)
+        self._hlayout.addWidget(self.edit_category_frame)
         self._hlayout.addWidget(self.section_edit_pane)
         self._hlayout.addWidget(self.section_view_pane)
 
@@ -118,3 +129,19 @@ class MainWidget(QtWidgets.QWidget):
 
     def set_selected_section(self, section_id):
         self._main_tree.setCurrentItem(self.sections[section_id])
+
+    def switch_to_view_mode(self):
+        # TODO: In the future, uncomment these and remove the part which hides buttons
+        # self._hlayout.removeWidget(self.edit_category_frame)
+        # self.edit_category_frame.setVisible(False)
+        self.add_category_btn.setVisible(False)
+        self.add_section_btn.setVisible(False)
+        self.remove_category_btn.setVisible(False)
+        self.clear_tshooter_btn.setVisible(False)
+        self.save_tshooter_btn.setVisible(False)
+        self.load_tshooter_btn.setVisible(False)
+        self.edit_category_btn.setVisible(False)
+
+        self._hlayout.removeWidget(self.section_edit_pane)
+        self.section_edit_pane.setVisible(False)
+        self.view_mode = True

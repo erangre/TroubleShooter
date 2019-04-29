@@ -1,0 +1,135 @@
+all_categories: !!python/object/apply:collections.OrderedDict
+- - - main
+    - caption: main
+      id: main
+      image: null
+      level: 0
+      parent_id: null
+      sections: null
+      subcategories: !!python/object/apply:collections.OrderedDict
+      - - - NO_BEAM
+          - &id001
+            caption: No Beam
+            id: NO_BEAM
+            image: ''
+            level: 1
+            parent_id: main
+            sections: !!python/object/apply:collections.OrderedDict
+            - []
+            subcategories: !!python/object/apply:collections.OrderedDict
+            - - - CHECK_HUTCHES
+                - &id002
+                  caption: Check Hutches Searched
+                  id: CHECK_HUTCHES
+                  image: ''
+                  level: 2
+                  parent_id: NO_BEAM
+                  sections: !!python/object/apply:collections.OrderedDict
+                  - - - Check_Hutches_Section
+                      - caption: Check_Hutches_Section
+                        choices: []
+                        id: Check_Hutches_Section
+                        level: 3
+                        message_pv:
+                        - null
+                        - 13IDD:m81.RBV
+                        message_type:
+                        - 0
+                        - 2
+                        messages:
+                        - 'Checking Hutch A:'
+                        - 'Hutch A: {}'
+                        parent_id: CHECK_HUTCHES
+                        solution_message: []
+                        solution_section_id: []
+                        solution_type: []
+                    - - Check_Shutter_Section
+                      - &id003
+                        caption: Check_Shutter_Section
+                        choices: []
+                        id: Check_Shutter_Section
+                        level: 3
+                        message_pv:
+                        - null
+                        - null
+                        - null
+                        - null
+                        - 13IDA:eps_mbbi25
+                        - 13IDA:eps_mbbi26
+                        message_type:
+                        - 0
+                        - 0
+                        - 0
+                        - 1
+                        - 2
+                        - 2
+                        messages:
+                        - Both FE and ID-B shutter shoud be open (green squares)
+                        - If ID-B shutter is closed (red), push the square
+                        - If FE shutter is closed (red) contact staff
+                        - C:/github/TroubleShooter/TShooter/test/data/images/beam_status.png
+                        - '13ID Fe Shutter: {} (open=1)'
+                        - '13ID-B Shutter: {} (open=1)'
+                        parent_id: CHECK_HUTCHES
+                        solution_message: []
+                        solution_section_id: []
+                        solution_type: []
+                  subcategories: !!python/object/apply:collections.OrderedDict
+                  - []
+  - - NO_BEAM
+    - *id001
+  - - CHECK_HUTCHES
+    - *id002
+all_sections: !!python/object/apply:collections.OrderedDict
+- - - Check_Hutches_Section
+    - caption: Check_Hutches_Section
+      choices:
+      - 'Yes'
+      - 'No'
+      id: Check_Hutches_Section
+      level: 3
+      message_pv:
+      - null
+      - null
+      - null
+      - null
+      - null
+      - PA:13ID:STA_A_SRCHD_TO_B.VAL
+      - PA:13ID:STA_B_SRCHD_TO_B.VAL
+      - PA:13ID:STA_C_SRCHD_TO_B.VAL
+      - PA:13ID:STA_D_SRCHD_TO_B.VAL
+      - null
+      message_type:
+      - 0
+      - 0
+      - 0
+      - 1
+      - 0
+      - 2
+      - 2
+      - 2
+      - 2
+      - 0
+      messages:
+      - All hutches should show green circle as in image below.
+      - If D is red search the hutch again.
+      - If A, B or C are red contact staff.
+      - C:/github/TroubleShooter/TShooter/test/data/images/beam_status.png
+      - EPICS reports the following (1=searched)
+      - 'Hutch A: {}'
+      - 'Hutch B: {}'
+      - 'Hutch C: {}'
+      - 'Hutch D: {}'
+      - Are all hutches searched?
+      parent_id: CHECK_HUTCHES
+      solution_message:
+      - Click Next
+      - Search appropriate hutch or contact staff
+      solution_section_id:
+      - Check_Shutter_Section
+      - null
+      solution_type:
+      - section
+      - message
+  - - Check_Shutter_Section
+    - *id003

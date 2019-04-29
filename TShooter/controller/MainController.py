@@ -14,7 +14,7 @@ from ..model.tshoot_model import TroubleShooter, SECTION_SOLUTION, IMAGE, TEXT, 
 from ..widget.MainWidget import MainWidget
 from .SectionEditController import SectionEditController
 from .SectionViewController import SectionViewController
-from ..widget.utils import QMsgBoxOKCancel
+from ..widget.utils import QMsgBoxOKCancel, QMsgBoxNoYes
 
 DEFAULT_IMAGE = ''
 
@@ -215,10 +215,11 @@ class MainController(object):
             return
         temp_cats = []
         for tree_item_id, tree_item in self.widget.categories.items():
-            temp_cats.append(tree_item_id)
-        for tree_item_id in temp_cats:
             if self.model.get_category_by_id(tree_item_id)['parent_id'] == 'main':
-                self.remove_category(tree_item_id)
+                temp_cats.append(tree_item_id)
+
+        for tree_item_id in temp_cats:
+            self.remove_category(tree_item_id)
         del temp_cats
 
     def tree_item_selection_changed(self):
@@ -229,7 +230,8 @@ class MainController(object):
 
         if self.selected_item in self.widget.sections.values():
             self.widget._hlayout.addWidget(self.widget.section_edit_pane)
-            self.widget.section_edit_pane.setVisible(True)
+            if not self.widget.view_mode:
+                self.widget.section_edit_pane.setVisible(True)
             self.update_section_edit_pane()
             self.widget._hlayout.addWidget(self.widget.section_view_pane)
             self.widget.section_view_pane.setVisible(True)
@@ -351,6 +353,8 @@ class MainController(object):
         if not tshooter_file or not tshooter_file[0]:
             return
         self.clear_tshooter_btn_clicked()  # first clear everything
+        open_in_edit_mode = QMsgBoxNoYes("Open file in Edit Mode")
+
         self.model.import_category_from_yaml(tshooter_file)
         all_data = self.model.get_all_data()
         for category_id in all_data['all_categories']:
@@ -365,3 +369,6 @@ class MainController(object):
         for section_id in all_data['all_sections']:
             section = all_data['all_sections'][section_id]
             self.widget.add_section(section['parent_id'], section_id)
+
+        if not open_in_edit_mode == QtWidgets.QMessageBox.Yes:
+            self.widget.switch_to_view_mode()

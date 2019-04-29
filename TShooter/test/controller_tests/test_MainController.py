@@ -24,6 +24,7 @@ class CategoryTests(QtTest):
             cls.app = QtWidgets.QApplication([])
 
     def setUp(self):
+        # TODO add an option when loading to load in view only mode instead of the editing mode
         self.controller = MainController()
         # sys.excepthook = excepthook
 
@@ -396,6 +397,7 @@ class SaveLoadTests(QtTest):
         # sys.excepthook = excepthook
         filename = os.path.normpath(os.path.join(data_path, 'tshooter_temp1.yml'))
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=(filename, True))
+        QtWidgets.QMessageBox.exec_ = MagicMock(return_value=QtWidgets.QMessageBox.Ok)
         self.widget.load_tshooter_btn.click()
         self.assertEqual(self.model.subcategory_counter('main'), 2)
         self.assertEqual(self.model.section_counter('first_category'), 2)
@@ -405,7 +407,51 @@ class SaveLoadTests(QtTest):
         self.assertEqual(len(self.widget.categories), 3)
         self.assertEqual(len(self.widget.sections), 3)
 
+    def test_clear_with_subcats(self):
+        # sys.excepthook = excepthook
+        filename = os.path.normpath(os.path.join(data_path, 'attempt1.yaml'))
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=(filename, True))
+        QtWidgets.QMessageBox.exec_ = MagicMock(return_value=QtWidgets.QMessageBox.Ok)
+        self.widget.load_tshooter_btn.click()
+        self.widget.clear_tshooter_btn.click()
+
+    def test_load_file_twice(self):
+        # sys.excepthook = excepthook
+        filename = os.path.normpath(os.path.join(data_path, 'attempt1.yaml'))
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=(filename, True))
+        QtWidgets.QMessageBox.exec_ = MagicMock(return_value=QtWidgets.QMessageBox.Ok)
+        self.widget.load_tshooter_btn.click()
+        filename = os.path.normpath(os.path.join(data_path, 'attempt1.yaml'))
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=(filename, True))
+        QtWidgets.QMessageBox.exec_ = MagicMock(return_value=QtWidgets.QMessageBox.Ok)
+        self.widget.load_tshooter_btn.click()
+
+    def test_load_in_view_mode_hides_edit_panels(self):
+        filename = os.path.normpath(os.path.join(data_path, 'tshooter_temp1.yml'))
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=(filename, True))
+        # Mock Ok to erase, No to edit
+        QtWidgets.QMessageBox.exec_ = MagicMock(side_effect=[QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.No])
+        self.widget.load_tshooter_btn.click()
+        self.assertFalse(self.helper_is_widget_in_layout(self.widget.section_edit_pane, self.widget._hlayout))
+        # TODO: Replace the edit_category with the view_category (with icons)
+        # self.assertFalse(self.helper_is_widget_in_layout(self.widget.edit_category_frame, self.widget._hlayout))
+        # self.assertTrue(self.helper_is_widget_in_layout(self.widget.view_category_frame, self.widget._hlayout))
+
     def helper_create_category(self, cat_id, caption, image):
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image, ''])
         self.controller.widget.add_category_btn.click()
+
+    def helper_is_widget_in_layout(self, widget_name, layout):
+        """
+
+        :param widget_name:
+        :param layout:
+        :type layout: QtWidgets.QLayout
+        :return:
+        """
+        for ind in range(layout.count()):
+            item = layout.itemAt(ind).widget()
+            if widget_name == item:
+                return True
+        return False
