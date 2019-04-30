@@ -24,7 +24,6 @@ class CategoryTests(QtTest):
             cls.app = QtWidgets.QApplication([])
 
     def setUp(self):
-        # TODO add an option when loading to load in view only mode instead of the editing mode
         self.controller = MainController()
         # sys.excepthook = excepthook
 
@@ -434,8 +433,8 @@ class SaveLoadTests(QtTest):
         self.widget.load_tshooter_btn.click()
         self.assertFalse(self.helper_is_widget_in_layout(self.widget.section_edit_pane, self.widget._hlayout))
         # TODO: Replace the edit_category with the view_category (with icons)
-        # self.assertFalse(self.helper_is_widget_in_layout(self.widget.edit_category_frame, self.widget._hlayout))
-        # self.assertTrue(self.helper_is_widget_in_layout(self.widget.view_category_frame, self.widget._hlayout))
+        self.assertFalse(self.helper_is_widget_in_layout(self.widget.edit_category_frame, self.widget._hlayout))
+        self.assertTrue(self.helper_is_widget_in_layout(self.widget.view_category_frame, self.widget._hlayout))
 
     def helper_create_category(self, cat_id, caption, image):
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])

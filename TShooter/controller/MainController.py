@@ -371,4 +371,37 @@ class MainController(object):
             self.widget.add_section(section['parent_id'], section_id)
 
         if not open_in_edit_mode == QtWidgets.QMessageBox.Yes:
+            self.widget.set_selected_category('main')
             self.widget.switch_to_view_mode()
+            self.widget.clear_grid_view()
+            self.populate_grid_view('main')
+
+    def populate_grid_view(self, category_id):
+        # if category_id == 'main' or category_id == 'Main':
+        sub_cats = self.model.get_category_by_id(category_id)['subcategories']
+        if sub_cats:
+            for sub_cat_id in sub_cats:
+                sub_cat = self.model.get_category_by_id(sub_cat_id)
+                caption = sub_cat['caption']
+                # if not (caption == 'Main' or caption == 'main'):
+                image = sub_cat['image']
+                self.widget.add_category_grid_btn(caption, image)
+                self.widget.get_last_category_btn().clicked.connect(partial(self.grid_view_subcat_btn_clicked,
+                                                                            sub_cat_id))
+
+        sections = self.model.get_category_by_id(category_id)['sections']
+        if sections:
+            for section_id in sections:
+                section = self.model.get_section_by_id(section_id)
+                caption = section['caption']
+                image = None
+                self.widget.add_category_grid_btn(caption, image)
+                self.widget.get_last_category_btn().clicked.connect(partial(self.grid_view_section_btn_clicked,
+                                                                            section_id))
+
+    def grid_view_subcat_btn_clicked(self, category_id):
+        self.widget.clear_grid_view()
+        self.populate_grid_view(category_id)
+
+    def grid_view_section_btn_clicked(self, section_id):
+        self.widget.set_selected_section(section_id)
