@@ -86,14 +86,25 @@ class TroubleShooter(QtCore.QObject):
 
         return self._all_sections[section_id]
 
-    def get_section_by_id(self, section_id):
-        return self._all_sections.get(section_id, None)
-
     def remove_section(self, section_id):
         parent_category_id = self._all_sections[section_id]['parent_id']
         del self._all_categories[parent_category_id]['sections'][section_id]
         del self._all_sections[section_id]
         return parent_category_id
+
+    def get_section_by_id(self, section_id):
+        return self._all_sections.get(section_id, None)
+
+    def edit_section(self, old_section_id, new_section_id):
+        section = self.get_section_by_id(old_section_id)
+        section['id'] = new_section_id
+        section['caption'] = new_section_id
+        parent_id = section['parent_id']
+        parent_cat = self.get_category_by_id(parent_id)
+        parent_cat['sections'] = OrderedDict(
+            (new_section_id if k == old_section_id else k, v) for k, v in parent_cat['sections'].items())
+        self._all_sections = OrderedDict(
+            (new_section_id if k == old_section_id else k, v) for k, v in self._all_sections.items())
 
     def message_counter(self, section_id):
         return len(self._all_sections[section_id]['messages'])

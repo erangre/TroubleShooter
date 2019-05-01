@@ -144,6 +144,11 @@ class MainWidget(QtWidgets.QWidget):
         self.categories[parent_id].addChild(self.sections[section_id])
         self._main_tree.setCurrentItem(self.sections[section_id])
 
+    def edit_section(self, parent_id, old_section_id, new_section_id):
+        self.categories[parent_id].removeChild(self.sections[old_section_id])
+        self.sections = OrderedDict((new_section_id if k == old_section_id else k, v) for k, v in self.sections.items())
+        self.categories[parent_id].addChild(self.sections[new_section_id])
+
     def set_selected_section(self, section_id):
         self._main_tree.setCurrentItem(self.sections[section_id])
 

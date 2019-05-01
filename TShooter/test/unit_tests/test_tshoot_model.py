@@ -207,7 +207,6 @@ class TroubleSectionTest(QtTest):
         self.assertEqual(self.new_section['message_type'][next_ind], IMAGE)
         self.assertEqual(self.new_section['message_pv'][next_ind], None)
 
-
     def test_add_pv_as_message(self):
         msg1 = "this is the value {}"
         pv = "13IDD:m20"
@@ -316,6 +315,7 @@ class YAMLExportImportTest(QtTest):
         output_contents = outfile.readlines()
         self.assertTrue(self.new_subcategory_id in '-'.join(output_contents))
 
+    # TODO: Fix this test
     def test_import_category_from_yaml(self):
         output_file = os.path.join(data_path, 'output1.yml')
         self.model.export_category_to_yaml(output_file)

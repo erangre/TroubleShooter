@@ -158,13 +158,21 @@ class MainController(object):
             tree_item.setText(0, subcat_caption)
         self.model.edit_category(category_id, subcat_caption, subcat_image)
 
+    # TODO: currently the caption is taken from the id for sections. This is not the same as for categories. This is why when editing a category it is simple, the id does not change.
+    # TODO: when editing a section, the id changes and it makes everything complicated. It also causes the sectoin to move to last place in order. maybe it is better to change this.
+    # TODO: to move sections in order it is possible to remove child and add child for the category.
     def edit_section(self, section_id):
-        pass
-        # section_id, ok = QtWidgets.QInputDialog.getText(self.widget, 'Create a new section', 'Section ID')
-        # if not ok:
-        #     return
-        # if self.model.get_section_by_id(section_id) or section_id == '':
-        #     return
+        tree_item = self.widget.sections.get(section_id, None)
+        new_section_id, ok = QtWidgets.QInputDialog.getText(self.widget, 'Modify section ID', 'Section ID:',
+                                                            text=tree_item.text(0))
+        if not ok:
+            return
+
+        if tree_item is not None:
+            tree_item.setText(0, new_section_id)
+        parent_id = self.model.get_section_by_id(section_id)['parent_id']
+        self.model.edit_section(section_id, new_section_id)
+        self.widget.edit_section(parent_id, section_id, new_section_id)
 
     def remove_category_btn_clicked(self):
         selected_categories = self.widget.get_selected_categories()

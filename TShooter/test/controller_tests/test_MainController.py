@@ -16,6 +16,7 @@ unittest_path = os.path.dirname(__file__)
 data_path = os.path.normpath(os.path.join(unittest_path, '../data'))
 
 
+# TODO: In all these category and sectoin tests, use Mock instead of setting the controller default cat_id
 class CategoryTests(QtTest):
     @classmethod
     def setUpClass(cls):
@@ -281,6 +282,21 @@ class SectionTests(QtTest):
         # Note: This test doesn't actually make sure that you cannot add with an existing name.
         # This is because it might be adding the same one again and the model doesn't change but the widget has two of
         # the same section.
+
+    def test_edit_section(self):
+        # sys.excepthook = excepthook
+        section_id = 'section_a'
+        parent_id = self.cat_id
+        self.controller.section_id = section_id
+        self.controller.widget.add_section_btn.click()
+        self.controller.widget.set_selected_section(section_id)
+        new_section_id = 'section_x'
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[new_section_id, True]])
+        self.controller.widget.edit_category_btn.click()
+
+        self.assertEqual(self.controller.widget.get_selected_categories()[0].text(0), new_section_id)
+        self.assertFalse(section_id in self.controller.model.get_category_by_id(parent_id)['sections'])
+        self.assertTrue(new_section_id in self.controller.model.get_category_by_id(parent_id)['sections'])
 
     def helper_create_category(self, cat_id, caption, image):
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])
