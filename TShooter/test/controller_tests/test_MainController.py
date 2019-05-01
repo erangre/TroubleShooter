@@ -13,7 +13,7 @@ from ...widget.MainWidget import MainWidget
 from ..utility import excepthook
 
 unittest_path = os.path.dirname(__file__)
-data_path = os.path.normpath(os.path.join(unittest_path, '../data'))
+data_path = os.path.join(unittest_path, '../data')
 
 
 class CategoryTests(QtTest):
@@ -35,7 +35,7 @@ class CategoryTests(QtTest):
         self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.categories["main"])
         cat_id = 'test_subcategory'
         caption = 'caption_test'
-        image = os.path.join(data_path, "images/beam_status.png")
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         parent_id = 'main'
         level = 1
 
@@ -52,7 +52,7 @@ class CategoryTests(QtTest):
     def test_add_subcategory(self):
         cat_id = 'test_subcategory'
         caption = 'caption_test'
-        image = os.path.join(data_path, "images/beam_status.png")
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         parent_id = 'main'
         cat_level = 1
         self.helper_create_category(cat_id, caption, image)
@@ -61,7 +61,7 @@ class CategoryTests(QtTest):
         subcat_caption = 'sub cat!'
         subcat_parent_id = cat_id
         subcat_level = 2
-        subcat_image = os.path.join(data_path, "images/garfield.png")
+        subcat_image = os.path.normpath(os.path.join(data_path, "images/garfield.png"))
 
         self.helper_create_category(subcat_id, subcat_caption, subcat_image)
 
@@ -75,7 +75,7 @@ class CategoryTests(QtTest):
     def test_add_two_categories(self):
         cat_id = 'test_subcategory'
         caption = 'caption_test'
-        image = os.path.join(data_path, "images/beam_status.png")
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
 
         self.helper_create_category(cat_id, caption, image)
 
@@ -84,7 +84,7 @@ class CategoryTests(QtTest):
 
         cat_id = 'test_subcategory2'
         caption = 'caption_test2'
-        image = os.path.join(data_path, "images/garfield.png")
+        image = os.path.normpath(os.path.join(data_path, "images/garfield.png"))
         parent_id = 'main'
         level = 1
 
@@ -102,7 +102,7 @@ class CategoryTests(QtTest):
     def test_remove_category(self):
         cat_id = 'test_subcategory'
         caption = 'caption_test'
-        image = os.path.join(data_path, "images/beam_status.png")
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         parent_id = 'main'
         cat_level = 1
 
@@ -117,7 +117,7 @@ class CategoryTests(QtTest):
     def test_cannot_add_same_category_twice(self):
         cat_id = 'test_subcategory'
         caption = 'caption_test'
-        image = os.path.join(data_path, "images/beam_status.png")
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         parent_id = 'main'
         level = 1
 
@@ -129,12 +129,12 @@ class CategoryTests(QtTest):
     def test_edit_category(self):
         cat_id = 'test_subcategory'
         caption = 'caption_test'
-        image = os.path.join(data_path, "images/beam_status.png")
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         parent_id = 'main'
         level = 1
         self.helper_create_category(cat_id, caption, image)
         new_caption = 'caption_changed'
-        new_image = os.path.join(data_path, "images/garfield.png")
+        new_image = os.path.normpath(os.path.join(data_path, "images/garfield.png"))
         QtWidgets.QInputDialog.getText = MagicMock(return_value=[new_caption, True])
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[new_image, ''])
         self.controller.widget.edit_category_btn.click()
@@ -161,7 +161,7 @@ class SectionTests(QtTest):
         self.controller = MainController()
         self.cat_id = 'first_category'
         caption = 'The first category!'
-        image = os.path.join(data_path, "images/beam_status.png")
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
 
         self.helper_create_category(self.cat_id, caption, image)
 
@@ -210,7 +210,7 @@ class SectionTests(QtTest):
     def test_cannot_add_section_to_category_with_sub_categories(self):
         subcat_id = 'test_sub_cat'
         subcat_caption = 'sub cat!'
-        image = os.path.join(data_path, "images/beam_status.png")
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
 
         self.helper_create_category(subcat_id, subcat_caption, image)
 
@@ -228,7 +228,7 @@ class SectionTests(QtTest):
 
         subcat_id = 'test_sub_cat'
         subcat_caption = 'sub cat!'
-        image = os.path.join(data_path, "images/beam_status.png")
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
 
         self.helper_create_category(subcat_id, subcat_caption, image)
         self.assertIsNone(self.controller.model.get_category_by_id(subcat_id))
@@ -239,7 +239,7 @@ class SectionTests(QtTest):
 
         subcat_id = 'test_sub_cat'
         subcat_caption = 'sub cat!'
-        image = os.path.join(data_path, "images/beam_status.png")
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
 
         self.helper_create_category(subcat_id, subcat_caption, image)
 
@@ -306,7 +306,7 @@ class SaveLoadTests(QtTest):
 
         self.cat_id = 'first_category'
         caption = 'The first category!'
-        image = os.path.join(data_path, "images/beam_status.png")
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
         self.helper_create_category(self.cat_id, caption, image)
 
         self.section_id = 'section_a'
@@ -317,7 +317,7 @@ class SaveLoadTests(QtTest):
         QtWidgets.QInputDialog.getText = MagicMock(return_value=[self.message_1, True])
         self.widget.section_edit_pane.add_message_btn.click()
 
-        self.image_filename = os.path.join(data_path, "images/beam_status.png")  # add an image message
+        self.image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))  # add an image message
         QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[self.image_filename, ''])
         self.widget.section_edit_pane.add_message_btn.click()
@@ -346,7 +346,7 @@ class SaveLoadTests(QtTest):
 
         self.cat_id2 = 'second_category'
         caption = 'The second category!'
-        image = os.path.join(data_path, "images/garfield.png")
+        image = os.path.normpath(os.path.join(data_path, "images/garfield.png"))
         self.helper_create_category(self.cat_id2, caption, image)
 
         self.section_id_c = 'section_c'
