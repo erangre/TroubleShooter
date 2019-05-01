@@ -429,9 +429,3 @@ class MainController(object):
             self.widget.clear_grid_view()
             self.populate_grid_view(category_id)
         return category_view_back_btn_clicked
-
-
-    # def category_view_back_btn_clicked(self, category_id):
-    #     print(category_id)
-    #     self.widget.clear_grid_view()
-    #     self.populate_grid_view(category_id)

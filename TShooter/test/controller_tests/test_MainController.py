@@ -16,7 +16,6 @@ unittest_path = os.path.dirname(__file__)
 data_path = os.path.normpath(os.path.join(unittest_path, '../data'))
 
 
-# TODO: In all these category and sectoin tests, use Mock instead of setting the controller default cat_id
 class CategoryTests(QtTest):
     @classmethod
     def setUpClass(cls):
@@ -174,8 +173,8 @@ class SectionTests(QtTest):
         section_id = 'section_a'
         parent_id = self.cat_id
         level = 2
-        self.controller.section_id = section_id
-        self.controller.widget.add_section_btn.click()
+        self.helper_create_section(section_id)
+
         self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.sections[section_id])
         self.assertEqual(self.controller.model.get_section_by_id(section_id)['parent_id'], parent_id)
         self.assertEqual(self.controller.model.get_section_by_id(section_id)['level'], level)
@@ -183,8 +182,7 @@ class SectionTests(QtTest):
     def test_add_two_sections_to_one_category(self):
         # add first section
         section_id_a = 'section_a'
-        self.controller.section_id = section_id_a
-        self.controller.widget.add_section_btn.click()
+        self.helper_create_section(section_id_a)
         self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.sections[section_id_a])
 
         # simulate the user choosing the category again
@@ -194,8 +192,7 @@ class SectionTests(QtTest):
         section_id_b = 'section_b'
         parent_id = self.cat_id
         level = 2
-        self.controller.section_id = section_id_b
-        self.controller.widget.add_section_btn.click()
+        self.helper_create_section(section_id_b)
 
         self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.sections[section_id_b])
         self.assertEqual(self.controller.model.get_section_by_id(section_id_a)['parent_id'], parent_id)
@@ -206,8 +203,7 @@ class SectionTests(QtTest):
         sections_widget = self.controller.widget.sections
         self.controller.widget.set_selected_category("main")
         section_id = 'section_a'
-        self.controller.section_id = section_id
-        self.controller.widget.add_section_btn.click()
+        self.helper_create_section(section_id)
         self.assertDictEqual(self.controller.widget.sections, sections_widget)
         self.assertIsNone(self.controller.model.get_section_by_id(section_id))
 
@@ -220,8 +216,7 @@ class SectionTests(QtTest):
 
         self.controller.widget.set_selected_category(self.cat_id)
         section_id = 'section_a'
-        self.controller.section_id = section_id
-        self.controller.widget.add_section_btn.click()
+        self.helper_create_section(section_id)
         self.assertIsNone(self.controller.model.get_section_by_id(section_id))
 
     def test_cannot_add_subcategory_to_category_with_sections(self):
@@ -235,49 +230,37 @@ class SectionTests(QtTest):
         subcat_caption = 'sub cat!'
         image = os.path.join(data_path, "images/beam_status.png")
 
-        self.controller.category_info = {'id': subcat_id,
-                                         'caption': subcat_caption,
-                                         'image': image,
-                                         }
-        self.controller.widget.add_category_btn.click()
+        self.helper_create_category(subcat_id, subcat_caption, image)
         self.assertIsNone(self.controller.model.get_category_by_id(subcat_id))
 
     def test_cannot_add_subcategory_in_section(self):
         section_id = 'section_a'
-        self.controller.section_id = section_id
-        self.controller.widget.add_section_btn.click()
+        self.helper_create_section(section_id)
 
         subcat_id = 'test_sub_cat'
         subcat_caption = 'sub cat!'
         image = os.path.join(data_path, "images/beam_status.png")
 
-        self.controller.category_info = {'id': subcat_id,
-                                         'caption': subcat_caption,
-                                         'image': image,
-                                         }
-        self.controller.widget.add_category_btn.click()
+        self.helper_create_category(subcat_id, subcat_caption, image)
+
         self.assertIsNone(self.controller.model.get_category_by_id(subcat_id))
 
     def test_adding_section_when_section_selected_adds_section_to_parent_category(self):
         section_id = 'section_a'
-        self.controller.section_id = section_id
-        self.controller.widget.add_section_btn.click()
+        self.helper_create_section(section_id)
         self.assertEqual(self.controller.model.section_counter(self.cat_id), 1)
 
         section_id = 'section_b'
-        self.controller.section_id = section_id
-        self.controller.widget.add_section_btn.click()
+        self.helper_create_section(section_id)
         self.assertEqual(self.controller.model.section_counter(self.cat_id), 2)
 
     def test_cannot_add_section_with_existing_name(self):
         section_id = 'section_a'
-        self.controller.section_id = section_id
-        self.controller.widget.add_section_btn.click()
+        self.helper_create_section(section_id)
         self.assertEqual(self.controller.model.section_counter(self.cat_id), 1)
 
         section_id = 'section_a'
-        self.controller.section_id = section_id
-        self.controller.widget.add_section_btn.click()
+        self.helper_create_section(section_id)
         self.assertEqual(self.controller.model.section_counter(self.cat_id), 1)
         # Note: This test doesn't actually make sure that you cannot add with an existing name.
         # This is because it might be adding the same one again and the model doesn't change but the widget has two of
@@ -287,12 +270,12 @@ class SectionTests(QtTest):
         # sys.excepthook = excepthook
         section_id = 'section_a'
         parent_id = self.cat_id
-        self.controller.section_id = section_id
-        self.controller.widget.add_section_btn.click()
+        self.helper_create_section(section_id)
         self.controller.widget.set_selected_section(section_id)
         new_section_id = 'section_x'
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[new_section_id, True]])
         self.controller.widget.edit_category_btn.click()
+        self.controller.widget.set_selected_section(new_section_id)
 
         self.assertEqual(self.controller.widget.get_selected_categories()[0].text(0), new_section_id)
         self.assertFalse(section_id in self.controller.model.get_category_by_id(parent_id)['sections'])
@@ -302,6 +285,10 @@ class SectionTests(QtTest):
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image, ''])
         self.controller.widget.add_category_btn.click()
+
+    def helper_create_section(self, section_id):
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[section_id, True]])
+        self.controller.widget.add_section_btn.click()
 
 
 class SaveLoadTests(QtTest):
@@ -323,8 +310,7 @@ class SaveLoadTests(QtTest):
         self.helper_create_category(self.cat_id, caption, image)
 
         self.section_id = 'section_a'
-        self.controller.section_id = self.section_id
-        self.widget.add_section_btn.click()
+        self.helper_create_section(self.section_id)
 
         self.message_1 = 'message_1'  # add a text message
         QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
@@ -351,8 +337,7 @@ class SaveLoadTests(QtTest):
         self.widget.section_edit_pane.add_choice_btn.click()
 
         self.section_id_b = 'section_b'
-        self.controller.section_id = self.section_id_b
-        self.widget.add_section_btn.click()
+        self.helper_create_section(self.section_id_b)
 
         self.widget.set_selected_category(self.cat_id)  # go to a category and back to update before testing
         self.widget.set_selected_section(self.section_id)
@@ -365,8 +350,7 @@ class SaveLoadTests(QtTest):
         self.helper_create_category(self.cat_id2, caption, image)
 
         self.section_id_c = 'section_c'
-        self.controller.section_id = self.section_id_c
-        self.widget.add_section_btn.click()
+        self.helper_create_section(self.section_id_c)
 
         self.message_c1 = 'message_c1'  # add a text message
         QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
@@ -497,3 +481,7 @@ class SaveLoadTests(QtTest):
             if widget_name == item:
                 return True
         return False
+
+    def helper_create_section(self, section_id):
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[section_id, True]])
+        self.controller.widget.add_section_btn.click()
