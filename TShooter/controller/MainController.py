@@ -377,7 +377,16 @@ class MainController(object):
             self.populate_grid_view('main')
 
     def populate_grid_view(self, category_id):
-        # if category_id == 'main' or category_id == 'Main':
+        self.widget.category_view_back_btn.setVisible(not (category_id == 'main' or category_id == 'Main'))
+
+        parent_id = self.model.get_category_by_id(category_id)['parent_id']
+        try:
+            self.widget.category_view_back_btn.clicked.disconnect()
+        except TypeError:
+            pass
+        self.widget.category_view_back_btn.clicked.connect(self.create_category_view_back_btn_clicked_function(
+            parent_id))
+
         sub_cats = self.model.get_category_by_id(category_id)['subcategories']
         if sub_cats:
             for sub_cat_id in sub_cats:
@@ -405,3 +414,15 @@ class MainController(object):
 
     def grid_view_section_btn_clicked(self, section_id):
         self.widget.set_selected_section(section_id)
+
+    def create_category_view_back_btn_clicked_function(self, category_id):
+        def category_view_back_btn_clicked():
+            self.widget.clear_grid_view()
+            self.populate_grid_view(category_id)
+        return category_view_back_btn_clicked
+
+
+    # def category_view_back_btn_clicked(self, category_id):
+    #     print(category_id)
+    #     self.widget.clear_grid_view()
+    #     self.populate_grid_view(category_id)

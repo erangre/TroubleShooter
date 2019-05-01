@@ -450,6 +450,15 @@ class SaveLoadTests(QtTest):
         self.widget._category_grid_btns[0].click()
         self.assertEqual(self.widget.section_view_pane.message_layout.itemAt(0).widget().text(), 'message_1')
 
+    def test_back_btn_in_view_mode(self):
+        # sys.excepthook = excepthook
+        self.helper_load_in_view_mode()
+        self.widget._category_grid_btns[0].click()
+        self.widget.category_view_back_btn.click()
+        self.assertEqual(len(self.widget._category_grid_btns), 2)
+        self.assertEqual(self.widget._category_grid_btns[0].text(), "The first category!")
+        self.assertEqual(self.widget._category_grid_btns[1].text(), "The second category!")
+
     def helper_load_in_view_mode(self):
         filename = os.path.normpath(os.path.join(data_path, 'tshooter_temp1.yml'))
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=(filename, True))

@@ -40,6 +40,9 @@ class MainWidget(QtWidgets.QWidget):
         self._main_tree.setColumnCount(2)
         self._main_tree.setHeaderLabels(["caption", "type"])
 
+        self.category_view_back_btn = QtWidgets.QPushButton('Back')
+        self.category_view_back_btn.setVisible(False)
+
         self.section_edit_pane = SectionEditGroupBox()
 
         self.section_edit_pane.setVisible(False)
@@ -53,28 +56,32 @@ class MainWidget(QtWidgets.QWidget):
 
     def arrange_layout(self):
         self._file_layout = QtWidgets.QHBoxLayout()
-        self._btn_category_layout = QtWidgets.QHBoxLayout()
+        self._category_edit_btns_layout = QtWidgets.QHBoxLayout()
         self._hlayout = QtWidgets.QHBoxLayout()
-        self._category_layout = QtWidgets.QVBoxLayout()
-        self._category_grid = QtWidgets.QGridLayout()
+        self._category_edit_layout = QtWidgets.QVBoxLayout()
+        self._category_view_layout = QtWidgets.QVBoxLayout()
+        self._category_view_grid = QtWidgets.QGridLayout()
 
         self._file_layout.addWidget(self.save_tshooter_btn)
         self._file_layout.addWidget(self.load_tshooter_btn)
         self._file_layout.addWidget(self.clear_tshooter_btn)
 
-        self._btn_category_layout.addWidget(self.add_category_btn)
-        self._btn_category_layout.addWidget(self.add_section_btn)
-        self._btn_category_layout.addWidget(self.edit_category_btn)
-        self._btn_category_layout.addWidget(self.remove_category_btn)
+        self._category_edit_btns_layout.addWidget(self.add_category_btn)
+        self._category_edit_btns_layout.addWidget(self.add_section_btn)
+        self._category_edit_btns_layout.addWidget(self.edit_category_btn)
+        self._category_edit_btns_layout.addWidget(self.remove_category_btn)
 
-        self._category_layout.addLayout(self._file_layout)
-        self._category_layout.addLayout(self._btn_category_layout)
-        self._category_layout.addWidget(self._main_tree)
+        self._category_edit_layout.addLayout(self._file_layout)
+        self._category_edit_layout.addLayout(self._category_edit_btns_layout)
+        self._category_edit_layout.addWidget(self._main_tree)
 
-        self.edit_category_frame.setLayout(self._category_layout)
-        self.view_category_frame.setLayout(self._category_grid)
+        self._category_view_layout.addLayout(self._category_view_grid)
+        self._category_view_layout.addWidget(self.category_view_back_btn)
 
-        self._hlayout.addLayout(self._category_layout)
+        self.edit_category_frame.setLayout(self._category_edit_layout)
+        self.view_category_frame.setLayout(self._category_view_layout)
+
+        self._hlayout.addLayout(self._category_edit_layout)
         self._hlayout.addWidget(self.edit_category_frame)
         self._hlayout.addWidget(self.section_edit_pane)
         self._hlayout.addWidget(self.section_view_pane)
@@ -167,7 +174,7 @@ class MainWidget(QtWidgets.QWidget):
                 caption = top_level_cat.text(0)
                 if not (caption == 'Main' or caption == 'main'):
                     self._category_grid_btns.append(QtWidgets.QPushButton(caption))
-                    self._category_grid.addWidget(self._category_grid_btns[-1])
+                    self._category_view_grid.addWidget(self._category_grid_btns[-1])
         else:
             current_category_item = self.categories[category_id]
             print(current_category_item)
@@ -175,12 +182,12 @@ class MainWidget(QtWidgets.QWidget):
                 print("adding child number ", ind)
                 child_cat = current_category_item.child(ind)
                 self._category_grid_btns.append(QtWidgets.QPushButton(child_cat.text(0)))
-                self._category_grid.addWidget(self._category_grid_btns[-1])
+                self._category_view_grid.addWidget(self._category_grid_btns[-1])
 
     def clear_grid_view(self):
         self._category_grid_btns = []
-        while self._category_grid.count():
-            child = self._category_grid.takeAt(0)
+        while self._category_view_grid.count():
+            child = self._category_view_grid.takeAt(0)
             if child.widget():
                 child.widget().deleteLater()
 
@@ -191,7 +198,7 @@ class MainWidget(QtWidgets.QWidget):
             self._category_grid_btns[-1].setIconSize(QtCore.QSize(100, 100))
             self._category_grid_btns[-1].setSizePolicy(QtWidgets.QSizePolicy.Minimum,
                                                        QtWidgets.QSizePolicy.Minimum)
-        self._category_grid.addWidget(self._category_grid_btns[-1])
+        self._category_view_grid.addWidget(self._category_grid_btns[-1])
 
     def get_last_category_btn(self):
         return self._category_grid_btns[-1]
