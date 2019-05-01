@@ -1,4 +1,4 @@
-# import os
+import os
 # import csv
 from sys import platform as _platform
 from qtpy import QtWidgets, QtCore, QtGui
@@ -84,7 +84,7 @@ class MainController(object):
                                                             'Category Caption')
         if not ok:
             return
-        subcat_image, _ = QtWidgets.QFileDialog.getOpenFileName(self.widget, None, 'Choose image for subcategory')
+        subcat_image, _ = QtWidgets.QFileDialog.getOpenFileName(self.widget, 'Choose image for subcategory')
         if subcat_image == '':
             subcat_image = DEFAULT_IMAGE
 
@@ -144,14 +144,15 @@ class MainController(object):
                     return
 
     def edit_category(self, category_id):
+        tree_item = self.widget.categories.get(category_id, None)
         subcat_caption, ok = QtWidgets.QInputDialog.getText(self.widget, 'Edit category',
-                                                            'New Category Caption')
+                                                            'New Category Caption', text=tree_item.text(0))
         if not ok:
             return
-        subcat_image, _ = QtWidgets.QFileDialog.getOpenFileName(self.widget, None, 'Choose new image for subcategory')
+        subcat_image, _ = QtWidgets.QFileDialog.getOpenFileName(self.widget, 'Choose new image for subcategory',
+                                                                self.model.get_category_by_id(category_id)['image'])
         if subcat_image == '':
             subcat_image = DEFAULT_IMAGE
-        tree_item = self.widget.categories.get(category_id, None)
 
         if tree_item is not None:
             tree_item.setText(0, subcat_caption)

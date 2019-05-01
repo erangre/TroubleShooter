@@ -148,7 +148,6 @@ class MainWidget(QtWidgets.QWidget):
         self._main_tree.setCurrentItem(self.sections[section_id])
 
     def switch_to_view_mode(self):
-        # TODO: In the future, uncomment these and remove the part which hides buttons
         self._hlayout.removeWidget(self.edit_category_frame)
         self.edit_category_frame.setVisible(False)
         self._hlayout.insertWidget(0, self.view_category_frame)

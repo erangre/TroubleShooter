@@ -146,7 +146,6 @@ class ViewSectionTests(QtTest):
                 self.assertEqual(self.widget.section_view_pane.section_id_lbl.text(),
                                  self.section_id)
 
-    # TODO - Work on image message
     # TODO - ??? Previous button when no link used (or maybe prev is always prev within category and link uses back btn
     # TODO - Make an option for auto next
 
