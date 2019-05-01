@@ -426,15 +426,36 @@ class SaveLoadTests(QtTest):
         self.widget.load_tshooter_btn.click()
 
     def test_load_in_view_mode_hides_edit_panels(self):
+        self.helper_load_in_view_mode()
+
+        self.assertFalse(self.helper_is_widget_in_layout(self.widget.section_edit_pane, self.widget._hlayout))
+        self.assertFalse(self.helper_is_widget_in_layout(self.widget.edit_category_frame, self.widget._hlayout))
+        self.assertTrue(self.helper_is_widget_in_layout(self.widget.view_category_frame, self.widget._hlayout))
+
+    def test_load_in_view_mode_adds_buttons(self):
+        self.helper_load_in_view_mode()
+        self.assertEqual(len(self.widget._category_grid_btns), 2)
+        self.assertEqual(self.widget._category_grid_btns[0].text(), "The first category!")
+        self.assertEqual(self.widget._category_grid_btns[1].text(), "The second category!")
+
+    def test_btns_in_view_mode_work(self):
+        self.helper_load_in_view_mode()
+        # check if clicking on a category button opens up what it has inside, in this case two section buttons
+        self.widget._category_grid_btns[0].click()
+        self.assertEqual(len(self.widget._category_grid_btns), 2)
+        self.assertEqual(self.widget._category_grid_btns[0].text(), "section_a")
+        self.assertEqual(self.widget._category_grid_btns[1].text(), "section_b")
+
+        # check if clicking a section button shows the correct section in the view panel
+        self.widget._category_grid_btns[0].click()
+        self.assertEqual(self.widget.section_view_pane.message_layout.itemAt(0).widget().text(), 'message_1')
+
+    def helper_load_in_view_mode(self):
         filename = os.path.normpath(os.path.join(data_path, 'tshooter_temp1.yml'))
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=(filename, True))
         # Mock Ok to erase, No to edit
         QtWidgets.QMessageBox.exec_ = MagicMock(side_effect=[QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.No])
         self.widget.load_tshooter_btn.click()
-        self.assertFalse(self.helper_is_widget_in_layout(self.widget.section_edit_pane, self.widget._hlayout))
-        # TODO: Replace the edit_category with the view_category (with icons)
-        self.assertFalse(self.helper_is_widget_in_layout(self.widget.edit_category_frame, self.widget._hlayout))
-        self.assertTrue(self.helper_is_widget_in_layout(self.widget.view_category_frame, self.widget._hlayout))
 
     def helper_create_category(self, cat_id, caption, image):
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])
