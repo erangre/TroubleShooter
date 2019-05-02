@@ -50,6 +50,7 @@ class MainController(object):
         self.section_edit_controller.section_modified.connect(self.tree_item_selection_changed)
 
         self.widget.search_le.textChanged.connect(self.search_le_changed)
+        self.widget.search_results_table.cellClicked.connect(self.search_results_table_clicked)
 
     def show_window(self):
         self.widget.show()
@@ -395,7 +396,6 @@ class MainController(object):
             self.populate_search_results(new_search_string)
 
     def populate_search_results(self, search_string):
-        # TODO: make the table rows open the appropriate section
         search_results = self.model.find_search_string_in_all(search_string)
         self.widget.search_results_table.blockSignals(True)
         self.widget.search_results_table.clearContents()
@@ -415,6 +415,11 @@ class MainController(object):
             self.widget.search_results_table.horizontalHeader().setSectionResizeMode(1,
                 QtWidgets.QHeaderView.ResizeToContents)
         self.widget.search_results_table.blockSignals(False)
+
+    def search_results_table_clicked(self, *args):
+        # TODO: add highlight to searched keywords
+        section_id = str(self.widget.search_results_table.item(args[0], 0).text())
+        self.widget.set_selected_section(section_id)
 
     def populate_grid_view(self, category_id):
         self.widget.category_view_back_btn.setVisible(not (category_id == 'main' or category_id == 'Main'))

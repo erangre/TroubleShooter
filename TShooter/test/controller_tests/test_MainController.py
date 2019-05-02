@@ -576,12 +576,23 @@ class SearchTests(QtTest):
         self.assertTrue(self.helper_is_widget_in_layout(self.widget.search_results_frame, self.widget._hlayout))
 
     def test_search_updates_search_table(self):
-        sys.excepthook = excepthook
+        # sys.excepthook = excepthook
         self.widget.search_le.setText('age')
         self.assertEqual(self.widget.search_results_table.rowCount(), 3)
         # make sure table clear sto zero rows
         self.widget.search_le.setText('ag')
         self.assertEqual(self.widget.search_results_table.rowCount(), 3)
+
+    def test_clicking_on_table_opens_correct_section(self):
+        sys.excepthook = excepthook
+        self.widget.search_le.setText('age')
+
+        self.widget.search_results_table.cellClicked.emit(0, 1)
+        self.assertEqual(self.widget.section_view_pane.message_layout.itemAt(0).widget().text(), 'message_1')
+        self.widget.search_results_table.cellClicked.emit(0, 2)
+        self.assertEqual(self.widget.section_view_pane.message_layout.itemAt(0).widget().text(), 'message_1')
+        self.widget.search_results_table.cellClicked.emit(2, 1)
+        self.assertEqual(self.widget.section_view_pane.message_layout.itemAt(0).widget().text(), 'message_c1')
 
     def helper_save_tshooter(self):
         filename = os.path.normpath(os.path.join(data_path, 'tshooter_temp1.yml'))
