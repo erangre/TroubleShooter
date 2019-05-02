@@ -259,14 +259,22 @@ class TroubleShooter(QtCore.QObject):
         return search_results
 
     def find_string_in_section_messages(self, search_string):
-        # TODO: in type add which type of message it is (text, image, PV) maybe also search PVs?
         search_results = []
         for section_id in self._all_sections:
             section = self.get_section_by_id(section_id)
             for ind, message in enumerate(section['messages']):
                 if search_string in message:
+                    if section['message_type'][ind] == TEXT:
+                        message_type = 'section_message'
+                    elif section['message_type'][ind] == IMAGE:
+                        message_type = 'image_path'
+                    elif section['message_type'][ind] == PV:
+                        message_type = 'pv_message'
                     search_results.append({'id': section['id'], 'text': section['messages'][ind],
-                                           'type': 'section_message'})
+                                           'type': message_type})
+                if not section['message_pv'][ind] is None and search_string in section['message_pv'][ind]:
+                    search_results.append({'id': section['id'], 'text': section['message_pv'][ind],
+                                           'type': 'epics_pv'})
         return search_results
 
     def find_string_in_solution_messages(self, search_string):
