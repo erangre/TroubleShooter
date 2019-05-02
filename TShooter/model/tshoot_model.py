@@ -25,6 +25,7 @@ class TroubleShooter(QtCore.QObject):
                                'sections': None,
                                'subcategories': OrderedDict()}
         self._all_categories[category_id] = self._main_category
+        self.search_string = ''
 
     def subcategory_counter(self, category_id):
         return len(self._all_categories[category_id]['subcategories'])

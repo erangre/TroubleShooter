@@ -294,6 +294,8 @@ class MainController(object):
         self.widget.section_view_pane.section_caption_lbl.setText(selected_section['caption'])
         for msg, msg_type, pv in zip(selected_section['messages'], selected_section['message_type'],
                                      selected_section['message_pv']):
+            if self.model.search_string:
+                msg = self.highlight_msg(msg, self.model.search_string)
             if ep and msg_type == PV:
                 msg = msg.format(epics.caget(pv))
             self.widget.section_view_pane.messages.append(QtWidgets.QLabel(msg))
@@ -310,6 +312,9 @@ class MainController(object):
             self.widget.section_view_pane.choices[-1].clicked.connect(self.choice_click_functions[-1])
             self.widget.section_view_pane.choices_layout.addWidget(self.widget.section_view_pane.choices[-1])
 
+    def highlight_msg(self, msg, search_string):
+        return msg.replace(search_string, "<b><font color='yellow'>"+search_string+"</font></b>")
+
     def clear_layout(self, layout):
         """
         :param layout:
@@ -325,7 +330,8 @@ class MainController(object):
     def create_choice_click_function(self, selected_section, ind):
         if selected_section['solution_type'][ind] == 'message':
             def choice_click_function():
-                self.widget.section_view_pane.solution_message_lbl.setText(selected_section['solution_message'][ind])
+                msg = self.highlight_msg(selected_section['solution_message'][ind], self.model.search_string)
+                self.widget.section_view_pane.solution_message_lbl.setText(msg)
                 self.widget.section_view_pane.solution_message_lbl.setVisible(True)
         elif selected_section['solution_type'][ind] == 'section':
             def choice_click_function():
@@ -389,6 +395,7 @@ class MainController(object):
             self.populate_grid_view('main')
 
     def search_le_changed(self, new_search_string):
+        self.model.search_string = new_search_string
         if new_search_string == '':
             self.widget.toggle_search_mode(False)
         else:
@@ -417,7 +424,7 @@ class MainController(object):
         self.widget.search_results_table.blockSignals(False)
 
     def search_results_table_clicked(self, *args):
-        # TODO: add highlight to searched keywords
+        # TODO: maybe add highlight in the table for the searched word
         section_id = str(self.widget.search_results_table.item(args[0], 0).text())
         self.widget.set_selected_section(section_id)
 
