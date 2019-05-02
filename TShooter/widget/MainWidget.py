@@ -40,8 +40,15 @@ class MainWidget(QtWidgets.QWidget):
         self._main_tree.setColumnCount(2)
         self._main_tree.setHeaderLabels(["caption", "type"])
 
+        self.search_le = QtWidgets.QLineEdit('')
         self.category_view_back_btn = QtWidgets.QPushButton('Back')
         self.category_view_back_btn.setVisible(False)
+
+        self.search_results_table = QtWidgets.QTableWidget()
+        self.search_results_table.setColumnCount(3)
+        self.search_results_table.setHorizontalHeaderLabels(['section_id', 'Text', 'Type'])
+        self.search_results_table.horizontalHeader().setVisible(True)
+        self.search_results_table.horizontalHeader().setStretchLastSection(False)
 
         self.section_edit_pane = SectionEditGroupBox()
 
@@ -53,6 +60,8 @@ class MainWidget(QtWidgets.QWidget):
         self.edit_category_frame = QtWidgets.QFrame()
         self.view_category_frame = QtWidgets.QFrame()
         self.view_category_frame.setVisible(False)
+        self.search_results_frame = QtWidgets.QFrame()
+        self.search_results_frame.setVisible(False)
 
     def arrange_layout(self):
         self._file_layout = QtWidgets.QHBoxLayout()
@@ -61,6 +70,7 @@ class MainWidget(QtWidgets.QWidget):
         self._category_edit_layout = QtWidgets.QVBoxLayout()
         self._category_view_layout = QtWidgets.QVBoxLayout()
         self._category_view_grid = QtWidgets.QGridLayout()
+        self._search_results_layout = QtWidgets.QVBoxLayout()
 
         self._file_layout.addWidget(self.save_tshooter_btn)
         self._file_layout.addWidget(self.load_tshooter_btn)
@@ -75,11 +85,15 @@ class MainWidget(QtWidgets.QWidget):
         self._category_edit_layout.addLayout(self._category_edit_btns_layout)
         self._category_edit_layout.addWidget(self._main_tree)
 
+        self._category_view_layout.addWidget(self.search_le)
         self._category_view_layout.addLayout(self._category_view_grid)
         self._category_view_layout.addWidget(self.category_view_back_btn)
 
+        self._search_results_layout.addWidget(self.search_results_table)
+
         self.edit_category_frame.setLayout(self._category_edit_layout)
         self.view_category_frame.setLayout(self._category_view_layout)
+        self.search_results_frame.setLayout(self._search_results_layout)
 
         self._hlayout.addLayout(self._category_edit_layout)
         self._hlayout.addWidget(self.edit_category_frame)
@@ -169,6 +183,19 @@ class MainWidget(QtWidgets.QWidget):
         self.section_edit_pane.setVisible(False)
         self.view_mode = True
         self.fill_view_category_frame('main')
+
+    def toggle_search_mode(self, toggle):
+        self.view_category_frame.setVisible(not toggle)
+        self.search_results_frame.setVisible(toggle)
+        if toggle:
+            self._hlayout.removeWidget(self.view_category_frame)
+            self._hlayout.insertWidget(0, self.search_results_frame)
+            self._search_results_layout.insertWidget(0, self.search_le)
+        else:
+            self._hlayout.removeWidget(self.search_results_frame)
+            self._hlayout.insertWidget(0, self.view_category_frame)
+            self._category_view_layout.insertWidget(0, self.search_le)
+        self.search_le.setFocus()
 
     def fill_view_category_frame(self, category_id):
 

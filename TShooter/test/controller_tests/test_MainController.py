@@ -485,3 +485,135 @@ class SaveLoadTests(QtTest):
     def helper_create_section(self, section_id):
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[section_id, True]])
         self.controller.widget.add_section_btn.click()
+
+
+class SearchTests(QtTest):
+    @classmethod
+    def setUpClass(cls):
+        cls.app = QtWidgets.QApplication.instance()
+        if cls.app is None:
+            cls.app = QtWidgets.QApplication([])
+
+    def setUp(self):
+        # sys.excepthook = excepthook
+        self.controller = MainController()
+        self.model = self.controller.model
+        self.widget = self.controller.widget
+
+        self.cat_id = 'first_category'
+        caption = 'The first category!'
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
+        self.helper_create_category(self.cat_id, caption, image)
+
+        self.section_id = 'section_a'
+        self.helper_create_section(self.section_id)
+
+        self.message_1 = 'message_1'  # add a text message
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
+        QtWidgets.QInputDialog.getText = MagicMock(return_value=[self.message_1, True])
+        self.widget.section_edit_pane.add_message_btn.click()
+
+        self.image_filename = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))  # add an image message
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Image', True])
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[self.image_filename, ''])
+        self.widget.section_edit_pane.add_message_btn.click()
+
+        self.choice_1 = 'Yes'  # add a choice with text solution
+        self.message_choice_1 = 'Clear all settings'
+        solution_type = 'message'
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[self.choice_1, True], [self.message_choice_1, True]])
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=[solution_type, True])
+        self.widget.section_edit_pane.add_choice_btn.click()
+
+        self.choice_2 = 'No'  # add a choice with a section solution
+        solution_type = 'section'
+        self.next_section_id = 'section_b'
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[self.choice_2, True]])
+        QtWidgets.QInputDialog.getItem = MagicMock(side_effect=[[solution_type, True], [self.next_section_id, True]])
+        self.widget.section_edit_pane.add_choice_btn.click()
+
+        self.section_id_b = 'section_b'
+        self.helper_create_section(self.section_id_b)
+
+        self.widget.set_selected_category(self.cat_id)  # go to a category and back to update before testing
+        self.widget.set_selected_section(self.section_id)
+
+        self.widget.set_selected_category('main')
+
+        self.cat_id2 = 'second_category'
+        caption = 'The second category!'
+        image = os.path.normpath(os.path.join(data_path, "images/garfield.png"))
+        self.helper_create_category(self.cat_id2, caption, image)
+
+        self.section_id_c = 'section_c'
+        self.helper_create_section(self.section_id_c)
+
+        self.message_c1 = 'message_c1'  # add a text message
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
+        QtWidgets.QInputDialog.getText = MagicMock(return_value=[self.message_c1, True])
+        self.widget.section_edit_pane.add_message_btn.click()
+
+        self.choice_c1 = 'Yes'  # add a choice with text solution
+        self.message_choice_c1 = 'Clear all settings'
+        solution_type = 'message'
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[self.choice_c1, True], [self.message_choice_c1, True]])
+        QtWidgets.QInputDialog.getItem = MagicMock(return_value=[solution_type, True])
+        self.widget.section_edit_pane.add_choice_btn.click()
+
+        self.helper_save_tshooter()
+        self.helper_load_in_view_mode()
+
+    def tearDown(self):
+        del self.controller
+        gc.collect()
+
+    def test_search_changes_view(self):
+        # sys.excepthook = excepthook
+        self.widget.search_le.setText('age')
+        self.assertFalse(self.helper_is_widget_in_layout(self.widget.section_edit_pane, self.widget._hlayout))
+        self.assertFalse(self.helper_is_widget_in_layout(self.widget.edit_category_frame, self.widget._hlayout))
+        self.assertFalse(self.helper_is_widget_in_layout(self.widget.view_category_frame, self.widget._hlayout))
+        self.assertTrue(self.helper_is_widget_in_layout(self.widget.search_results_frame, self.widget._hlayout))
+
+    def test_search_updates_search_table(self):
+        sys.excepthook = excepthook
+        self.widget.search_le.setText('age')
+        self.assertEqual(self.widget.search_results_table.rowCount(), 3)
+        # make sure table clear sto zero rows
+        self.widget.search_le.setText('ag')
+        self.assertEqual(self.widget.search_results_table.rowCount(), 3)
+
+    def helper_save_tshooter(self):
+        filename = os.path.normpath(os.path.join(data_path, 'tshooter_temp1.yml'))
+        QtWidgets.QFileDialog.getSaveFileName = MagicMock(return_value=(filename, True))
+        self.widget.save_tshooter_btn.click()
+
+    def helper_load_in_view_mode(self):
+        filename = os.path.normpath(os.path.join(data_path, 'tshooter_temp1.yml'))
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=(filename, True))
+        # Mock Ok to erase, No to edit
+        QtWidgets.QMessageBox.exec_ = MagicMock(side_effect=[QtWidgets.QMessageBox.Ok, QtWidgets.QMessageBox.No])
+        self.widget.load_tshooter_btn.click()
+
+    def helper_create_category(self, cat_id, caption, image):
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])
+        QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image, ''])
+        self.controller.widget.add_category_btn.click()
+
+    def helper_is_widget_in_layout(self, widget_name, layout):
+        """
+
+        :param widget_name:
+        :param layout:
+        :type layout: QtWidgets.QLayout
+        :return:
+        """
+        for ind in range(layout.count()):
+            item = layout.itemAt(ind).widget()
+            if widget_name == item:
+                return True
+        return False
+
+    def helper_create_section(self, section_id):
+        QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[section_id, True]])
+        self.controller.widget.add_section_btn.click()

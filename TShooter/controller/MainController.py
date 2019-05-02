@@ -49,6 +49,8 @@ class MainController(object):
         self.widget._main_tree.itemSelectionChanged.connect(self.tree_item_selection_changed)
         self.section_edit_controller.section_modified.connect(self.tree_item_selection_changed)
 
+        self.widget.search_le.textChanged.connect(self.search_le_changed)
+
     def show_window(self):
         self.widget.show()
 
@@ -384,6 +386,35 @@ class MainController(object):
             self.widget.switch_to_view_mode()
             self.widget.clear_grid_view()
             self.populate_grid_view('main')
+
+    def search_le_changed(self, new_search_string):
+        if new_search_string == '':
+            self.widget.toggle_search_mode(False)
+        else:
+            self.widget.toggle_search_mode(True)
+            self.populate_search_results(new_search_string)
+
+    def populate_search_results(self, search_string):
+        # TODO: make the table rows open the appropriate section
+        search_results = self.model.find_search_string_in_all(search_string)
+        self.widget.search_results_table.blockSignals(True)
+        self.widget.search_results_table.clearContents()
+        self.widget.search_results_table.setRowCount(0)
+        for search_result in search_results:
+            current_rows = self.widget.search_results_table.rowCount()
+            self.widget.search_results_table.setRowCount(current_rows + 1)
+            search_result_id = QtWidgets.QTableWidgetItem(search_result['id'])
+            search_result_id.setFlags(search_result_id.flags() & ~QtCore.Qt.ItemIsEditable)
+            self.widget.search_results_table.setItem(current_rows, 0, search_result_id)
+            search_result_text = QtWidgets.QTableWidgetItem(search_result['text'])
+            search_result_text.setFlags(search_result_text.flags() & ~QtCore.Qt.ItemIsEditable)
+            self.widget.search_results_table.setItem(current_rows, 1, search_result_text)
+            search_result_type = QtWidgets.QTableWidgetItem(search_result['type'])
+            search_result_type.setFlags(search_result_type.flags() & ~QtCore.Qt.ItemIsEditable)
+            self.widget.search_results_table.setItem(current_rows, 2, search_result_type)
+            self.widget.search_results_table.horizontalHeader().setSectionResizeMode(1,
+                QtWidgets.QHeaderView.ResizeToContents)
+        self.widget.search_results_table.blockSignals(False)
 
     def populate_grid_view(self, category_id):
         self.widget.category_view_back_btn.setVisible(not (category_id == 'main' or category_id == 'Main'))

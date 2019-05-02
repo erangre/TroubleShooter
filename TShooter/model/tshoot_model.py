@@ -249,3 +249,39 @@ class TroubleShooter(QtCore.QObject):
             if cat_data['image'] is not None:
                 cat_data['image'] = os.path.normpath(os.path.join(os.path.dirname(input_file),
                                                                   cat_data['image']))
+
+    def find_string_in_section_captions(self, search_string):
+        search_results = []
+        for section_id in self._all_sections:
+            section = self.get_section_by_id(section_id)
+            if search_string in section['caption']:
+                search_results.append({'id': section['id'], 'text': section['caption'], 'type': 'section_caption'})
+        return search_results
+
+    def find_string_in_section_messages(self, search_string):
+        # TODO: in type add which type of message it is (text, image, PV) maybe also search PVs?
+        search_results = []
+        for section_id in self._all_sections:
+            section = self.get_section_by_id(section_id)
+            for ind, message in enumerate(section['messages']):
+                if search_string in message:
+                    search_results.append({'id': section['id'], 'text': section['messages'][ind],
+                                           'type': 'section_message'})
+        return search_results
+
+    def find_string_in_solution_messages(self, search_string):
+        search_results = []
+        for section_id in self._all_sections:
+            section = self.get_section_by_id(section_id)
+            for ind, message in enumerate(section['solution_message']):
+                if search_string in message:
+                    search_results.append({'id': section['id'], 'text': section['solution_message'][ind],
+                                           'type': 'solution_message'})
+        return search_results
+
+    def find_search_string_in_all(self, search_string):
+        # TODO: make search have more potions, like two different strings, etc...
+        search_results = self.find_string_in_section_captions(search_string) + \
+                         self.find_string_in_section_messages(search_string) + \
+                         self.find_string_in_solution_messages(search_string)
+        return search_results

@@ -331,3 +331,54 @@ class YAMLExportImportTest(QtTest):
         self.assertDictEqual(self.model.get_all_data(), all_data)
 
         # os.remove(output_file)
+
+
+class SearchTest(QtTest):
+    def setUp(self):
+        self.model = TroubleShooter(category_id="main", level=0)
+        self.main_category_id = "main"
+        new_subcategory_image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
+        self.new_subcategory_id = "subcategory_a"
+        new_subcategory_caption = "first category"
+        self.new_subcategory = self.model.add_subcategory(self.main_category_id, self.new_subcategory_id,
+                                                          new_subcategory_caption, new_subcategory_image)
+
+        self.new_section_id = "section_a"
+        new_section_caption = "First problem to check"
+        self.new_section = self.model.add_section_to_category(self.new_subcategory_id, self.new_section_id,
+                                                              new_section_caption)
+
+        self.new_section_id_b = "section_b"
+        new_section_caption = "Second problem to check"
+        self.new_section_b = self.model.add_section_to_category(self.new_subcategory_id, self.new_section_id_b,
+                                                                new_section_caption)
+
+        msg1 = "test message to fix problem"
+        next_ind = self.model.message_counter(self.new_section_id)
+        self.model.add_message_to_section(self.new_section_id, msg1, TEXT)
+
+        choice1 = "yes"
+        solution1_type = "message"
+        solution1 = "fix problem a"
+
+        choice2 = "nope"
+        solution2_type = "section"
+        solution2 = self.new_section_id_b
+
+        self.model.add_choice_to_section(self.new_section_id, choice1, solution_type=solution1_type, solution=solution1)
+        self.model.add_choice_to_section(self.new_section_id, choice2, solution_type=solution2_type, solution=solution2)
+
+    def tearDown(self):
+        del self.model
+
+    def test_find_string_in_section_captions(self):
+        found_section_captions = self.model.find_string_in_section_captions('prob')
+        self.assertEqual(len(found_section_captions), 2)
+
+    def test_find_string_in_section_messages(self):
+        found_section_messages = self.model.find_string_in_section_messages('prob')
+        self.assertEqual(len(found_section_messages), 1)
+
+    def test_find_string_in_solution_messages(self):
+        found_solution_messages = self.model.find_string_in_solution_messages('prob')
+        self.assertEqual(len(found_solution_messages), 1)
