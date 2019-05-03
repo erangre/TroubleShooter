@@ -382,3 +382,11 @@ class SearchTest(QtTest):
     def test_find_string_in_solution_messages(self):
         found_solution_messages = self.model.find_string_in_solution_messages('prob')
         self.assertEqual(len(found_solution_messages), 1)
+
+    def test_find_string_in_all(self):
+        found_solution_messages = self.model.find_search_string_in_all('prob')
+        self.assertEqual(len(found_solution_messages), 4)
+
+    def test_search_is_not_case_sensitive(self):
+        found_solution_messages = self.model.find_search_string_in_all('Prob')
+        self.assertEqual(len(found_solution_messages), 4)

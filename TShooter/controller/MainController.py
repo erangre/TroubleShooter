@@ -1,5 +1,6 @@
 import os
 # import csv
+import re
 from sys import platform as _platform
 from qtpy import QtWidgets, QtCore, QtGui
 from functools import partial
@@ -294,7 +295,7 @@ class MainController(object):
         self.widget.section_view_pane.section_caption_lbl.setText(selected_section['caption'])
         for msg, msg_type, pv in zip(selected_section['messages'], selected_section['message_type'],
                                      selected_section['message_pv']):
-            if self.model.search_string:
+            if self.model.search_string and msg_type == TEXT:
                 msg = self.highlight_msg(msg, self.model.search_string)
             if ep and msg_type == PV:
                 msg = msg.format(epics.caget(pv))
@@ -313,7 +314,8 @@ class MainController(object):
             self.widget.section_view_pane.choices_layout.addWidget(self.widget.section_view_pane.choices[-1])
 
     def highlight_msg(self, msg, search_string):
-        return msg.replace(search_string, "<b><font color='yellow'>"+search_string+"</font></b>")
+        non_case_sensitive_msg = re.compile(re.escape(search_string), re.IGNORECASE)
+        return str(non_case_sensitive_msg.sub("<b><font color='yellow'>"+search_string.lower()+"</font></b>", msg))
 
     def clear_layout(self, layout):
         """
@@ -425,6 +427,7 @@ class MainController(object):
 
     def search_results_table_clicked(self, *args):
         # TODO: maybe add highlight in the table for the searched word
+        # TODO: make search non case sensitive
         section_id = str(self.widget.search_results_table.item(args[0], 0).text())
         self.widget.set_selected_section(section_id)
 

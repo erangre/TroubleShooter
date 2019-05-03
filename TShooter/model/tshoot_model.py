@@ -1,5 +1,6 @@
 import copy
 import os
+import re
 from collections import OrderedDict
 
 import yaml
@@ -255,7 +256,7 @@ class TroubleShooter(QtCore.QObject):
         search_results = []
         for section_id in self._all_sections:
             section = self.get_section_by_id(section_id)
-            if search_string in section['caption']:
+            if re.search(search_string, section['caption'], re.IGNORECASE):
                 search_results.append({'id': section['id'], 'text': section['caption'], 'type': 'section_caption'})
         return search_results
 
@@ -264,7 +265,7 @@ class TroubleShooter(QtCore.QObject):
         for section_id in self._all_sections:
             section = self.get_section_by_id(section_id)
             for ind, message in enumerate(section['messages']):
-                if search_string in message:
+                if re.search(search_string, message, re.IGNORECASE):
                     if section['message_type'][ind] == TEXT:
                         message_type = 'section_message'
                     elif section['message_type'][ind] == IMAGE:
@@ -283,13 +284,13 @@ class TroubleShooter(QtCore.QObject):
         for section_id in self._all_sections:
             section = self.get_section_by_id(section_id)
             for ind, message in enumerate(section['solution_message']):
-                if search_string in message:
+                if re.search(search_string, message, re.IGNORECASE):
                     search_results.append({'id': section['id'], 'text': section['solution_message'][ind],
                                            'type': 'solution_message'})
         return search_results
 
     def find_search_string_in_all(self, search_string):
-        # TODO: make search have more potions, like two different strings, etc...
+        # TODO: make search have more options, such as only sections containing a few different strings
         search_results = self.find_string_in_section_captions(search_string) + \
                          self.find_string_in_section_messages(search_string) + \
                          self.find_string_in_solution_messages(search_string)
