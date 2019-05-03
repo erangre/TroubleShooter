@@ -427,7 +427,6 @@ class MainController(object):
 
     def search_results_table_clicked(self, *args):
         # TODO: maybe add highlight in the table for the searched word
-        # TODO: make search non case sensitive
         section_id = str(self.widget.search_results_table.item(args[0], 0).text())
         self.widget.set_selected_section(section_id)
 
