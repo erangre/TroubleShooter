@@ -295,13 +295,18 @@ class MainController(object):
         self.widget.section_view_pane.section_caption_lbl.setText(selected_section['caption'])
         for msg, msg_type, pv in zip(selected_section['messages'], selected_section['message_type'],
                                      selected_section['message_pv']):
-            if self.model.search_string and msg_type == TEXT:
-                msg = self.highlight_msg(msg, self.model.search_string)
+            if msg_type == TEXT:
+                msg = self.format_msg(msg)
+                if self.model.search_string:
+                    msg = self.highlight_msg(msg, self.model.search_string)
+
             if ep and msg_type == PV:
-                msg = msg.format(epics.caget(pv))
+                msg = self.highlight_msg(msg, '{}')
+                msg = msg.format(epics.caget(pv, as_string=True))
             self.widget.section_view_pane.messages.append(QtWidgets.QLabel(msg))
             if msg_type == TEXT:
                 self.widget.section_view_pane.message_layout.addWidget(self.widget.section_view_pane.messages[-1])
+                self.widget.section_view_pane.messages[-1].setWordWrap(True)
             elif msg_type == IMAGE:
                 self.widget.section_view_pane.messages[-1].setPixmap(QtGui.QPixmap(msg))
                 self.widget.section_view_pane.message_layout.addWidget(self.widget.section_view_pane.messages[-1])
@@ -312,6 +317,9 @@ class MainController(object):
             self.choice_click_functions.append(self.create_choice_click_function(selected_section, ind))
             self.widget.section_view_pane.choices[-1].clicked.connect(self.choice_click_functions[-1])
             self.widget.section_view_pane.choices_layout.addWidget(self.widget.section_view_pane.choices[-1])
+
+    def format_msg(self, msg):
+        return msg.replace('\\n', '\n').replace('\\t', '\t')
 
     def highlight_msg(self, msg, search_string):
         non_case_sensitive_msg = re.compile(re.escape(search_string), re.IGNORECASE)
