@@ -47,7 +47,7 @@ class MainController(object):
         self.widget.edit_category_btn.clicked.connect(self.edit_category_btn_clicked)
         self.widget.remove_category_btn.clicked.connect(self.remove_category_btn_clicked)
 
-        self.widget._main_tree.itemSelectionChanged.connect(self.tree_item_selection_changed)
+        self.widget.main_tree.itemSelectionChanged.connect(self.tree_item_selection_changed)
         self.section_edit_controller.section_modified.connect(self.tree_item_selection_changed)
 
         self.widget.search_le.textChanged.connect(self.search_le_changed)
@@ -340,7 +340,10 @@ class MainController(object):
     def create_choice_click_function(self, selected_section, ind):
         if selected_section['solution_type'][ind] == 'message':
             def choice_click_function():
-                msg = self.highlight_msg(selected_section['solution_message'][ind], self.model.search_string)
+                msg = selected_section['solution_message'][ind]
+                if self.model.search_string:
+                    msg = self.highlight_msg(msg, self.model.search_string)
+                msg = self.format_msg(msg)
                 self.widget.section_view_pane.solution_message_lbl.setText(msg)
                 self.widget.section_view_pane.solution_message_lbl.setVisible(True)
         elif selected_section['solution_type'][ind] == 'section':
@@ -385,6 +388,7 @@ class MainController(object):
 
         self.model.import_category_from_yaml(tshooter_file)
         all_data = self.model.get_all_data()
+        self.widget.main_tree.blockSignals(True)
         for category_id in all_data['all_categories']:
             category = all_data['all_categories'][category_id]
             if category['id'] == 'main':
@@ -393,7 +397,6 @@ class MainController(object):
                 self.widget.add_category(category['id'], category['caption'])
             else:
                 self.widget.add_subcategory(category['parent_id'], category['id'], category['caption'])
-
         for section_id in all_data['all_sections']:
             section = all_data['all_sections'][section_id]
             self.widget.add_section(section['parent_id'], section_id)
@@ -403,6 +406,7 @@ class MainController(object):
             self.widget.switch_to_view_mode()
             self.widget.clear_grid_view()
             self.populate_grid_view('main')
+        self.widget.main_tree.blockSignals(False)
 
     def search_le_changed(self, new_search_string):
         self.model.search_string = new_search_string
@@ -434,7 +438,8 @@ class MainController(object):
         self.widget.search_results_table.blockSignals(False)
 
     def search_results_table_clicked(self, *args):
-        # TODO: maybe add highlight in the table for the searched word
+        # TODO: maybe add highlight in the table for the searched word. Seems like this requires creating QLabels and
+        # TODO: adding them as widgets to the table.
         section_id = str(self.widget.search_results_table.item(args[0], 0).text())
         self.widget.set_selected_section(section_id)
 

@@ -32,7 +32,7 @@ class CategoryTests(QtTest):
         gc.collect()
 
     def test_add_category(self):
-        self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.categories["main"])
+        self.assertEqual(self.controller.widget.main_tree.currentItem(), self.controller.widget.categories["main"])
         cat_id = 'test_subcategory'
         caption = 'caption_test'
         image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
@@ -41,7 +41,7 @@ class CategoryTests(QtTest):
 
         self.helper_create_category(cat_id, caption, image)
 
-        self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.categories[cat_id])
+        self.assertEqual(self.controller.widget.main_tree.currentItem(), self.controller.widget.categories[cat_id])
         self.assertIsNotNone(self.controller.widget.categories.get(cat_id, None))
         self.assertEqual(self.controller.widget.categories.get(cat_id, None).text(0), caption)
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['caption'], caption)
@@ -65,7 +65,7 @@ class CategoryTests(QtTest):
 
         self.helper_create_category(subcat_id, subcat_caption, subcat_image)
 
-        self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.categories[subcat_id])
+        self.assertEqual(self.controller.widget.main_tree.currentItem(), self.controller.widget.categories[subcat_id])
         added_sub_category = self.controller.model.get_category_by_id(subcat_id)
         self.assertEqual(added_sub_category['level'], subcat_level)
         self.assertEqual(added_sub_category['parent_id'], cat_id)
@@ -90,7 +90,7 @@ class CategoryTests(QtTest):
 
         self.helper_create_category(cat_id, caption, image)
 
-        self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.categories[cat_id])
+        self.assertEqual(self.controller.widget.main_tree.currentItem(), self.controller.widget.categories[cat_id])
 
         self.assertIsNotNone(self.controller.widget.categories.get(cat_id, None))
         self.assertEqual(self.controller.widget.categories.get(cat_id, None).text(0), caption)
@@ -109,10 +109,10 @@ class CategoryTests(QtTest):
         self.helper_create_category(cat_id, caption, image)
 
         tree_widget_item = self.controller.widget.categories[cat_id]
-        self.assertEqual(self.controller.widget._main_tree.currentItem(), tree_widget_item)
+        self.assertEqual(self.controller.widget.main_tree.currentItem(), tree_widget_item)
         QtWidgets.QMessageBox.exec_ = MagicMock(return_value=QtWidgets.QMessageBox.Ok)
         self.controller.widget.remove_category_btn.click()
-        self.assertNotEqual(self.controller.widget._main_tree.currentItem(), tree_widget_item)
+        self.assertNotEqual(self.controller.widget.main_tree.currentItem(), tree_widget_item)
 
     def test_cannot_add_same_category_twice(self):
         cat_id = 'test_subcategory'
@@ -175,7 +175,7 @@ class SectionTests(QtTest):
         level = 2
         self.helper_create_section(section_id)
 
-        self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.sections[section_id])
+        self.assertEqual(self.controller.widget.main_tree.currentItem(), self.controller.widget.sections[section_id])
         self.assertEqual(self.controller.model.get_section_by_id(section_id)['parent_id'], parent_id)
         self.assertEqual(self.controller.model.get_section_by_id(section_id)['level'], level)
 
@@ -183,7 +183,7 @@ class SectionTests(QtTest):
         # add first section
         section_id_a = 'section_a'
         self.helper_create_section(section_id_a)
-        self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.sections[section_id_a])
+        self.assertEqual(self.controller.widget.main_tree.currentItem(), self.controller.widget.sections[section_id_a])
 
         # simulate the user choosing the category again
         self.controller.widget.set_selected_category(self.cat_id)
@@ -194,7 +194,7 @@ class SectionTests(QtTest):
         level = 2
         self.helper_create_section(section_id_b)
 
-        self.assertEqual(self.controller.widget._main_tree.currentItem(), self.controller.widget.sections[section_id_b])
+        self.assertEqual(self.controller.widget.main_tree.currentItem(), self.controller.widget.sections[section_id_b])
         self.assertEqual(self.controller.model.get_section_by_id(section_id_a)['parent_id'], parent_id)
         self.assertEqual(self.controller.model.get_section_by_id(section_id_b)['parent_id'], parent_id)
         self.assertEqual(self.controller.model.get_section_by_id(section_id_a)['level'], level)

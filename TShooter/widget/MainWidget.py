@@ -36,9 +36,9 @@ class MainWidget(QtWidgets.QWidget):
         self.edit_category_btn = QtWidgets.QPushButton('Edit')
         self.remove_category_btn = QtWidgets.QPushButton('Remove')
 
-        self._main_tree = QtWidgets.QTreeWidget()
-        self._main_tree.setColumnCount(2)
-        self._main_tree.setHeaderLabels(["caption", "type"])
+        self.main_tree = QtWidgets.QTreeWidget()
+        self.main_tree.setColumnCount(2)
+        self.main_tree.setHeaderLabels(["caption", "type"])
 
         self.search_le = QtWidgets.QLineEdit('')
         self.category_view_back_btn = QtWidgets.QPushButton('Back')
@@ -83,7 +83,7 @@ class MainWidget(QtWidgets.QWidget):
 
         self._category_edit_layout.addLayout(self._file_layout)
         self._category_edit_layout.addLayout(self._category_edit_btns_layout)
-        self._category_edit_layout.addWidget(self._main_tree)
+        self._category_edit_layout.addWidget(self.main_tree)
 
         self._category_view_layout.addWidget(self.search_le)
         self._category_view_layout.addLayout(self._category_view_grid)
@@ -112,18 +112,18 @@ class MainWidget(QtWidgets.QWidget):
         self.categories[subcat_id] = QtWidgets.QTreeWidgetItem()
         self.categories[subcat_id].setText(0, subcat_caption)
         self.categories[subcat_id].setText(1, "category")
-        self._main_tree.addTopLevelItem(self.categories[subcat_id])
-        self._main_tree.setCurrentItem(self.categories[subcat_id])
+        self.main_tree.addTopLevelItem(self.categories[subcat_id])
+        self.main_tree.setCurrentItem(self.categories[subcat_id])
 
     def add_subcategory(self, parent_id, subcat_id, subcat_caption):
         self.categories[subcat_id] = QtWidgets.QTreeWidgetItem()
         self.categories[subcat_id].setText(0, subcat_caption)
         self.categories[subcat_id].setText(1, "sub-category")
         self.categories[parent_id].addChild(self.categories[subcat_id])
-        self._main_tree.setCurrentItem(self.categories[subcat_id])
+        self.main_tree.setCurrentItem(self.categories[subcat_id])
 
     def remove_top_level_tree_item(self, category_id, tree_item_ind):
-        self._main_tree.takeTopLevelItem(tree_item_ind)
+        self.main_tree.takeTopLevelItem(tree_item_ind)
         del self.categories[category_id]
 
     def remove_non_top_level_tree_item(self, tree_item_id, tree_item_type, parent_id):
@@ -137,26 +137,26 @@ class MainWidget(QtWidgets.QWidget):
             del self.sections[tree_item_id]
 
     def get_index_of_top_level_tree_item(self, tree_item_id):
-        return self._main_tree.indexOfTopLevelItem(self.categories[tree_item_id])
+        return self.main_tree.indexOfTopLevelItem(self.categories[tree_item_id])
 
     def get_top_tree_item_count(self):
-        return self._main_tree.topLevelItemCount()
+        return self.main_tree.topLevelItemCount()
 
     def get_top_level_tree_item_by_index(self, ind):
-        return self._main_tree.topLevelItem(ind)
+        return self.main_tree.topLevelItem(ind)
 
     def get_selected_categories(self):
-        return self._main_tree.selectedItems()
+        return self.main_tree.selectedItems()
 
     def set_selected_category(self, category_id):
-        self._main_tree.setCurrentItem(self.categories[category_id])
+        self.main_tree.setCurrentItem(self.categories[category_id])
 
     def add_section(self, parent_id, section_id):
         self.sections[section_id] = QtWidgets.QTreeWidgetItem()
         self.sections[section_id].setText(0, section_id)
         self.sections[section_id].setText(1, "section")
         self.categories[parent_id].addChild(self.sections[section_id])
-        self._main_tree.setCurrentItem(self.sections[section_id])
+        self.main_tree.setCurrentItem(self.sections[section_id])
 
     def edit_section(self, parent_id, old_section_id, new_section_id):
         self.categories[parent_id].removeChild(self.sections[old_section_id])
@@ -164,7 +164,7 @@ class MainWidget(QtWidgets.QWidget):
         self.categories[parent_id].addChild(self.sections[new_section_id])
 
     def set_selected_section(self, section_id):
-        self._main_tree.setCurrentItem(self.sections[section_id])
+        self.main_tree.setCurrentItem(self.sections[section_id])
 
     def switch_to_view_mode(self):
         self._hlayout.removeWidget(self.edit_category_frame)
@@ -200,8 +200,8 @@ class MainWidget(QtWidgets.QWidget):
     def fill_view_category_frame(self, category_id):
 
         if category_id == 'main' or category_id == 'Main':
-            for ind in range(self._main_tree.topLevelItemCount()):
-                top_level_cat = self._main_tree.topLevelItem(ind)
+            for ind in range(self.main_tree.topLevelItemCount()):
+                top_level_cat = self.main_tree.topLevelItem(ind)
                 caption = top_level_cat.text(0)
                 if not (caption == 'Main' or caption == 'main'):
                     self._category_grid_btns.append(QtWidgets.QPushButton(caption))
