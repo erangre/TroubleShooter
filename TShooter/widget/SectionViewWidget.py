@@ -18,6 +18,7 @@ class SectionViewPage(QtWidgets.QWidget):
         self.section_id_lbl = QtWidgets.QLabel()
         self.section_caption_lbl = QtWidgets.QLabel('')
         self.solution_message_lbl = QtWidgets.QLabel('')
+        self.solution_message_lbl.setWordWrap(True)
         self.previous_section_btn = QtWidgets.QPushButton('Previous')
         self.next_section_btn = QtWidgets.QPushButton('Next')
 
