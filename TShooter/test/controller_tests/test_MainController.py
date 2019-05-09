@@ -588,11 +588,14 @@ class SearchTests(QtTest):
         self.widget.search_le.setText('age')
 
         self.widget.search_results_table.cellClicked.emit(0, 1)
-        self.assertEqual(self.widget.section_view_pane.message_layout.itemAt(0).widget().text(), 'message_1')
+        self.assertEqual(self.widget.section_view_pane.message_layout.itemAt(0).widget().text(),
+                         self.controller.highlight_msg('message_1', 'age'))
         self.widget.search_results_table.cellClicked.emit(0, 2)
-        self.assertEqual(self.widget.section_view_pane.message_layout.itemAt(0).widget().text(), 'message_1')
+        self.assertEqual(self.widget.section_view_pane.message_layout.itemAt(0).widget().text(),
+                         self.controller.highlight_msg('message_1', 'age'))
         self.widget.search_results_table.cellClicked.emit(2, 1)
-        self.assertEqual(self.widget.section_view_pane.message_layout.itemAt(0).widget().text(), 'message_c1')
+        self.assertEqual(self.widget.section_view_pane.message_layout.itemAt(0).widget().text(),
+                         self.controller.highlight_msg('message_c1', 'age'))
 
     def helper_save_tshooter(self):
         filename = os.path.normpath(os.path.join(data_path, 'tshooter_temp1.yml'))

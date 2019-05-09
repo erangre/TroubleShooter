@@ -78,10 +78,11 @@ class SaveLoadInDifferentFolders(QtTest):
         QtWidgets.QMessageBox.exec_ = MagicMock(return_value=QtWidgets.QMessageBox.Ok)
         self.widget.load_tshooter_btn.click()
 
-        self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
-        self.assertEqual(self.widget.section_edit_pane.section_message_list.item(0).text(), new_image_filename)
         self.assertEqual(len(self.model.get_section_by_id(self.section_id)['messages']), 1)
         self.assertEqual(self.model.get_section_by_id(self.section_id)['messages'][0], new_image_filename)
+        self.widget.set_selected_section(self.section_id)
+        self.assertEqual(self.widget.section_edit_pane.section_message_list.count(), 1)
+        self.assertEqual(self.widget.section_edit_pane.section_message_list.item(0).text(), new_image_filename)
 
         rmtree(first_dir)
         rmtree(second_dir)

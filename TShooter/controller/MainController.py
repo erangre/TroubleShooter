@@ -348,14 +348,19 @@ class MainController(object):
                 self.widget.section_view_pane.solution_message_lbl.setVisible(True)
         elif selected_section['solution_type'][ind] == 'section':
             def choice_click_function():
-                self.widget.section_view_pane.solution_message_lbl.setText(SECTION_SOLUTION)
-                self.widget.section_view_pane.next_section_btn.setEnabled(True)
-                self.widget.section_view_pane.next_section_btn.setVisible(True)
-                self.widget.section_view_pane.solution_message_lbl.setVisible(True)
+                # self.widget.section_view_pane.solution_message_lbl.setText(SECTION_SOLUTION)
+                # self.widget.section_view_pane.next_section_btn.setEnabled(True)
+                # self.widget.section_view_pane.next_section_btn.setVisible(True)
+                # self.widget.section_view_pane.solution_message_lbl.setVisible(True)
+                # # self.widget.section_view_pane.next_section_btn.clicked.connect(
+                # #     partial(self.widget.set_selected_section, selected_section['solution_section_id'][ind]))
+                self.widget.set_selected_section(selected_section['solution_section_id'][ind])
+                self.widget.section_view_pane.previous_section_btn.clicked.connect(
+                    partial(self.widget.set_selected_section, selected_section['id']))
+                self.widget.section_view_pane.previous_section_btn.setEnabled(True)
+                self.widget.section_view_pane.previous_section_btn.setVisible(True)
                 # self.widget.section_view_pane.next_section_btn.clicked.connect(
-                #     partial(self.widget.set_selected_section, selected_section['solution_section_id'][ind]))
-                self.widget.section_view_pane.next_section_btn.clicked.connect(
-                    self.create_next_btn_clicked_function(selected_section, ind))
+                #     self.create_next_btn_clicked_function(selected_section, ind))
         else:
             choice_click_function = None
 
