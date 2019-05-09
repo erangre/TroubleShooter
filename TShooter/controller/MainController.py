@@ -332,11 +332,18 @@ class MainController(object):
         :return:
         """
         for ind in reversed(range(layout.count())):
-            widget_to_remove = layout.itemAt(ind).widget()
-            widget_to_remove.hide()
-            layout.removeWidget(widget_to_remove)
-            widget_to_remove.setParent(None)
-            widget_to_remove.deleteLater()
+            layout_item = layout.itemAt(ind)
+            if layout_item.widget() is not None:
+                widget_to_remove = layout_item.widget()
+                widget_to_remove.hide()
+                layout.removeWidget(widget_to_remove)
+                widget_to_remove.setParent(None)
+                widget_to_remove.deleteLater()
+            elif layout_item.spacerItem() is not None:
+                pass  # add something to remove spacer items
+            else:
+                layout_to_remove = layout.itemAt(ind)
+                self.clear_layout(layout_to_remove)
 
     def create_choice_click_function(self, selected_section, ind):
         if selected_section['solution_type'][ind] == 'message':
