@@ -333,6 +333,7 @@ class MainController(object):
         """
         for ind in reversed(range(layout.count())):
             widget_to_remove = layout.itemAt(ind).widget()
+            widget_to_remove.hide()
             layout.removeWidget(widget_to_remove)
             widget_to_remove.setParent(None)
             widget_to_remove.deleteLater()
