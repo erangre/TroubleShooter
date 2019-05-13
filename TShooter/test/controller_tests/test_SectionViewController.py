@@ -10,6 +10,7 @@ from ..utility import QtTest, click_button
 
 from ...controller.MainController import MainController
 from ...model.tshoot_model import TroubleShooter, SECTION_SOLUTION
+from ...model.config import highlight_strings
 from ...widget.MainWidget import MainWidget
 from ..utility import excepthook
 
@@ -116,6 +117,25 @@ class ViewSectionTests(QtTest):
         self.assertIn(self.expected_message_3, messages)
         # self.assertIn(self.image_filename, messages)
 
+    def test_highlighted_messages_appear_correct(self):
+        msg0 = 'special_message'
+        for custom_highlight in highlight_strings:
+            msg0 = "test_message"
+            msg1 = highlight_strings[custom_highlight]['start']['input'] + msg0 + \
+                   highlight_strings[custom_highlight]['end']['input']
+
+            QtWidgets.QInputDialog.getItem = MagicMock(return_value=['Text', True])
+            QtWidgets.QInputDialog.getText = MagicMock(return_value=[msg1, True])
+            self.widget.section_edit_pane.add_message_btn.click()
+            messages = []
+            for msg in self.widget.section_view_pane.messages:
+                messages.append(msg.text())
+
+            msg2 = highlight_strings[custom_highlight]['start']['output'] + msg0 + \
+                   highlight_strings[custom_highlight]['end']['output']
+
+            self.assertIn(msg2, messages)
+
     def test_selecting_section_updates_section_view_choices(self):
         choices = []
 
@@ -146,7 +166,6 @@ class ViewSectionTests(QtTest):
                                  self.section_id)
 
     # TODO - ??? Previous button when no link used (or maybe prev is always prev within category and link uses back btn
-    # TODO - Make an option for auto next
 
     def helper_is_widget_in_layout(self, widget, layout):
         for ind in range(layout.count()):

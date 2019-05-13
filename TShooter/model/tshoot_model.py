@@ -2,6 +2,7 @@ import copy
 import os
 import re
 from collections import OrderedDict
+from .config import highlight_strings
 
 import yaml
 from qtpy import QtCore
@@ -295,3 +296,14 @@ class TroubleShooter(QtCore.QObject):
                          self.find_string_in_section_messages(search_string) + \
                          self.find_string_in_solution_messages(search_string)
         return search_results
+
+    def format_msg(self, msg):
+        msg = msg.replace('\\n', '\n').replace('\\t', '\t')
+        for custom_highlight in highlight_strings:
+            start_input = highlight_strings[custom_highlight]['start']['input']
+            start_output = highlight_strings[custom_highlight]['start']['output']
+            end_input = highlight_strings[custom_highlight]['end']['input']
+            end_output = highlight_strings[custom_highlight]['end']['output']
+            msg = msg.replace(start_input, start_output)
+            msg = msg.replace(end_input, end_output)
+        return msg

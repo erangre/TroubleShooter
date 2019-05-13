@@ -296,7 +296,7 @@ class MainController(object):
         for msg, msg_type, pv in zip(selected_section['messages'], selected_section['message_type'],
                                      selected_section['message_pv']):
             if msg_type == TEXT:
-                msg = self.format_msg(msg)
+                msg = self.model.format_msg(msg)
                 if self.model.search_string:
                     msg = self.highlight_msg(msg, self.model.search_string)
 
@@ -317,9 +317,6 @@ class MainController(object):
             self.choice_click_functions.append(self.create_choice_click_function(selected_section, ind))
             self.widget.section_view_pane.choices[-1].clicked.connect(self.choice_click_functions[-1])
             self.widget.section_view_pane.choices_layout.addWidget(self.widget.section_view_pane.choices[-1])
-
-    def format_msg(self, msg):
-        return msg.replace('\\n', '\n').replace('\\t', '\t')
 
     def highlight_msg(self, msg, search_string):
         non_case_sensitive_msg = re.compile(re.escape(search_string), re.IGNORECASE)
@@ -351,7 +348,7 @@ class MainController(object):
                 msg = selected_section['solution_message'][ind]
                 if self.model.search_string:
                     msg = self.highlight_msg(msg, self.model.search_string)
-                msg = self.format_msg(msg)
+                msg = self.model.format_msg(msg)
                 self.widget.section_view_pane.solution_message_lbl.setText(msg)
                 self.widget.section_view_pane.solution_message_lbl.setVisible(True)
         elif selected_section['solution_type'][ind] == 'section':

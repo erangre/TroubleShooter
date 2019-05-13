@@ -9,6 +9,7 @@ from ..utility import QtTest
 # from ...model.cat_model import TroubleCategory
 # from ...model.ts_model import TroubleSection
 from ...model.tshoot_model import TroubleShooter, IMAGE, TEXT, PV, SECTION_SOLUTION
+from ...model.config import highlight_strings
 
 unittest_path = os.path.dirname(__file__)
 data_path = os.path.normpath(os.path.join(unittest_path, '../data'))
@@ -223,6 +224,17 @@ class TroubleSectionTest(QtTest):
         self.test_add_text_message()
         next_ind = self.model.message_counter(self.new_section_id)
         self.assertEqual(next_ind, 4)
+
+    def test_add_message_with_custom_highlight(self):
+        for custom_highlight in highlight_strings:
+            msg0 = "test_message"
+            msg1 = highlight_strings[custom_highlight]['start']['input'] + msg0 + \
+                   highlight_strings[custom_highlight]['end']['input']
+            next_ind = self.model.message_counter(self.new_section_id)
+            self.model.add_message_to_section(self.new_section_id, msg1, TEXT)
+            # msg2 = highlight_strings[custom_highlight]['start']['output'] + msg0 + \
+            #        highlight_strings[custom_highlight]['end']['output']
+            self.assertEqual(self.new_section['messages'][next_ind], msg1)
 
     def test_choice_counter(self):
         next_ind = self.model.choice_counter(self.new_section_id)
