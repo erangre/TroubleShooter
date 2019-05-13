@@ -25,7 +25,6 @@ class MainWidget(QtWidgets.QWidget):
         self.view_mode = False
         self._category_grid_btns = []
 
-
     def create_widgets(self):
         self.save_tshooter_btn = QtWidgets.QPushButton('Save')
         self.load_tshooter_btn = QtWidgets.QPushButton('Load')
