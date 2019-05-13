@@ -467,3 +467,5 @@ class EditSectionTests(QtTest):
         QtWidgets.QInputDialog.getItem = MagicMock(side_effect=[[solution_type, True], [next_section_id, True]])
         self.widget.section_edit_pane.add_choice_btn.click()
         return solution_type
+
+    # TODO: Add auto-save in a temporary file
