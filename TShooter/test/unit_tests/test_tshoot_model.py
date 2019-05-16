@@ -275,6 +275,28 @@ class TroubleSectionTest(QtTest):
         self.assertEqual(self.new_section['solution_message'][next_ind], SECTION_SOLUTION)
         self.assertEqual(self.new_section['solution_section_id'][next_ind], next_section_id)
 
+    def test_edit_section_name(self):
+        next_section_id = "section_b"
+        next_section_caption = "Check this next"
+        next_section = self.model.add_section_to_category(self.new_subcategory_id, next_section_id,
+                                                          next_section_caption)
+
+        choice1 = "nope"
+        solution1_type = "section"
+
+        next_ind = self.model.choice_counter(self.new_section_id)
+
+        self.model.add_choice_to_section(self.new_section_id, choice1, solution_type=solution1_type,
+                                         solution=next_section_id)
+
+        new_next_section_id = "section_c"
+        self.model.edit_section(next_section_id, new_next_section_id)
+
+        self.assertEqual(self.new_section['choices'][next_ind], choice1)
+        self.assertEqual(self.new_section['solution_type'][next_ind], solution1_type)
+        self.assertEqual(self.new_section['solution_message'][next_ind], SECTION_SOLUTION)
+        self.assertEqual(self.new_section['solution_section_id'][next_ind], new_next_section_id)
+
     def test_add_multiple_choices(self):
         self.test_add_choice_with_message_as_solution()
         self.test_add_choice_with_section_as_solution()
@@ -402,3 +424,5 @@ class SearchTest(QtTest):
     def test_search_is_not_case_sensitive(self):
         found_solution_messages = self.model.find_search_string_in_all('Prob')
         self.assertEqual(len(found_solution_messages), 4)
+
+        # TODO: give warning when trying to add cat with same id or section with same id

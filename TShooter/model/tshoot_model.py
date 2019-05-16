@@ -108,6 +108,11 @@ class TroubleShooter(QtCore.QObject):
             (new_section_id if k == old_section_id else k, v) for k, v in parent_cat['sections'].items())
         self._all_sections = OrderedDict(
             (new_section_id if k == old_section_id else k, v) for k, v in self._all_sections.items())
+        for section in self._all_sections:
+            for solution_section_id in self._all_sections[section]['solution_section_id']:
+                self._all_sections[section]['solution_section_id'] = \
+                    [new_section_id if solution_section_id == old_section_id else
+                     sec for sec in self._all_sections[section]['solution_section_id']]
 
     def message_counter(self, section_id):
         return len(self._all_sections[section_id]['messages'])
