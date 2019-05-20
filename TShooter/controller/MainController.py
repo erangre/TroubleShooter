@@ -417,6 +417,8 @@ class MainController(object):
             self.widget.clear_grid_view()
             self.populate_grid_view('main')
         self.widget.main_tree.blockSignals(False)
+        for ind in range(self.widget.main_tree.columnCount()):
+            self.widget.main_tree.resizeColumnToContents(ind)
 
     def search_le_changed(self, new_search_string):
         self.model.search_string = new_search_string
