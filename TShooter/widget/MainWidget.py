@@ -23,7 +23,7 @@ class MainWidget(QtWidgets.QWidget):
         self.add_category("main", "Main")
 
         self.view_mode = False
-        self._category_grid_btns = []
+        self._category_grid_btns = []  # type: list[QtWidgets.QPushButton]
 
     def create_widgets(self):
         self.save_tshooter_btn = QtWidgets.QPushButton('Save')
@@ -234,8 +234,7 @@ class MainWidget(QtWidgets.QWidget):
         if image:
             self._category_grid_btns[-1].setIcon(QtGui.QIcon(QtGui.QPixmap(image)))
             self._category_grid_btns[-1].setIconSize(QtCore.QSize(100, 100))
-            self._category_grid_btns[-1].setSizePolicy(QtWidgets.QSizePolicy.Minimum,
-                                                       QtWidgets.QSizePolicy.Minimum)
+            self._category_grid_btns[-1].setFixedHeight(120)
         self._category_view_grid.addWidget(self._category_grid_btns[-1])
 
     def get_last_category_btn(self):
