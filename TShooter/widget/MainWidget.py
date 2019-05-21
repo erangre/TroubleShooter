@@ -94,12 +94,20 @@ class MainWidget(QtWidgets.QWidget):
         self.view_category_frame.setLayout(self._category_view_layout)
         self.search_results_frame.setLayout(self._search_results_layout)
 
-        self._hlayout.addLayout(self._category_edit_layout)
+        # self._hlayout.addLayout(self._category_edit_layout)
         self._hlayout.addWidget(self.edit_category_frame)
         self._hlayout.addWidget(self.section_edit_pane)
         self._hlayout.addWidget(self.section_view_pane)
 
         self.setLayout(self._hlayout)
+
+        self._hlayout.setAlignment(QtCore.Qt.AlignLeft)
+        self.view_category_frame.setMinimumWidth(200)
+        self.view_category_frame.setMaximumWidth(300)
+        self.edit_category_frame.setMinimumWidth(350)
+        self.edit_category_frame.setMaximumWidth(350)
+        self.search_results_frame.setMinimumWidth(200)
+        self.search_results_frame.setMaximumWidth(600)
 
     def set_stylesheet(self):
         file = open(os.path.normpath(os.path.join(widget_path, "stylesheet.qss")))

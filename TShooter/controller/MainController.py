@@ -304,6 +304,7 @@ class MainController(object):
                 msg = self.highlight_msg(msg, '{}')
                 msg = msg.format(epics.caget(pv, as_string=True))
             self.widget.section_view_pane.messages.append(QtWidgets.QLabel(msg))
+            self.widget.section_view_pane.messages[-1].setStyleSheet("font-size: 16pt")
             if msg_type == TEXT:
                 self.widget.section_view_pane.message_layout.addWidget(self.widget.section_view_pane.messages[-1])
                 self.widget.section_view_pane.messages[-1].setWordWrap(True)
@@ -427,6 +428,7 @@ class MainController(object):
         else:
             self.widget.toggle_search_mode(True)
             self.populate_search_results(new_search_string)
+        self.widget.search_le.setFocus()
 
     def populate_search_results(self, search_string):
         search_results = self.model.find_search_string_in_all(search_string)
@@ -486,6 +488,7 @@ class MainController(object):
                 self.widget.add_category_grid_btn(caption, image)
                 self.widget.get_last_category_btn().clicked.connect(partial(self.grid_view_section_btn_clicked,
                                                                             section_id))
+        self.widget._category_view_layout.addStretch(1)
 
     def grid_view_subcat_btn_clicked(self, category_id):
         self.widget.clear_grid_view()
