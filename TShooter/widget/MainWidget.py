@@ -68,7 +68,16 @@ class MainWidget(QtWidgets.QWidget):
         self._hlayout = QtWidgets.QHBoxLayout()
         self._category_edit_layout = QtWidgets.QVBoxLayout()
         self._category_view_layout = QtWidgets.QVBoxLayout()
-        self._category_view_grid = QtWidgets.QGridLayout()
+        self._category_view_grid = QtWidgets.QVBoxLayout()
+        self._category_view_grid_scroll_widget = QtWidgets.QWidget()
+        self._category_view_grid_scroll = QtWidgets.QScrollArea()
+
+        self._category_view_grid_scroll.setMinimumHeight(900)
+        self._category_view_grid_scroll.setMaximumHeight(900)
+        self._category_view_grid_scroll_widget.setLayout(self._category_view_grid)
+        self._category_view_grid_scroll.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self._category_view_grid_scroll.setWidgetResizable(True)
+        self._category_view_grid_scroll.setWidget(self._category_view_grid_scroll_widget)
         self._search_results_layout = QtWidgets.QVBoxLayout()
 
         self._file_layout.addWidget(self.save_tshooter_btn)
@@ -85,7 +94,7 @@ class MainWidget(QtWidgets.QWidget):
         self._category_edit_layout.addWidget(self.main_tree)
 
         self._category_view_layout.addWidget(self.search_le)
-        self._category_view_layout.addLayout(self._category_view_grid)
+        self._category_view_layout.addWidget(self._category_view_grid_scroll)
         self._category_view_layout.addWidget(self.category_view_back_btn)
 
         self._search_results_layout.addWidget(self.search_results_table)
