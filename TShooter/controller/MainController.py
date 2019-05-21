@@ -46,6 +46,7 @@ class MainController(object):
         self.widget.add_section_btn.clicked.connect(self.add_section_btn_clicked)
         self.widget.edit_category_btn.clicked.connect(self.edit_category_btn_clicked)
         self.widget.remove_category_btn.clicked.connect(self.remove_category_btn_clicked)
+        self.widget.move_tree_item_up_btn.clicked.connect(self.move_tree_itm_up_btn_clicked)
 
         self.widget.main_tree.itemSelectionChanged.connect(self.tree_item_selection_changed)
         self.section_edit_controller.section_modified.connect(self.tree_item_selection_changed)
@@ -165,6 +166,7 @@ class MainController(object):
     # TODO: currently the caption is taken from the id for sections. This is not the same as for categories. This is why when editing a category it is simple, the id does not change.
     # TODO: when editing a section, the id changes and it makes everything complicated. It also causes the sectoin to move to last place in order. maybe it is better to change this.
     # TODO: to move sections in order it is possible to remove child and add child for the category.
+
     def edit_section(self, section_id):
         tree_item = self.widget.sections.get(section_id, None)
         new_section_id, ok = QtWidgets.QInputDialog.getText(self.widget, 'Modify section ID', 'Section ID:',
@@ -502,3 +504,25 @@ class MainController(object):
             self.widget.clear_grid_view()
             self.populate_grid_view(category_id)
         return category_view_back_btn_clicked
+
+    def move_tree_itm_up_btn_clicked(self):
+        selected_categories = self.widget.get_selected_categories()
+
+        if selected_categories:
+            for tree_item_id, tree_item in self.widget.categories.items():
+                if selected_categories[0] == tree_item:
+                    # self.move_category(tree_item_id, 'up')
+                    pass
+            for tree_item_id, tree_item in self.widget.sections.items():
+                if selected_categories[0] == tree_item:
+                    self.move_section(tree_item_id, 'up')
+                    return
+
+    def move_section(self, section_id, direction):
+        tree_item = self.widget.sections.get(section_id, None)
+
+        # if tree_item is not None:
+        #     tree_item.setText(0, new_section_id)
+        parent_id = self.model.get_section_by_id(section_id)['parent_id']
+        # self.model.move_section(section_id, 'up')
+        self.widget.move_section(parent_id, section_id, 'up')

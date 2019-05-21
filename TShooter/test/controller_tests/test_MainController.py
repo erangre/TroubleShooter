@@ -281,6 +281,30 @@ class SectionTests(QtTest):
         self.assertFalse(section_id in self.controller.model.get_category_by_id(parent_id)['sections'])
         self.assertTrue(new_section_id in self.controller.model.get_category_by_id(parent_id)['sections'])
 
+    def test_move_section_up(self):
+        sys.excepthook = excepthook
+
+        section_id_a = 'section_a'
+        parent_id = self.cat_id
+        self.helper_create_section(section_id_a)
+
+        section_id_b = 'section_b'
+        parent_id = self.cat_id
+        self.helper_create_section(section_id_b)
+
+        self.controller.widget.set_selected_section(section_id_b)
+        old_index = self.controller.widget.main_tree.indexFromItem(
+            self.controller.widget.main_tree.selectedItems()[0]).row()
+
+        self.controller.widget.move_tree_item_up_btn.click()
+
+        self.controller.widget.set_selected_section(section_id_b)
+        new_index = self.controller.widget.main_tree.indexFromItem(
+            self.controller.widget.main_tree.selectedItems()[0]).row()
+        self.assertEqual(old_index - 1, new_index)
+
+        # TODO: tets model (and write code for model. Then write the same test for move down. Maybe for move category
+
     def helper_create_category(self, cat_id, caption, image):
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image, ''])

@@ -17,8 +17,8 @@ class MainWidget(QtWidgets.QWidget):
         self.arrange_layout()
         self.set_stylesheet()
 
-        self.categories = OrderedDict()
-        self.sections = OrderedDict()
+        self.categories = OrderedDict()  # type: dict[str, QtWidgets.QTreeWidgetItem]
+        self.sections = OrderedDict()  # type: dict[str, QtWidgets.QTreeWidgetItem]
 
         self.add_category("main", "Main")
 
@@ -34,6 +34,8 @@ class MainWidget(QtWidgets.QWidget):
         self.add_section_btn = QtWidgets.QPushButton('Add Section')
         self.edit_category_btn = QtWidgets.QPushButton('Edit')
         self.remove_category_btn = QtWidgets.QPushButton('Remove')
+        self.move_tree_item_up_btn = QtWidgets.QPushButton(u'\u2191')
+        self.move_tree_item_down_btn = QtWidgets.QPushButton(u'\u2193')
 
         self.main_tree = QtWidgets.QTreeWidget()
         self.main_tree.setColumnCount(2)
@@ -88,6 +90,8 @@ class MainWidget(QtWidgets.QWidget):
         self._category_edit_btns_layout.addWidget(self.add_section_btn)
         self._category_edit_btns_layout.addWidget(self.edit_category_btn)
         self._category_edit_btns_layout.addWidget(self.remove_category_btn)
+        self._category_edit_btns_layout.addWidget(self.move_tree_item_up_btn)
+        self._category_edit_btns_layout.addWidget(self.move_tree_item_down_btn)
 
         self._category_edit_layout.addLayout(self._file_layout)
         self._category_edit_layout.addLayout(self._category_edit_btns_layout)
@@ -178,6 +182,17 @@ class MainWidget(QtWidgets.QWidget):
         self.categories[parent_id].removeChild(self.sections[old_section_id])
         self.sections = OrderedDict((new_section_id if k == old_section_id else k, v) for k, v in self.sections.items())
         self.categories[parent_id].addChild(self.sections[new_section_id])
+
+    def move_section(self, parent_id, section_id, direction):
+        section_ind = self.main_tree.indexFromItem(self.main_tree.selectedItems()[0]).row()
+        if direction == 'up':
+            if section_ind > 0:
+                section = self.categories[parent_id].takeChild(section_ind)
+                self.categories[parent_id].insertChild(section_ind - 1, section)
+        elif direction == 'down':
+            if section_ind < self.categories[parent_id].childCount() - 1:
+                section = self.categories[parent_id].takeChild(section_ind)
+                self.categories[parent_id].insertChild(section_ind + 1, section)
 
     def set_selected_section(self, section_id):
         self.main_tree.setCurrentItem(self.sections[section_id])
