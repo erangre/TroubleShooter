@@ -33,8 +33,8 @@ class MainWidget(QtWidgets.QWidget):
         self.remove_category_btn = QtWidgets.QPushButton('Remove')
 
         self._main_tree = QtWidgets.QTreeWidget()
-        self._main_tree.setColumnCount(2)
-        self._main_tree.setHeaderLabels(["caption", "type"])
+        self._main_tree.setColumnCount(3)
+        self._main_tree.setHeaderLabels(["caption", "type", "id"])
 
         self.section_edit_pane = SectionEditGroupBox()
         self.section_edit_pane.setVisible(False)
@@ -76,6 +76,7 @@ class MainWidget(QtWidgets.QWidget):
         self.categories[subcat_id] = QtWidgets.QTreeWidgetItem()
         self.categories[subcat_id].setText(0, subcat_caption)
         self.categories[subcat_id].setText(1, "category")
+        self.categories[subcat_id].setText(2, subcat_id)
         self._main_tree.addTopLevelItem(self.categories[subcat_id])
         self._main_tree.setCurrentItem(self.categories[subcat_id])
 
@@ -83,6 +84,7 @@ class MainWidget(QtWidgets.QWidget):
         self.categories[subcat_id] = QtWidgets.QTreeWidgetItem()
         self.categories[subcat_id].setText(0, subcat_caption)
         self.categories[subcat_id].setText(1, "sub-category")
+        self.categories[subcat_id].setText(2, subcat_id)
         self.categories[parent_id].addChild(self.categories[subcat_id])
         self._main_tree.setCurrentItem(self.categories[subcat_id])
 
@@ -113,6 +115,7 @@ class MainWidget(QtWidgets.QWidget):
         self.sections[section_id] = QtWidgets.QTreeWidgetItem()
         self.sections[section_id].setText(0, section_id)
         self.sections[section_id].setText(1, "section")
+        self.sections[section_id].setText(2, section_id)
         self.categories[parent_id].addChild(self.sections[section_id])
         self._main_tree.setCurrentItem(self.sections[section_id])
 

@@ -7,6 +7,7 @@ try:
     import epics
     ep = True
 except ImportError:
+    print("No epics library found")
     ep = False
 # import xml.etree.cElementTree as ET
 
