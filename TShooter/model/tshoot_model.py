@@ -231,7 +231,7 @@ class TroubleShooter(QtCore.QObject):
 
         for category in all_data['all_categories']:
             cat_data = all_data['all_categories'][category]
-            if cat_data['image'] is not None:
+            if cat_data['image'] is not None and cat_data['image'] is not '':
                 cat_data['image'] = os.path.relpath(cat_data['image'], os.path.dirname(output_file))
 
         stream = open(output_file, "w")
