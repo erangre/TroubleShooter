@@ -159,6 +159,7 @@ class SectionTests(QtTest):
 
     def setUp(self):
         self.controller = MainController()
+        self.model = self.controller.model  # type: TroubleShooter
         self.cat_id = 'first_category'
         caption = 'The first category!'
         image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
@@ -292,6 +293,11 @@ class SectionTests(QtTest):
         parent_id = self.cat_id
         self.helper_create_section(section_id_b)
 
+        # First check the model before the move:
+        cat_sections = list(self.model.get_category_by_id(parent_id)['sections'].items())
+        self.assertEqual(cat_sections[1][0], section_id_b)
+        self.assertEqual(cat_sections[1][1]['id'], section_id_b)
+
         self.controller.widget.set_selected_section(section_id_b)
         old_index = self.controller.widget.main_tree.indexFromItem(
             self.controller.widget.main_tree.selectedItems()[0]).row()
@@ -303,7 +309,43 @@ class SectionTests(QtTest):
             self.controller.widget.main_tree.selectedItems()[0]).row()
         self.assertEqual(old_index - 1, new_index)
 
-        # TODO: tets model (and write code for model. Then write the same test for move down. Maybe for move category
+        # Now check the model after the move:
+        cat_sections = list(self.model.get_category_by_id(parent_id)['sections'].items())
+        self.assertEqual(cat_sections[0][0], section_id_b)
+        self.assertEqual(cat_sections[0][1]['id'], section_id_b)
+
+    def test_move_section_down(self):
+        sys.excepthook = excepthook
+
+        section_id_a = 'section_a'
+        parent_id = self.cat_id
+        self.helper_create_section(section_id_a)
+
+        section_id_b = 'section_b'
+        parent_id = self.cat_id
+        self.helper_create_section(section_id_b)
+
+        # First check the model before the move:
+        cat_sections = list(self.model.get_category_by_id(parent_id)['sections'].items())
+        self.assertEqual(cat_sections[0][0], section_id_a)
+        self.assertEqual(cat_sections[0][1]['id'], section_id_a)
+
+        self.controller.widget.set_selected_section(section_id_a)
+        old_index = self.controller.widget.main_tree.indexFromItem(
+            self.controller.widget.main_tree.selectedItems()[0]).row()
+
+        self.controller.widget.move_tree_item_down_btn.click()
+
+        self.controller.widget.set_selected_section(section_id_a)
+        new_index = self.controller.widget.main_tree.indexFromItem(
+            self.controller.widget.main_tree.selectedItems()[0]).row()
+        self.assertEqual(old_index + 1, new_index)
+
+        # Now check the model after the move:
+        cat_sections = list(self.model.get_category_by_id(parent_id)['sections'].items())
+        self.assertEqual(cat_sections[1][0], section_id_a)
+        self.assertEqual(cat_sections[1][1]['id'], section_id_a)
+        # TODO: write the same test for move down. Maybe for move category
 
     def helper_create_category(self, cat_id, caption, image):
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])

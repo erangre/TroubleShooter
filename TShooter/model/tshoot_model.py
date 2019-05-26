@@ -114,6 +114,16 @@ class TroubleShooter(QtCore.QObject):
                     [new_section_id if solution_section_id == old_section_id else
                      sec for sec in self._all_sections[section]['solution_section_id']]
 
+    def move_section(self, parent_cat_id, section_id, direction):
+        parent_cat = self.get_category_by_id(parent_cat_id)
+        section_ind = list(parent_cat['sections'].keys()).index(section_id)
+        sections_list = list(parent_cat['sections'].items())
+        if direction == 'up' and section_ind > 0:
+            sections_list.insert(section_ind - 1, sections_list.pop(section_ind))
+        elif direction == 'down' and section_ind < len(sections_list) - 1:
+            sections_list.insert(section_ind + 1, sections_list.pop(section_ind))
+        parent_cat['sections'] = dict(sections_list)
+
     def message_counter(self, section_id):
         return len(self._all_sections[section_id]['messages'])
 

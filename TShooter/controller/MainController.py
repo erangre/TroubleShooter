@@ -48,7 +48,8 @@ class MainController(object):
         self.widget.add_section_btn.clicked.connect(self.add_section_btn_clicked)
         self.widget.edit_category_btn.clicked.connect(self.edit_category_btn_clicked)
         self.widget.remove_category_btn.clicked.connect(self.remove_category_btn_clicked)
-        self.widget.move_tree_item_up_btn.clicked.connect(self.move_tree_itm_up_btn_clicked)
+        self.widget.move_tree_item_up_btn.clicked.connect(self.move_tree_item_up_btn_clicked)
+        self.widget.move_tree_item_down_btn.clicked.connect(self.move_tree_item_down_btn_clicked)
 
         self.widget.main_tree.itemSelectionChanged.connect(self.tree_item_selection_changed)
         self.section_edit_controller.section_modified.connect(self.tree_item_selection_changed)
@@ -507,7 +508,7 @@ class MainController(object):
             self.populate_grid_view(category_id)
         return category_view_back_btn_clicked
 
-    def move_tree_itm_up_btn_clicked(self):
+    def move_tree_item_up_btn_clicked(self):
         selected_categories = self.widget.get_selected_categories()
 
         if selected_categories:
@@ -520,11 +521,24 @@ class MainController(object):
                     self.move_section(tree_item_id, 'up')
                     return
 
+    def move_tree_item_down_btn_clicked(self):
+        selected_categories = self.widget.get_selected_categories()
+
+        if selected_categories:
+            for tree_item_id, tree_item in self.widget.categories.items():
+                if selected_categories[0] == tree_item:
+                    # self.move_category(tree_item_id, 'down')
+                    pass
+            for tree_item_id, tree_item in self.widget.sections.items():
+                if selected_categories[0] == tree_item:
+                    self.move_section(tree_item_id, 'down')
+                    return
+
     def move_section(self, section_id, direction):
         tree_item = self.widget.sections.get(section_id, None)
 
         # if tree_item is not None:
         #     tree_item.setText(0, new_section_id)
         parent_id = self.model.get_section_by_id(section_id)['parent_id']
-        # self.model.move_section(section_id, 'up')
-        self.widget.move_section(parent_id, section_id, 'up')
+        self.widget.move_section(parent_id, section_id, direction)
+        self.model.move_section(parent_id, section_id, direction)
