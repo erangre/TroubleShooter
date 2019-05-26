@@ -6,7 +6,13 @@ import gc
 from qtpy import QtWidgets, QtCore, QtGui
 # from qtpy.QtTest import QTest
 from mock import MagicMock
-import epics
+try:
+    import epics
+    ep = True
+except ModuleNotFoundError:
+    from ...controller.utils import FakeEpics
+    epics = FakeEpics()
+    ep = False
 from ..utility import QtTest, click_button
 
 import time
@@ -107,7 +113,10 @@ class SaveLoadInDifferentFolders(QtTest):
     def helper_create_pv_message(self, message, pv):
         QtWidgets.QInputDialog.getItem = MagicMock(return_value=['PV_string', True])
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[message, True], [pv, True]])
-        epics.caget = MagicMock(return_value=37077)
+        if ep:
+            epics.caget = MagicMock(return_value='37077')
+        else:
+            FakeEpics.caget = MagicMock(return_value='37077')
 
         self.widget.section_edit_pane.add_message_btn.click()
 
