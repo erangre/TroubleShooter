@@ -8,6 +8,8 @@ try:
     import epics
     ep = True
 except ImportError:
+    from .utils import FakeEpics
+    epics = FakeEpics()
     ep = False
 # import xml.etree.cElementTree as ET
 
@@ -302,7 +304,7 @@ class MainController(object):
                 if self.model.search_string:
                     msg = self.highlight_msg(msg, self.model.search_string)
 
-            if ep and msg_type == PV:
+            if msg_type == PV:
                 msg = self.highlight_msg(msg, '{}')
                 msg = msg.format(epics.caget(pv, as_string=True))
             self.widget.section_view_pane.messages.append(QtWidgets.QLabel(msg))

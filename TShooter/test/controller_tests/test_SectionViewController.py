@@ -4,8 +4,14 @@ import gc
 # import numpy as np
 from qtpy import QtWidgets, QtCore, QtGui
 # from qtpy.QtTest import QTest
-from mock import MagicMock
-import epics
+from mock import MagicMock, Mock
+try:
+    import epics
+    ep = True
+except ModuleNotFoundError:
+    from ...controller.utils import FakeEpics
+    epics = FakeEpics()
+    ep = False
 from ..utility import QtTest, click_button
 
 from ...controller.MainController import MainController
@@ -64,7 +70,10 @@ class ViewSectionTests(QtTest):
         self.expected_message_3 = self.message_3.format(test_value)
         QtWidgets.QInputDialog.getItem = MagicMock(return_value=['PV_string', True])
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[self.message_3, True], [self.pv, True]])
-        epics.caget = MagicMock(return_value=37077)
+        if ep:
+            epics.caget = MagicMock(return_value='37077')
+        else:
+            FakeEpics.caget = MagicMock(return_value='37077')
 
         self.widget.section_edit_pane.add_message_btn.click()
 
