@@ -542,3 +542,4 @@ class MainController(object):
         parent_id = self.model.get_section_by_id(section_id)['parent_id']
         self.widget.move_section(parent_id, section_id, direction)
         self.model.move_section(parent_id, section_id, direction)
+        self.widget.set_selected_section(section_id)
