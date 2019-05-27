@@ -164,7 +164,7 @@ class MainWidget(QtWidgets.QWidget):
                     category = self.main_tree.takeTopLevelItem(category_ind)
                     self.main_tree.insertTopLevelItem(category_ind - 1, category)
             elif direction == 'down':
-                if category_ind < self.main_tree.topLevelItemCount():
+                if category_ind < self.main_tree.topLevelItemCount() - 1:
                     category = self.main_tree.takeTopLevelItem(category_ind)
                     self.main_tree.insertTopLevelItem(category_ind + 1, category)
         else:

@@ -450,7 +450,6 @@ class SectionTests(QtTest):
         cat_sections = list(self.model.get_category_by_id(parent_id)['sections'].items())
         self.assertEqual(cat_sections[1][0], section_id_a)
         self.assertEqual(cat_sections[1][1]['id'], section_id_a)
-        # TODO: write the same test for move down. Maybe for move category
 
     def helper_create_category(self, cat_id, caption, image):
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])
