@@ -144,6 +144,59 @@ class CategoryTests(QtTest):
         self.assertEqual(self.controller.model.get_category_by_id(cat_id)['image'], new_image)
         self.assertEqual(self.controller.widget.categories.get(cat_id, None).text(0), new_caption)
 
+    def test_move_category_up(self):
+        # sys.excepthook = excepthook
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
+        cat_id_a = 'cat_a'
+        caption_a = 'cat a'
+        cat_id_b = 'cat_b'
+        caption_b = 'cat b'
+        self.helper_create_category(cat_id_a, caption_a, image)
+        self.controller.widget.set_selected_category("main")
+        self.helper_create_category(cat_id_b, caption_b, image)
+
+        self.controller.widget.set_selected_category(cat_id_b)
+
+        old_index = self.controller.widget.main_tree.indexFromItem(
+            self.controller.widget.main_tree.selectedItems()[0]).row()
+
+        self.controller.widget.move_tree_item_up_btn.click()
+        self.controller.widget.set_selected_category(cat_id_b)
+
+        new_index = self.controller.widget.main_tree.indexFromItem(
+            self.controller.widget.main_tree.selectedItems()[0]).row()
+
+        self.assertEqual(old_index - 1, new_index)
+
+        # section_id_a = 'section_a'
+        # parent_id = self.cat_id
+        # self.helper_create_section(section_id_a)
+        #
+        # section_id_b = 'section_b'
+        # parent_id = self.cat_id
+        # self.helper_create_section(section_id_b)
+        #
+        # # First check the model before the move:
+        # cat_sections = list(self.model.get_category_by_id(parent_id)['sections'].items())
+        # self.assertEqual(cat_sections[1][0], section_id_b)
+        # self.assertEqual(cat_sections[1][1]['id'], section_id_b)
+        #
+        # self.controller.widget.set_selected_section(section_id_b)
+        # old_index = self.controller.widget.main_tree.indexFromItem(
+        #     self.controller.widget.main_tree.selectedItems()[0]).row()
+        #
+        # self.controller.widget.move_tree_item_up_btn.click()
+        #
+        # self.controller.widget.set_selected_section(section_id_b)
+        # new_index = self.controller.widget.main_tree.indexFromItem(
+        #     self.controller.widget.main_tree.selectedItems()[0]).row()
+        # self.assertEqual(old_index - 1, new_index)
+        #
+        # # Now check the model after the move:
+        # cat_sections = list(self.model.get_category_by_id(parent_id)['sections'].items())
+        # self.assertEqual(cat_sections[0][0], section_id_b)
+        # self.assertEqual(cat_sections[0][1]['id'], section_id_b)
+
     def helper_create_category(self, cat_id, caption, image):
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])
         QtWidgets.QFileDialog.getOpenFileName = MagicMock(return_value=[image, ''])
@@ -283,8 +336,6 @@ class SectionTests(QtTest):
         self.assertTrue(new_section_id in self.controller.model.get_category_by_id(parent_id)['sections'])
 
     def test_move_section_up(self):
-        sys.excepthook = excepthook
-
         section_id_a = 'section_a'
         parent_id = self.cat_id
         self.helper_create_section(section_id_a)
@@ -315,8 +366,6 @@ class SectionTests(QtTest):
         self.assertEqual(cat_sections[0][1]['id'], section_id_b)
 
     def test_move_section_down(self):
-        sys.excepthook = excepthook
-
         section_id_a = 'section_a'
         parent_id = self.cat_id
         self.helper_create_section(section_id_a)

@@ -156,6 +156,27 @@ class MainWidget(QtWidgets.QWidget):
             self.categories[parent_id].removeChild(tree_item)
             del self.sections[tree_item_id]
 
+    def move_category(self, parent_id, category_id, direction):
+        category_ind = self.main_tree.indexFromItem(self.main_tree.selectedItems()[0]).row()
+        if parent_id == 'main':
+            if direction == 'up':
+                if category_ind > 1:
+                    category = self.main_tree.takeTopLevelItem(category_ind)
+                    self.main_tree.insertTopLevelItem(category_ind - 1, category)
+            elif direction == 'down':
+                if category_ind < self.main_tree.topLevelItemCount() - 1:
+                    category = self.main_tree.takeTopLevelItem(category_ind)
+                    self.main_tree.insertTopLevelItem(category_ind + 1, category)
+        else:
+            if direction == 'up':
+                if category_ind > 0:
+                    category = self.categories[parent_id].takeChild(category_ind)
+                    self.categories[parent_id].insertChild(category_ind - 1, category)
+            elif direction == 'down':
+                if category_ind < self.categories[parent_id].childCount() - 1:
+                    category = self.categories[parent_id].takeChild(category_ind)
+                    self.categories[parent_id].insertChild(category_ind + 1, category)
+
     def get_index_of_top_level_tree_item(self, tree_item_id):
         return self.main_tree.indexOfTopLevelItem(self.categories[tree_item_id])
 

@@ -514,7 +514,7 @@ class MainController(object):
         if selected_categories:
             for tree_item_id, tree_item in self.widget.categories.items():
                 if selected_categories[0] == tree_item:
-                    # self.move_category(tree_item_id, 'up')
+                    self.move_category(tree_item_id, 'up')
                     pass
             for tree_item_id, tree_item in self.widget.sections.items():
                 if selected_categories[0] == tree_item:
@@ -535,11 +535,13 @@ class MainController(object):
                     return
 
     def move_section(self, section_id, direction):
-        tree_item = self.widget.sections.get(section_id, None)
-
-        # if tree_item is not None:
-        #     tree_item.setText(0, new_section_id)
         parent_id = self.model.get_section_by_id(section_id)['parent_id']
         self.widget.move_section(parent_id, section_id, direction)
         self.model.move_section(parent_id, section_id, direction)
         self.widget.set_selected_section(section_id)
+
+    def move_category(self, category_id, direction):
+        parent_id = self.model.get_category_by_id(category_id)['parent_id']
+        self.widget.move_category(parent_id, category_id, direction)
+        # self.model.move_category(parent_id, category_id, direction)
+        self.widget.set_selected_category(category_id)
