@@ -62,6 +62,16 @@ class TroubleShooter(QtCore.QObject):
         del self._all_categories[category_id]
         return parent_category_id
 
+    def move_category(self, parent_cat_id, category_id, direction):
+        parent_cat = self.get_category_by_id(parent_cat_id)
+        category_ind = list(parent_cat['subcategories'].keys()).index(category_id)
+        categories_list = list(parent_cat['subcategories'].items())
+        if direction == 'up' and category_ind > 0:
+            categories_list.insert(category_ind - 1, categories_list.pop(category_ind))
+        elif direction == 'down' and category_ind < len(categories_list) - 1:
+            categories_list.insert(category_ind + 1, categories_list.pop(category_ind))
+        parent_cat['subcategories'] = dict(categories_list)
+
     def section_counter(self, category_id):
         return len(self._all_categories[category_id]['sections'])
 

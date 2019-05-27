@@ -25,6 +25,7 @@ class CategoryTests(QtTest):
 
     def setUp(self):
         self.controller = MainController()
+        self.model = self.controller.model  # type: TroubleShooter
         # sys.excepthook = excepthook
 
     def tearDown(self):
@@ -147,6 +148,7 @@ class CategoryTests(QtTest):
     def test_move_category_up(self):
         # sys.excepthook = excepthook
         image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
+        parent_id = 'main'
         cat_id_a = 'cat_a'
         caption_a = 'cat a'
         cat_id_b = 'cat_b'
@@ -156,6 +158,11 @@ class CategoryTests(QtTest):
         self.helper_create_category(cat_id_b, caption_b, image)
 
         self.controller.widget.set_selected_category(cat_id_b)
+
+        # First check the model before the move:
+        cat_subcats = list(self.model.get_category_by_id(parent_id)['subcategories'].items())
+        self.assertEqual(cat_subcats[1][0], cat_id_b)
+        self.assertEqual(cat_subcats[1][1]['id'], cat_id_b)
 
         old_index = self.controller.widget.main_tree.indexFromItem(
             self.controller.widget.main_tree.selectedItems()[0]).row()
@@ -168,34 +175,83 @@ class CategoryTests(QtTest):
 
         self.assertEqual(old_index - 1, new_index)
 
-        # section_id_a = 'section_a'
-        # parent_id = self.cat_id
-        # self.helper_create_section(section_id_a)
-        #
-        # section_id_b = 'section_b'
-        # parent_id = self.cat_id
-        # self.helper_create_section(section_id_b)
-        #
-        # # First check the model before the move:
-        # cat_sections = list(self.model.get_category_by_id(parent_id)['sections'].items())
-        # self.assertEqual(cat_sections[1][0], section_id_b)
-        # self.assertEqual(cat_sections[1][1]['id'], section_id_b)
-        #
-        # self.controller.widget.set_selected_section(section_id_b)
-        # old_index = self.controller.widget.main_tree.indexFromItem(
-        #     self.controller.widget.main_tree.selectedItems()[0]).row()
-        #
-        # self.controller.widget.move_tree_item_up_btn.click()
-        #
-        # self.controller.widget.set_selected_section(section_id_b)
-        # new_index = self.controller.widget.main_tree.indexFromItem(
-        #     self.controller.widget.main_tree.selectedItems()[0]).row()
-        # self.assertEqual(old_index - 1, new_index)
-        #
-        # # Now check the model after the move:
-        # cat_sections = list(self.model.get_category_by_id(parent_id)['sections'].items())
-        # self.assertEqual(cat_sections[0][0], section_id_b)
-        # self.assertEqual(cat_sections[0][1]['id'], section_id_b)
+        # Then check the model after the move:
+        cat_subcats = list(self.model.get_category_by_id(parent_id)['subcategories'].items())
+        self.assertEqual(cat_subcats[0][0], cat_id_b)
+        self.assertEqual(cat_subcats[0][1]['id'], cat_id_b)
+
+    def test_move_category_down(self):
+        # sys.excepthook = excepthook
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
+        parent_id = 'main'
+        cat_id_a = 'cat_a'
+        caption_a = 'cat a'
+        cat_id_b = 'cat_b'
+        caption_b = 'cat b'
+        self.helper_create_category(cat_id_a, caption_a, image)
+        self.controller.widget.set_selected_category("main")
+        self.helper_create_category(cat_id_b, caption_b, image)
+
+        self.controller.widget.set_selected_category(cat_id_a)
+
+        # First check the model before the move:
+        cat_subcats = list(self.model.get_category_by_id(parent_id)['subcategories'].items())
+        self.assertEqual(cat_subcats[0][0], cat_id_a)
+        self.assertEqual(cat_subcats[0][1]['id'], cat_id_a)
+
+        old_index = self.controller.widget.main_tree.indexFromItem(
+            self.controller.widget.main_tree.selectedItems()[0]).row()
+
+        self.controller.widget.move_tree_item_down_btn.click()
+        self.controller.widget.set_selected_category(cat_id_a)
+
+        new_index = self.controller.widget.main_tree.indexFromItem(
+            self.controller.widget.main_tree.selectedItems()[0]).row()
+
+        self.assertEqual(old_index + 1, new_index)
+
+        # Then check the model after the move:
+        cat_subcats = list(self.model.get_category_by_id(parent_id)['subcategories'].items())
+        self.assertEqual(cat_subcats[1][0], cat_id_a)
+        self.assertEqual(cat_subcats[1][1]['id'], cat_id_a)
+
+    def test_move_subcategory_up(self):
+        # sys.excepthook = excepthook
+        image = os.path.normpath(os.path.join(data_path, "images/beam_status.png"))
+        parent_id = 'cat_a'
+        cat_id_a = 'cat_a'
+        caption_a = 'cat a'
+        cat_id_b = 'cat_b'
+        caption_b = 'cat b'
+        cat_id_c = 'cat_c'
+        caption_c = 'cat c'
+        self.helper_create_category(cat_id_a, caption_a, image)
+        self.helper_create_category(cat_id_b, caption_b, image)
+        self.controller.widget.set_selected_category("cat_a")
+        self.helper_create_category(cat_id_c, caption_c, image)
+
+        self.controller.widget.set_selected_category(cat_id_c)
+
+        # First check the model before the move:
+        cat_subcats = list(self.model.get_category_by_id(parent_id)['subcategories'].items())
+        self.assertEqual(cat_subcats[1][0], cat_id_c)
+        self.assertEqual(cat_subcats[1][1]['id'], cat_id_c)
+
+        old_index = self.controller.widget.main_tree.indexFromItem(
+            self.controller.widget.main_tree.selectedItems()[0]).row()
+
+        self.controller.widget.move_tree_item_up_btn.click()
+        self.controller.widget.set_selected_category(cat_id_c)
+
+        new_index = self.controller.widget.main_tree.indexFromItem(
+            self.controller.widget.main_tree.selectedItems()[0]).row()
+
+        self.assertEqual(old_index - 1, new_index)
+
+        # Then check the model after the move:
+        cat_subcats = list(self.model.get_category_by_id(parent_id)['subcategories'].items())
+        self.assertEqual(cat_subcats[0][0], cat_id_c)
+        self.assertEqual(cat_subcats[0][1]['id'], cat_id_c)
 
     def helper_create_category(self, cat_id, caption, image):
         QtWidgets.QInputDialog.getText = MagicMock(side_effect=[[cat_id, True], [caption, True]])
