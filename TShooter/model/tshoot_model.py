@@ -70,7 +70,7 @@ class TroubleShooter(QtCore.QObject):
             categories_list.insert(category_ind - 1, categories_list.pop(category_ind))
         elif direction == 'down' and category_ind < len(categories_list) - 1:
             categories_list.insert(category_ind + 1, categories_list.pop(category_ind))
-        parent_cat['subcategories'] = dict(categories_list)
+        parent_cat['subcategories'] = OrderedDict(categories_list)
 
     def section_counter(self, category_id):
         return len(self._all_categories[category_id]['sections'])
@@ -132,7 +132,7 @@ class TroubleShooter(QtCore.QObject):
             sections_list.insert(section_ind - 1, sections_list.pop(section_ind))
         elif direction == 'down' and section_ind < len(sections_list) - 1:
             sections_list.insert(section_ind + 1, sections_list.pop(section_ind))
-        parent_cat['sections'] = dict(sections_list)
+        parent_cat['sections'] = OrderedDict(sections_list)
 
     def message_counter(self, section_id):
         return len(self._all_sections[section_id]['messages'])

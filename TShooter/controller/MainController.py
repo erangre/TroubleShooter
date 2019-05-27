@@ -407,15 +407,15 @@ class MainController(object):
         self.widget.main_tree.blockSignals(True)
         for category_id in all_data['all_categories']:
             category = all_data['all_categories'][category_id]
-            if category['id'] == 'main':
-                continue
-            if category['parent_id'] == "main":
-                self.widget.add_category(category['id'], category['caption'])
-            else:
-                self.widget.add_subcategory(category['parent_id'], category['id'], category['caption'])
-        for section_id in all_data['all_sections']:
-            section = all_data['all_sections'][section_id]
-            self.widget.add_section(section['parent_id'], section_id)
+            for sub_category_id, sub_category in category['subcategories'].items():
+                if category['id'] == 'main':
+                    self.widget.add_category(sub_category['id'], sub_category['caption'])
+                else:
+                    self.widget.add_subcategory(sub_category['parent_id'], sub_category['id'], sub_category['caption'])
+
+                for section_id in sub_category['sections']:
+                    section = all_data['all_sections'][section_id]
+                    self.widget.add_section(section['parent_id'], section_id)
 
         if not open_in_edit_mode == QtWidgets.QMessageBox.Yes:
             self.widget.set_selected_category('main')
@@ -515,7 +515,7 @@ class MainController(object):
             for tree_item_id, tree_item in self.widget.categories.items():
                 if selected_categories[0] == tree_item:
                     self.move_category(tree_item_id, 'up')
-                    pass
+                    return
             for tree_item_id, tree_item in self.widget.sections.items():
                 if selected_categories[0] == tree_item:
                     self.move_section(tree_item_id, 'up')
