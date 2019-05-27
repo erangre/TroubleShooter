@@ -17,7 +17,7 @@ from ..model.tshoot_model import TroubleShooter, SECTION_SOLUTION, IMAGE, TEXT, 
 from ..widget.MainWidget import MainWidget
 from .SectionEditController import SectionEditController
 from .SectionViewController import SectionViewController
-from ..widget.utils import QMsgBoxOKCancel, QMsgBoxNoYes
+from ..widget.utils import QMsgBoxOKCancel, QMsgBoxNoYes, QWarningBox
 
 DEFAULT_IMAGE = ''
 
@@ -70,6 +70,7 @@ class MainController(object):
         # prevent adding a subcategory in a section
         for tree_item_id, tree_item in self.widget.sections.items():
             if self.widget.get_selected_categories()[0] == tree_item:
+                QWarningBox('Cannot add a subcategory in a section!')
                 return
 
         if self.widget.get_selected_categories():
