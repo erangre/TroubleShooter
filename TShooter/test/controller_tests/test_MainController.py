@@ -749,7 +749,7 @@ class SearchTests(QtTest):
         # sys.excepthook = excepthook
         self.widget.search_le.setText('age')
         self.assertEqual(self.widget.search_results_table.rowCount(), 3)
-        # make sure table clear sto zero rows
+        # make sure table clears to zero rows so that rows don't get added again when search term changes
         self.widget.search_le.setText('ag')
         self.assertEqual(self.widget.search_results_table.rowCount(), 3)
 

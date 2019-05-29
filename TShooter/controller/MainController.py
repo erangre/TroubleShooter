@@ -450,6 +450,9 @@ class MainController(object):
             search_result_text = QtWidgets.QTableWidgetItem(search_result['text'])
             search_result_text.setFlags(search_result_text.flags() & ~QtCore.Qt.ItemIsEditable)
             self.widget.search_results_table.setItem(current_rows, 1, search_result_text)
+            # this sets te search result as a label, but it causes problems. some clicks don't work, and it doens't mark when selected.
+            # search_result_lbl = QtWidgets.QLabel(self.highlight_msg(search_result['text'], search_string))
+            # self.widget.search_results_table.setCellWidget(current_rows, 1, search_result_lbl)
             search_result_type = QtWidgets.QTableWidgetItem(search_result['type'])
             search_result_type.setFlags(search_result_type.flags() & ~QtCore.Qt.ItemIsEditable)
             self.widget.search_results_table.setItem(current_rows, 2, search_result_type)
