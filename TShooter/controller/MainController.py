@@ -83,6 +83,7 @@ class MainController(object):
         # prevent subcategories being made in category with sections
         for section_id, section in self.widget.sections.items():
             if self.model.get_section_by_id(section_id)['parent_id'] == parent_id:
+                QWarningBox('Cannot add a subcategory in a category containing a section!')
                 return
 
         subcat_id, ok = QtWidgets.QInputDialog.getText(self.widget, 'Create a new subcategory', 'Category ID')
@@ -98,6 +99,7 @@ class MainController(object):
             subcat_image = DEFAULT_IMAGE
 
         if self.model.get_category_by_id(subcat_id) or subcat_id == '' or subcat_caption == '':
+            QWarningBox('Cannot add a category with an existing name or no name')
             return
 
         self.model.add_subcategory(parent_id, subcat_id, subcat_caption, subcat_image)
@@ -128,6 +130,7 @@ class MainController(object):
         # prevent sections being made in category with subcategory
         for category_id, category in self.widget.categories.items():
             if self.model.get_category_by_id(category_id)['parent_id'] == parent_id:
+                QWarningBox('Cannot add a section in a category with subcategories!')
                 return
 
         if section_id is None:
@@ -135,7 +138,9 @@ class MainController(object):
             if not ok:
                 return
         if self.model.get_section_by_id(section_id) or section_id == '':
+            QWarningBox('Cannot add a section with a name which already exists or with no name!')
             return
+
         self.model.add_section_to_category(parent_id, section_id, section_id)
         self.widget.add_section(parent_id, section_id)
 
@@ -178,6 +183,10 @@ class MainController(object):
         if not ok:
             return
 
+        if self.model.get_section_by_id(new_section_id) or new_section_id == '':
+            QWarningBox('Cannot change section to a name which already exists or with no name!')
+            return
+        
         if tree_item is not None:
             tree_item.setText(0, new_section_id)
         parent_id = self.model.get_section_by_id(section_id)['parent_id']
