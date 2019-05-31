@@ -186,7 +186,7 @@ class MainController(object):
         if self.model.get_section_by_id(new_section_id) or new_section_id == '':
             QWarningBox('Cannot change section to a name which already exists or with no name!')
             return
-        
+
         if tree_item is not None:
             tree_item.setText(0, new_section_id)
         parent_id = self.model.get_section_by_id(section_id)['parent_id']

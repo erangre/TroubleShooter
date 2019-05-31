@@ -11,6 +11,7 @@ class SectionViewPage(QtWidgets.QWidget):
         super(SectionViewPage, self).__init__(*args, **kwargs)
         self.create_widgets()
         self.arrange_section_layout()
+        self.set_widget_properties()
         self.messages = []
         self.choices = []
 
@@ -21,6 +22,10 @@ class SectionViewPage(QtWidgets.QWidget):
         self.solution_message_lbl.setWordWrap(True)
         self.previous_section_btn = QtWidgets.QPushButton('Previous')
         self.next_section_btn = QtWidgets.QPushButton('Next')
+
+    def set_widget_properties(self):
+        self.section_caption_lbl.setStyleSheet("font-size: 18pt;"
+                                               "color: lime;")
 
     def arrange_section_layout(self):
         self._outer_layout = QtWidgets.QVBoxLayout()
