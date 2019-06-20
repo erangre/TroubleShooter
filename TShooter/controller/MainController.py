@@ -506,7 +506,7 @@ class MainController(object):
                 self.widget.add_category_grid_btn(caption, image)
                 self.widget.get_last_category_btn().clicked.connect(partial(self.grid_view_section_btn_clicked,
                                                                             section_id))
-        self.widget._category_view_layout.addStretch(1)
+        self.widget._category_view_grid.addStretch(1)
 
     def grid_view_subcat_btn_clicked(self, category_id):
         self.widget.clear_grid_view()
