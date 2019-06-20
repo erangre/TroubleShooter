@@ -234,7 +234,7 @@ class MainWidget(QtWidgets.QWidget):
         self._hlayout.removeWidget(self.section_edit_pane)
         self.section_edit_pane.setVisible(False)
         self.view_mode = True
-        # TODO: Check if this needs to be called:
+        # TODO: Look slike this does not need to be called, and there is no need for the function:
         # self.fill_view_category_frame('main')
 
     def toggle_search_mode(self, toggle):
@@ -250,23 +250,23 @@ class MainWidget(QtWidgets.QWidget):
             self._category_view_layout.insertWidget(0, self.search_le)
         self.search_le.setFocus()
 
-    def fill_view_category_frame(self, category_id):
-
-        if category_id == 'main' or category_id == 'Main':
-            for ind in range(self.main_tree.topLevelItemCount()):
-                top_level_cat = self.main_tree.topLevelItem(ind)
-                caption = top_level_cat.text(0)
-                if not (caption == 'Main' or caption == 'main'):
-                    self._category_grid_btns.append(QtWidgets.QPushButton(caption))
-                    self._category_view_grid.addWidget(self._category_grid_btns[-1])
-        else:
-            current_category_item = self.categories[category_id]
-            print(current_category_item)
-            for ind in range(current_category_item.childCount()):
-                print("adding child number ", ind)
-                child_cat = current_category_item.child(ind)
-                self._category_grid_btns.append(QtWidgets.QPushButton(child_cat.text(0)))
-                self._category_view_grid.addWidget(self._category_grid_btns[-1])
+    # def fill_view_category_frame(self, category_id):
+    #
+    #     if category_id == 'main' or category_id == 'Main':
+    #         for ind in range(self.main_tree.topLevelItemCount()):
+    #             top_level_cat = self.main_tree.topLevelItem(ind)
+    #             caption = top_level_cat.text(0)
+    #             if not (caption == 'Main' or caption == 'main'):
+    #                 self._category_grid_btns.append(QtWidgets.QPushButton(caption))
+    #                 self._category_view_grid.addWidget(self._category_grid_btns[-1])
+    #     else:
+    #         current_category_item = self.categories[category_id]
+    #         print(current_category_item)
+    #         for ind in range(current_category_item.childCount()):
+    #             print("adding child number ", ind)
+    #             child_cat = current_category_item.child(ind)
+    #             self._category_grid_btns.append(QtWidgets.QPushButton(child_cat.text(0)))
+    #             self._category_view_grid.addWidget(self._category_grid_btns[-1])
 
     def clear_grid_view(self):
         self._category_grid_btns = []

@@ -424,5 +424,3 @@ class SearchTest(QtTest):
     def test_search_is_not_case_sensitive(self):
         found_solution_messages = self.model.find_search_string_in_all('Prob')
         self.assertEqual(len(found_solution_messages), 4)
-
-        # TODO: give warning when trying to add cat with same id or section with same id
