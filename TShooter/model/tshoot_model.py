@@ -119,10 +119,9 @@ class TroubleShooter(QtCore.QObject):
         self._all_sections = OrderedDict(
             (new_section_id if k == old_section_id else k, v) for k, v in self._all_sections.items())
         for section in self._all_sections:
-            for solution_section_id in self._all_sections[section]['solution_section_id']:
-                self._all_sections[section]['solution_section_id'] = \
-                    [new_section_id if solution_section_id == old_section_id else
-                     sec for sec in self._all_sections[section]['solution_section_id']]
+            self._all_sections[section]['solution_section_id'] = \
+                [new_section_id if sec == old_section_id else
+                 sec for sec in self._all_sections[section]['solution_section_id']]
 
     def move_section(self, parent_cat_id, section_id, direction):
         parent_cat = self.get_category_by_id(parent_cat_id)
